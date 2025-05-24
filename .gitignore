@@ -7,7 +7,8 @@ yarn-debug.log*
 yarn-error.log*
 dist/
 build/
-
+# Ignore all JSON files (use carefully)
+*.json
 # -------------------------------
 # Environment Variables
 # -------------------------------
