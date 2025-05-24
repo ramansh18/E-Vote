@@ -1,0 +1,360 @@
+const Election = require("../models/Election");
+const { web3,contracts } = require("../web3/index.js");
+const {electionContract} = contracts;
+const { votingContract,candidateRegistrationContract } = contracts;
+const deployedAddresses = require("../../contractAddresses.json");
+require("dotenv").config({ path: "../.env" });
+const Candidate = require("../models/Candidate.js")
+
+
+
+
+// ✅ Create Election (Off-chain)
+exports.createElection = async (req, res) => {
+    try {
+        const { title, description, candidates, startTime, endTime } = req.body;
+        const latestElection = await Election.findOne().sort({ electionNumber: -1 });
+        const newElectionNumber = latestElection ? latestElection.electionNumber + 1 : 1;
+
+        const newElection = new Election({
+            title,
+            description,
+            candidates,
+            startTime,
+            endTime,
+            electionNumber: newElectionNumber,
+            status: "upcoming"
+        });
+
+        await newElection.save();
+        res.status(201).json({ message: "Election created successfully!", election: newElection });
+    } catch (error) {
+        console.error("Election creation failed:", error);
+        res.status(500).json({ message: "Error creating election", error });
+    }
+};
+
+// ✅ Get All Elections (Off-chain)
+exports.getElections = async (req, res) => {
+    try {
+        const elections = await Election.find();
+        res.status(200).json(elections);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching elections", error });
+    }
+};
+exports.getAvailableElections = async (req, res) => {
+    try {
+      const elections = await Election.find({
+        status: { $in: ["ongoing", "upcoming"] },
+      });
+  
+      res.status(200).json(elections);
+    } catch (error) {
+      console.error("Error fetching elections:", error.message);
+      res.status(500).json({ message: "Failed to load elections" });
+    }
+  };
+// ✅ Get Single Election (Off-chain)
+exports.getElectionById = async (req, res) => {
+    try {
+        const election = await Election.findById(req.params.id);
+        if (!election) {
+            return res.status(404).json({ message: "Election not found" });
+        }
+        res.status(200).json(election);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching election", error });
+    }
+};
+
+// ✅ Start Election (On-chain + update DB)
+exports.startElection = async (req, res) => {
+    try {
+        const { duration } = req.body;
+        const election = await Election.findById(req.params.id);
+        if (!election) {
+            return res.status(404).json({ message: "Election not found" });
+        }
+
+        // Check if there are any approved candidates for this election
+        const approvedCandidates = await Candidate.find({ electionId: election._id,  status: "approved" });
+        if (approvedCandidates.length === 0) {
+            return res.status(400).json({ message: "No approved candidates for this election." });
+        }
+
+        console.log("Approved candidates for election:", approvedCandidates);
+
+
+        // Set up relayer for gasless transactions
+        const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
+        const relayerWallet = web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
+
+        // Add each approved candidate to the Voting contract
+        for (let candidate of approvedCandidates) {
+            const candidateAddress = candidate.walletAddress; // Assuming the candidate's address is stored in the 'address' field
+
+            // Add candidate to the Voting contract
+            const txDataAddCandidate = votingContract.methods.addCandidate(candidateAddress).encodeABI();
+
+            // Estimate gas for adding candidate
+            const gasAddCandidate = await web3.eth.estimateGas({
+                to: deployedAddresses.voting, // Use the deployed Voting contract address
+                data: txDataAddCandidate,
+                from: relayerWallet.address
+            });
+
+            // Get the gas price
+            const gasPriceAddCandidate = await web3.eth.getGasPrice();
+
+            // Sign the transaction to add the candidate
+            const signedTxAddCandidate = await web3.eth.accounts.signTransaction(
+                {
+                    to: deployedAddresses.voting, // Use the deployed Voting contract address
+                    data: txDataAddCandidate,
+                    gas: gasAddCandidate,
+                    gasPrice: gasPriceAddCandidate,
+                    from: relayerWallet.address
+                },
+                relayerPrivateKey
+            );
+
+            // Send the signed transaction to add the candidate
+            await web3.eth.sendSignedTransaction(signedTxAddCandidate.rawTransaction);
+        }
+
+        // Now, start the election in the Election contract
+        const txDataStartElection = electionContract.methods.startElection(duration).encodeABI();
+
+        // Estimate gas for starting the election
+        const gasStartElection = await web3.eth.estimateGas({
+            to: deployedAddresses.election, // Use the deployed Election contract address
+            data: txDataStartElection,
+            from: relayerWallet.address
+        });
+
+        // Get the gas price for the start election transaction
+        const gasPriceStartElection = await web3.eth.getGasPrice();
+
+        // Sign the transaction to start the election
+        const signedTxStartElection = await web3.eth.accounts.signTransaction(
+            {
+                to: deployedAddresses.election, // Use the deployed Election contract address
+                data: txDataStartElection,
+                gas: gasStartElection,
+                gasPrice: gasPriceStartElection,
+                from: relayerWallet.address
+            },
+            relayerPrivateKey
+        );
+
+        // Send the signed transaction to start the election
+        const tx = await web3.eth.sendSignedTransaction(signedTxStartElection.rawTransaction);
+
+        // Update the election status to 'ongoing'
+        election.status = "ongoing";
+        await election.save();
+
+        res.status(200).json({
+            message: "Election started successfully!",
+            election,
+            txHash: tx.transactionHash // Return the transaction hash
+        });
+    } catch (error) {
+        console.error("Error in startElection:", error);
+        res.status(500).json({ message: "Error starting election", error });
+    }
+};
+
+
+// ✅ End Election (On-chain + update DB)
+exports.endElection = async (req, res) => {
+    try {
+        const election = await Election.findById(req.params.id);
+        if (!election) {
+            return res.status(404).json({ message: "Election not found" });
+        }
+
+        const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
+        const relayerWallet = web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
+
+        const txData = electionContract.methods.endElection().encodeABI();
+
+        // Estimate gas
+        const gas = await web3.eth.estimateGas({
+            to: deployedAddresses.election, // Use the deployed contract address
+            data: txData,
+            from: relayerWallet.address
+        });
+
+        // Get the gas price
+        const gasPrice = await web3.eth.getGasPrice();
+
+        // Sign the transaction
+        const signedTx = await web3.eth.accounts.signTransaction(
+            {
+                to: deployedAddresses.election,
+                data: txData,
+                gas,
+                gasPrice,
+                from: relayerWallet.address
+            },
+            relayerPrivateKey
+        );
+
+        // Send the signed transaction
+        const tx = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        // Update the election status to "completed"
+        election.status = "completed";
+        await election.save();
+
+        res.status(200).json({
+            message: "Election ended successfully!",
+            election,
+            txHash: tx.transactionHash // Return the transaction hash
+        });
+    } catch (error) {
+        console.error("Error in endElection:", error);
+        res.status(500).json({ message: "Error ending election", error });
+    }
+};
+
+
+// ✅ Delete Election (Off-chain)
+exports.deleteElection = async (req, res) => {
+    try {
+        const election = await Election.findById(req.params.id);
+        if (!election) {
+            return res.status(404).json({ message: "Election not found" });
+        }
+
+        if (election.status === "ongoing") {
+            return res.status(400).json({ message: "Cannot delete an ongoing election." });
+        }
+
+        // Directly delete the election
+        await Election.findByIdAndDelete(req.params.id);
+        console.log(`Election with ID: ${req.params.id} deleted successfully.`);
+        res.status(200).json({ message: "Election deleted successfully!" });
+    } catch (error) {
+        console.error('Error deleting election:', error);
+        res.status(500).json({ message: "Error deleting election", error });
+    }
+};
+
+exports.getApprovedCandidatesForElection = async (req, res) => {
+    try {
+      const { electionId } = req.params;
+  
+      // Fetch all approved candidates for the given election from MongoDB
+      const approvedCandidates = await Candidate.find({
+        electionId: electionId,
+        status: "approved"
+      })
+        .populate('userId', 'name email')
+        .exec();
+  
+      if (approvedCandidates.length === 0) {
+        return res.status(404).json({ message: "No approved candidates found for this election." });
+      }
+  
+      // Get all candidates from the blockchain
+      const blockchainCandidates = await votingContract.methods.getAllCandidates().call();
+      const blockchainAddresses = blockchainCandidates.map(addr => addr.toLowerCase());
+  
+      // Filter candidates whose walletAddress matches any on the blockchain (case-insensitive)
+      const finalCandidates = approvedCandidates.filter(candidate =>
+        blockchainAddresses.includes(candidate.walletAddress.toLowerCase())
+      );
+  
+      if (finalCandidates.length === 0) {
+        return res.status(404).json({ message: "No candidates found on the blockchain for this election." });
+      }
+  
+      // Prepare final response data
+      const finalCandidateData = finalCandidates.map(candidate => ({
+        _id: candidate._id,
+        walletAddress: candidate.walletAddress,
+        party: candidate.party,
+        user: candidate.userId, // Populated user details
+      }));
+  
+      res.status(200).json({ candidates: finalCandidateData });
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+      res.status(500).json({ message: "Failed to fetch candidates", error: error.message });
+    }
+  };
+  
+  
+  exports.updateElectionVotes = async (req, res) => {
+    try {
+      const { electionId } = req.params;
+      const election = await Election.findById(electionId);
+  
+      if (!election) {
+        return res.status(404).json({ message: 'Election not found' });
+      }
+  
+      // Fetch updated vote counts from the blockchain
+      const updatedCandidates = await Promise.all(
+        election.candidates.map(async (candidate) => {
+          const voteCount = await votingContract.methods.getVotes(candidate.walletAddress).call();
+          return {
+            ...candidate.toObject(),
+            votes: parseInt(voteCount),
+          };
+        })
+      );
+  
+      // Update the election document with the new vote counts
+      election.candidates = updatedCandidates;
+      await election.save();
+  
+      res.status(200).json({
+        message: 'Votes updated successfully from blockchain',
+        candidates: updatedCandidates,
+      });
+    } catch (error) {
+      console.error('Error updating votes:', error);
+      res.status(500).json({ message: 'Failed to update votes from blockchain' });
+    }
+  };
+  
+
+  exports.getElectionResults = async (req, res) => {
+    try {
+      const { electionId } = req.params;
+  
+      // Find the election with candidate details
+      const election = await Election.findById(electionId);
+  
+      if (!election) {
+        return res.status(404).json({ message: 'Election not found' });
+      }
+  
+      // Structure the result for frontend use
+      const candidates = election.candidates.map((candidate) => ({
+        candidateId: candidate._id,
+        walletAddress: candidate.walletAddress,
+        name: candidate.name,
+        party: candidate.party,
+        votes: candidate.votes,
+      }));
+  
+      res.status(200).json({
+        message: 'Election results fetched successfully',
+        election: {
+          _id: election._id,
+          title: election.title,
+          status: election.status,
+          totalVotes: candidates.reduce((sum, c) => sum + (c.votes || 0), 0),
+        },
+        candidates,
+      });
+    } catch (error) {
+      console.error('Error fetching election results:', error);
+      res.status(500).json({ message: 'Failed to fetch election results' });
+    }
+  };
