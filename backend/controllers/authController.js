@@ -36,7 +36,7 @@ const register = async (req, res) => {
     const emailBody = `<h3>Your OTP is: ${otp}</h3><p>Please use this OTP to complete your registration.</p>`;
     
     await mailSender(normalizedEmail, emailTitle, emailBody);
-    
+    console.log(otp)
     res.status(200).json({
         message: "OTP sent successfully",
         otp,

@@ -45,8 +45,33 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ['Male', 'Female', 'Other'],
+      enum: ['Male', 'Female', 'Other','male','female'],
     },
+    votingHistory: [
+    {
+      electionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Election',
+        required: true,
+      },
+      candidateAddress: {
+        type: String,
+        required: true,
+      },
+      title:{
+        type: String,
+        required: true,
+      },
+      txHash: {
+        type: String,
+        required: true,
+      },
+      timestamp: {
+        type: Date,
+        default: Date.now,
+      }
+    }
+  ],
     resetPasswordToken: String,
   resetPasswordExpires: Date,
   },

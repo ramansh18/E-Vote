@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import {
   TextField,
@@ -12,31 +12,42 @@ import {
   Snackbar,
   Alert,
   Typography,
-  Card,
   CardContent,
   Chip,
   IconButton,
   Fade,
   Grow,
-  Backdrop,
   CircularProgress,
+  Box,
+  InputAdornment,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from "@mui/material"
 import {
   Campaign as CampaignIcon,
-  Edit as EditIcon,
-  Save as SaveIcon,
-  Cancel as CancelIcon,
+  Delete as DeleteIcon,
   HowToVote as VoteIcon,
   Person as PersonIcon,
   CheckCircle as CheckCircleIcon,
   Error as ErrorIcon,
-  Refresh as RefreshIcon,
+  Pending as PendingIcon,
+  Groups as GroupsIcon,
+  CalendarToday as CalendarIcon,
+  Security as SecurityIcon,
+  CloudUpload as CloudUploadIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material"
 import { useSelector } from "react-redux"
 
 const RequestCandidate = () => {
   const [party, setParty] = useState("")
   const [electionId, setElectionId] = useState("")
+  const [electionSymbol, setElectionSymbol] = useState(null)
+  const [symbolPreview, setSymbolPreview] = useState(null)
   const [elections, setElections] = useState([])
   const [candidateRequests, setCandidateRequests] = useState([])
   const [openSnackbar, setOpenSnackbar] = useState(false)
@@ -44,9 +55,9 @@ const RequestCandidate = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success")
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [editingRequest, setEditingRequest] = useState(null)
-  const [editParty, setEditParty] = useState("")
-  const [editElectionId, setEditElectionId] = useState("")
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, requestId: null })
+  const [deleting, setDeleting] = useState(false)
+  const fileInputRef = useRef(null)
   const token = useSelector((state) => state.auth.token)
 
   useEffect(() => {
@@ -67,57 +78,28 @@ const RequestCandidate = () => {
 
   const fetchElections = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/election")
+      const response = await axios.get("http://localhost:5000/api/election/upcoming-election", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       setElections(response.data)
     } catch (error) {
       console.error("Error fetching elections:", error)
-      // Mock data for development
-      setElections([
-        {
-          _id: "1",
-          title: "Student Council Election 2024",
-          description: "Annual student council election",
-          status: "upcoming",
-        },
-        {
-          _id: "2",
-          title: "Department Head Selection",
-          description: "Computer Science department head selection",
-          status: "active",
-        },
-      ])
     }
   }
 
   const fetchCandidateRequests = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/candidate/my-requests", {
+      const response = await axios.get("http://localhost:5000/api/candidate/my-request", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-      setCandidateRequests(response.data)
+      console.log("kya aa rha hai dekho---", response.data)
+      setCandidateRequests(response.data.formattedRequests)
     } catch (error) {
       console.error("Error fetching candidate requests:", error)
-      // Mock data for development
-      setCandidateRequests([
-        {
-          _id: "1",
-          party: "Progressive Students Union",
-          electionId: "1",
-          electionTitle: "Student Council Election 2024",
-          status: "pending",
-          submittedAt: "2024-01-15T10:30:00Z",
-        },
-        {
-          _id: "2",
-          party: "Academic Excellence Party",
-          electionId: "2",
-          electionTitle: "Department Head Selection",
-          status: "approved",
-          submittedAt: "2024-01-10T14:20:00Z",
-        },
-      ])
     }
   }
 
@@ -127,28 +109,70 @@ const RequestCandidate = () => {
     setOpenSnackbar(true)
   }
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        showSnackbar("Please select an image file", "error")
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showSnackbar("File size must be less than 5MB", "error")
+        return
+      }
+
+      setElectionSymbol(file)
+
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setSymbolPreview(e.target.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemoveSymbol = () => {
+    setElectionSymbol(null)
+    setSymbolPreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!party.trim() || !electionId) {
-      showSnackbar("Please fill in all required fields", "error")
+    if (!party.trim() || !electionId || !electionSymbol) {
+      showSnackbar("Please fill in all required fields including election symbol", "error")
       return
     }
 
     try {
       setSubmitting(true)
-      const response = await axios.post(
-        "http://localhost:5000/api/candidate/submit-request",
-        { party: party.trim(), electionId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append("party", party.trim())
+      formData.append("electionId", electionId)
+      formData.append("electionSymbol", electionSymbol)
+
+      const response = await axios.post("http://localhost:5000/api/candidate/submit-request", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
-      )
+      })
       showSnackbar(response.data.message || "Candidate request submitted successfully!")
       setParty("")
       setElectionId("")
+      setElectionSymbol(null)
+      setSymbolPreview(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
       await fetchCandidateRequests()
     } catch (error) {
       showSnackbar(error.response?.data?.message || "Failed to submit candidate request", "error")
@@ -158,44 +182,31 @@ const RequestCandidate = () => {
     }
   }
 
-  const handleEditRequest = (request) => {
-    setEditingRequest(request._id)
-    setEditParty(request.party)
-    setEditElectionId(request.electionId)
-  }
-
-  const handleSaveEdit = async (requestId) => {
-    if (!editParty.trim()) {
-      showSnackbar("Party name is required", "error")
-      return
-    }
-
+  const handleDeleteRequest = async (requestId) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/candidate/update-request/${requestId}`,
-        { party: editParty.trim(), electionId: editElectionId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      setDeleting(true)
+      const response = await axios.delete(`http://localhost:5000/api/candidate/delete-request/${requestId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      )
-      showSnackbar(response.data.message || "Request updated successfully!")
-      setEditingRequest(null)
-      setEditParty("")
-      setEditElectionId("")
+      })
+      showSnackbar(response.data.message || "Request deleted successfully!")
       await fetchCandidateRequests()
+      setDeleteDialog({ open: false, requestId: null })
     } catch (error) {
-      showSnackbar(error.response?.data?.message || "Failed to update request", "error")
+      showSnackbar(error.response?.data?.message || "Failed to delete request", "error")
       console.error(error)
+    } finally {
+      setDeleting(false)
     }
   }
 
-  const handleCancelEdit = () => {
-    setEditingRequest(null)
-    setEditParty("")
-    setEditElectionId("")
+  const openDeleteDialog = (requestId) => {
+    setDeleteDialog({ open: true, requestId })
+  }
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, requestId: null })
   }
 
   const getStatusColor = (status) => {
@@ -218,9 +229,9 @@ const RequestCandidate = () => {
       case "rejected":
         return <ErrorIcon />
       case "pending":
-        return <RefreshIcon />
+        return <PendingIcon />
       default:
-        return <RefreshIcon />
+        return <PendingIcon />
     }
   }
 
@@ -228,55 +239,118 @@ const RequestCandidate = () => {
     setOpenSnackbar(false)
   }
 
-  return (
-    <>
-      <Backdrop open={loading} className="z-50 bg-black bg-opacity-50">
-        <div className="text-center text-white">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center animate-pulse">
-            <CampaignIcon className="text-white text-3xl" />
-          </div>
-          <Typography variant="h6">Loading candidate information...</Typography>
+  if (loading) {
+    return (
+      <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
         </div>
-      </Backdrop>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <Fade in={!loading} timeout={1000}>
+        <Box className="relative z-10 flex justify-center items-center min-h-screen">
+          <Box className="text-center">
+            <Box className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center animate-pulse shadow-2xl">
+              <CampaignIcon className="text-white text-4xl" />
+            </Box>
+            <Typography variant="h5" className="text-gray-700 mb-2">
+              Loading Candidate Portal...
+            </Typography>
+            <CircularProgress size={40} sx={{ color: "#3b82f6" }} />
+          </Box>
+        </Box>
+      </Box>
+    )
+  }
+
+  return (
+    <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-bounce"></div>
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-ping"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`,
+            }}
+          ></div>
+        ))}
+      </div>
+
+      <Box className="relative z-10">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Fade in timeout={1000}>
             <div>
-              {/* Header Section */}
-              <div className="text-center mb-8">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-2xl">
-                  <CampaignIcon className="text-white text-4xl" />
-                </div>
-                <Typography variant="h3" className="font-bold text-gray-800 mb-4">
-                  Candidate Registration
+              {/* Hero Section */}
+              <Box className="text-center mb-12">
+                <Box className="flex justify-center mb-6">
+                  <Box className="relative">
+                    <Box className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
+                      <CampaignIcon className="text-white text-4xl" />
+                    </Box>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
+                  </Box>
+                </Box>
+                <Typography
+                  variant="h2"
+                  className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
+                >
+                  Candidate Portal
                 </Typography>
-                <Typography variant="h6" className="text-gray-600 max-w-2xl mx-auto">
-                  Submit your candidacy request for upcoming elections and represent your community
-                </Typography>
-              </div>
+              </Box>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* Registration Form */}
-                <Grow in={!loading} timeout={800}>
-                  <Card className="shadow-2xl rounded-3xl border-0 overflow-hidden">
-                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
+                <Grow in timeout={800}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      borderRadius: 4,
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8))",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {/* Form Header */}
+                    <Box
+                      sx={{
+                        background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                        p: 4,
+                        position: "relative",
+                      }}
+                    >
+                      <Box className="flex items-center space-x-4">
+                        <Box className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                           <PersonIcon className="text-white" />
-                        </div>
-                        <div>
-                          <Typography variant="h5" className="font-bold">
-                            New Candidacy Request
+                        </Box>
+                        <Box>
+                          <Typography variant="h5" className="font-bold text-white mb-1">
+                            Submit Candidacy Request
                           </Typography>
-                          <Typography variant="body2" className="opacity-90">
-                            Fill in your details to submit a request
+                          <Typography variant="body2" className="text-blue-100">
+                            Fill in your details to join the election
                           </Typography>
-                        </div>
-                      </div>
-                    </div>
+                        </Box>
+                      </Box>
 
-                    <CardContent className="p-8">
+                      {/* Decorative elements */}
+                      <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></Box>
+                      <Box className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></Box>
+                    </Box>
+
+                    <CardContent sx={{ p: 4 }}>
                       <form onSubmit={handleSubmit} className="space-y-6">
                         <FormControl fullWidth required>
                           <InputLabel className="text-gray-600 font-medium">Select Election</InputLabel>
@@ -284,31 +358,37 @@ const RequestCandidate = () => {
                             value={electionId}
                             onChange={(e) => setElectionId(e.target.value)}
                             label="Select Election"
-                            className="rounded-2xl"
+                            startAdornment={
+                              <InputAdornment position="start">
+                                <CalendarIcon className="text-gray-400 ml-2" />
+                              </InputAdornment>
+                            }
                             sx={{
-                              "& .MuiOutlinedInput-notchedOutline": {
-                                borderWidth: 2,
-                                borderColor: "#e5e7eb",
+                              borderRadius: 3,
+                              backgroundColor: "rgba(255, 255, 255, 0.8)",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
                               },
-                              "&:hover .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "#a855f7",
-                              },
-                              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                borderColor: "#a855f7",
-                                boxShadow: "0 0 0 3px rgba(168, 85, 247, 0.1)",
+                              "&.Mui-focused": {
+                                backgroundColor: "rgba(255, 255, 255, 1)",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
                               },
                             }}
                           >
                             {elections.map((election) => (
                               <MenuItem key={election._id} value={election._id}>
-                                <div className="flex flex-col">
+                                <Box>
                                   <Typography variant="body1" className="font-semibold">
                                     {election.title}
                                   </Typography>
                                   <Typography variant="caption" className="text-gray-500">
                                     {election.description}
                                   </Typography>
-                                </div>
+                                </Box>
                               </MenuItem>
                             ))}
                           </Select>
@@ -322,207 +402,429 @@ const RequestCandidate = () => {
                           fullWidth
                           placeholder="Enter your party or organization name"
                           variant="outlined"
-                          className="rounded-2xl"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <GroupsIcon className="text-gray-400" />
+                              </InputAdornment>
+                            ),
+                          }}
                           sx={{
                             "& .MuiOutlinedInput-root": {
-                              borderRadius: "16px",
-                              "& fieldset": {
-                                borderWidth: 2,
-                                borderColor: "#e5e7eb",
+                              borderRadius: 3,
+                              backgroundColor: "rgba(255, 255, 255, 0.8)",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
                               },
-                              "&:hover fieldset": {
-                                borderColor: "#a855f7",
-                              },
-                              "&.Mui-focused fieldset": {
-                                borderColor: "#a855f7",
-                                boxShadow: "0 0 0 3px rgba(168, 85, 247, 0.1)",
+                              "&.Mui-focused": {
+                                backgroundColor: "rgba(255, 255, 255, 1)",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
                               },
                             },
                           }}
                         />
+
+                        {/* Election Symbol Upload */}
+                        <Box>
+                          <Typography variant="subtitle1" className="font-semibold text-gray-700 mb-3">
+                            Election Symbol *
+                          </Typography>
+
+                          {!symbolPreview ? (
+                            <Box
+                              onClick={() => fileInputRef.current?.click()}
+                              sx={{
+                                border: "2px dashed #d1d5db",
+                                borderRadius: 3,
+                                p: 4,
+                                textAlign: "center",
+                                cursor: "pointer",
+                                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                  borderColor: "#3b82f6",
+                                  backgroundColor: "rgba(59, 130, 246, 0.05)",
+                                  transform: "translateY(-2px)",
+                                },
+                              }}
+                            >
+                              <CloudUploadIcon sx={{ fontSize: 48, color: "#9ca3af", mb: 2 }} />
+                              <Typography variant="h6" className="text-gray-600 mb-2">
+                                Upload Election Symbol
+                              </Typography>
+                              <Typography variant="body2" className="text-gray-500 mb-2">
+                                Click to browse or drag and drop your symbol image
+                              </Typography>
+                              <Typography variant="caption" className="text-gray-400">
+                                Supported formats: JPG, PNG, GIF (Max 5MB)
+                              </Typography>
+                            </Box>
+                          ) : (
+                            <Box
+                              sx={{
+                                border: "2px solid #10b981",
+                                borderRadius: 3,
+                                p: 3,
+                                backgroundColor: "rgba(16, 185, 129, 0.05)",
+                              }}
+                            >
+                              <Box className="flex items-center justify-between mb-3">
+                                <Typography variant="subtitle2" className="text-green-700 font-semibold">
+                                  Symbol Preview
+                                </Typography>
+                                <IconButton
+                                  onClick={handleRemoveSymbol}
+                                  size="small"
+                                  sx={{
+                                    color: "#ef4444",
+                                    backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(239, 68, 68, 0.2)",
+                                    },
+                                  }}
+                                >
+                                  <CloseIcon />
+                                </IconButton>
+                              </Box>
+                              <Box className="flex items-center space-x-4">
+                                <img
+                                  src={symbolPreview || "/placeholder.svg"}
+                                  alt="Election Symbol Preview"
+                                  className="w-20 h-20 object-cover rounded-2xl border-2 border-white shadow-lg"
+                                />
+                                <Box>
+                                  <Typography variant="body2" className="text-gray-700 font-medium">
+                                    {electionSymbol?.name}
+                                  </Typography>
+                                  <Typography variant="caption" className="text-gray-500">
+                                    {(electionSymbol?.size / 1024 / 1024).toFixed(2)} MB
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Box>
+                          )}
+
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            style={{ display: "none" }}
+                          />
+                        </Box>
 
                         <Button
                           type="submit"
                           variant="contained"
                           fullWidth
                           disabled={submitting}
-                          startIcon={submitting ? <CircularProgress size={20} /> : <CampaignIcon />}
-                          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-2xl py-4 text-lg font-bold shadow-lg transform hover:scale-105 transition-all duration-200"
+                          startIcon={submitting ? <CircularProgress size={20} color="inherit" /> : <CampaignIcon />}
+                          className="group transition-all duration-300"
+                          sx={{
+                            py: 3,
+                            fontSize: 16,
+                            fontWeight: 700,
+                            borderRadius: 3,
+                            textTransform: "none",
+                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                            boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
+                            "&:hover": {
+                              background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                              boxShadow: "0 12px 40px rgba(59, 130, 246, 0.4)",
+                              transform: "translateY(-2px) scale(1.02)",
+                            },
+                            "&:disabled": {
+                              background: "linear-gradient(135deg, #9ca3af, #6b7280)",
+                            },
+                          }}
                         >
                           {submitting ? "Submitting Request..." : "Submit Candidacy Request"}
                         </Button>
                       </form>
+
+                      {/* Security Note */}
+                      <Box className="mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                        <Box className="flex items-center space-x-2 mb-2">
+                          <SecurityIcon className="text-blue-500 text-sm" />
+                          <Typography variant="caption" className="font-semibold text-blue-800">
+                            Secure Submission
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" className="text-blue-700">
+                          Your candidacy request is encrypted and securely processed by our election committee.
+                        </Typography>
+                      </Box>
                     </CardContent>
-                  </Card>
+                  </Paper>
                 </Grow>
 
                 {/* My Requests */}
-                <Grow in={!loading} timeout={1200}>
-                  <Card className="shadow-2xl rounded-3xl border-0 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
+                <Grow in timeout={1200}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      borderRadius: 4,
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8))",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {/* Requests Header */}
+                    <Box
+                      sx={{
+                        background: "linear-gradient(135deg, #10b981, #059669)",
+                        p: 4,
+                        position: "relative",
+                      }}
+                    >
+                      <Box className="flex items-center space-x-4">
+                        <Box className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                           <VoteIcon className="text-white" />
-                        </div>
-                        <div>
-                          <Typography variant="h5" className="font-bold">
+                        </Box>
+                        <Box>
+                          <Typography variant="h5" className="font-bold text-white mb-1">
                             My Candidacy Requests
                           </Typography>
-                          <Typography variant="body2" className="opacity-90">
+                          <Typography variant="body2" className="text-green-100">
                             Track and manage your submitted requests
                           </Typography>
-                        </div>
-                      </div>
-                    </div>
+                        </Box>
+                      </Box>
 
-                    <CardContent className="p-6 max-h-96 overflow-y-auto">
+                      {/* Decorative elements */}
+                      <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></Box>
+                      <Box className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></Box>
+                    </Box>
+
+                    <CardContent sx={{ p: 4, maxHeight: 600, overflowY: "auto" }}>
                       {candidateRequests.length === 0 ? (
-                        <div className="text-center py-8">
-                          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                            <CampaignIcon className="text-gray-400 text-2xl" />
-                          </div>
-                          <Typography variant="h6" className="text-gray-500 mb-2">
-                            No requests yet
+                        <Box className="text-center py-12">
+                          <Box className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                            <CampaignIcon className="text-gray-400 text-3xl" />
+                          </Box>
+                          <Typography variant="h6" className="text-gray-500 mb-3">
+                            No candidacy requests yet
                           </Typography>
-                          <Typography variant="body2" className="text-gray-400">
-                            Submit your first candidacy request to get started
+                          <Typography variant="body2" className="text-gray-400 max-w-sm mx-auto">
+                            Submit your first candidacy request to get started on your political journey
                           </Typography>
-                        </div>
+                        </Box>
                       ) : (
-                        <div className="space-y-4">
+                        <Box className="space-y-4">
                           {candidateRequests.map((request, index) => (
                             <Grow in timeout={600 + index * 200} key={request._id}>
-                              <Card className="shadow-md hover:shadow-lg transition-all duration-300 rounded-2xl border border-gray-200">
-                                <CardContent className="p-6">
-                                  {editingRequest === request._id ? (
-                                    <div className="space-y-4">
-                                      <FormControl fullWidth>
-                                        <InputLabel>Election</InputLabel>
-                                        <Select
-                                          value={editElectionId}
-                                          onChange={(e) => setEditElectionId(e.target.value)}
-                                          label="Election"
-                                          className="rounded-xl"
-                                        >
-                                          {elections.map((election) => (
-                                            <MenuItem key={election._id} value={election._id}>
-                                              {election.title}
-                                            </MenuItem>
-                                          ))}
-                                        </Select>
-                                      </FormControl>
-
-                                      <TextField
-                                        label="Party/Organization Name"
-                                        value={editParty}
-                                        onChange={(e) => setEditParty(e.target.value)}
-                                        fullWidth
-                                        variant="outlined"
-                                        className="rounded-xl"
-                                      />
-
-                                      <div className="flex gap-3">
-                                        <Button
-                                          variant="contained"
-                                          startIcon={<SaveIcon />}
-                                          onClick={() => handleSaveEdit(request._id)}
-                                          className="bg-green-600 hover:bg-green-700 rounded-xl font-semibold"
-                                        >
-                                          Save
-                                        </Button>
-                                        <Button
-                                          variant="outlined"
-                                          startIcon={<CancelIcon />}
-                                          onClick={handleCancelEdit}
-                                          className="rounded-xl font-semibold"
-                                        >
-                                          Cancel
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div>
-                                      <div className="flex items-start justify-between mb-4">
-                                        <div className="flex-1">
-                                          <div className="flex items-center gap-3 mb-2">
-                                            <Typography variant="h6" className="font-bold text-gray-800">
-                                              {request.party}
-                                            </Typography>
-                                            <Chip
-                                              icon={getStatusIcon(request.status)}
-                                              label={request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                              color={getStatusColor(request.status)}
-                                              className="font-semibold"
-                                              size="small"
-                                            />
-                                          </div>
-                                          <Typography variant="body2" className="text-gray-600 mb-2">
-                                            Election: {request.electionTitle}
-                                          </Typography>
-                                          <Typography variant="caption" className="text-gray-500">
-                                            Submitted: {new Date(request.submittedAt).toLocaleDateString()}
-                                          </Typography>
-                                        </div>
-                                        {request.status === "pending" && (
-                                          <IconButton
-                                            onClick={() => handleEditRequest(request)}
-                                            className="text-blue-600 hover:bg-blue-50 transition-colors duration-200"
-                                          >
-                                            <EditIcon />
-                                          </IconButton>
-                                        )}
-                                      </div>
-
-                                      {request.status === "rejected" && (
-                                        <Alert severity="error" className="rounded-xl">
-                                          <Typography variant="body2">
-                                            Your request was rejected. You can submit a new request with updated
-                                            information.
-                                          </Typography>
-                                        </Alert>
+                              <Paper
+                                elevation={8}
+                                sx={{
+                                  borderRadius: 3,
+                                  background: "rgba(255, 255, 255, 0.8)",
+                                  backdropFilter: "blur(10px)",
+                                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                                  transition: "all 0.3s ease",
+                                  "&:hover": {
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
+                                  },
+                                }}
+                              >
+                                <CardContent sx={{ p: 3 }}>
+                                  <Box className="flex items-start justify-between mb-4">
+                                    <Box className="flex items-start space-x-4 flex-1">
+                                      {/* Symbol Preview */}
+                                      {request.symbolUrl && (
+                                        <Box className="flex-shrink-0">
+                                          <img
+                                            src={request.symbolUrl || "/placeholder.svg"}
+                                            alt="Election Symbol"
+                                            className="w-16 h-16 object-cover rounded-xl border-2 border-gray-200 shadow-md"
+                                          />
+                                        </Box>
                                       )}
 
-                                      {request.status === "approved" && (
-                                        <Alert severity="success" className="rounded-xl">
-                                          <Typography variant="body2">
-                                            Congratulations! Your candidacy has been approved. You can now participate
-                                            in the election.
+                                      <Box className="flex-1">
+                                        <Box className="flex items-center gap-3 mb-3">
+                                          <Typography variant="h6" className="font-bold text-gray-800">
+                                            {request.party}
                                           </Typography>
-                                        </Alert>
-                                      )}
-                                    </div>
+                                          <Chip
+                                            icon={getStatusIcon(request.status)}
+                                            label={request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                            color={getStatusColor(request.status)}
+                                            size="small"
+                                            sx={{
+                                              fontWeight: 600,
+                                              borderRadius: 2,
+                                            }}
+                                          />
+                                        </Box>
+                                        <Typography variant="body2" className="text-gray-600 mb-2 flex items-center">
+                                          <CalendarIcon className="text-gray-400 mr-2 text-sm" />
+                                          Election: {request.electionTitle}
+                                        </Typography>
+                                        <Typography variant="caption" className="text-gray-500">
+                                          Submitted: {new Date(request.submittedAt).toLocaleDateString()}
+                                        </Typography>
+                                      </Box>
+                                    </Box>
+
+                                    {request.status === "pending" && (
+                                      <IconButton
+                                        onClick={() => openDeleteDialog(request._id)}
+                                        sx={{
+                                          color: "#ef4444",
+                                          backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                          "&:hover": {
+                                            backgroundColor: "rgba(239, 68, 68, 0.2)",
+                                            transform: "scale(1.1)",
+                                          },
+                                          transition: "all 0.3s ease",
+                                        }}
+                                      >
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    )}
+                                  </Box>
+
+                                  {request.status === "rejected" && (
+                                    <Alert
+                                      severity="error"
+                                      sx={{
+                                        borderRadius: 2,
+                                        backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                        border: "1px solid rgba(239, 68, 68, 0.2)",
+                                      }}
+                                    >
+                                      <Typography variant="body2">
+                                        Your request was rejected. You can submit a new request with updated
+                                        information.
+                                      </Typography>
+                                    </Alert>
+                                  )}
+
+                                  {request.status === "approved" && (
+                                    <Alert
+                                      severity="success"
+                                      sx={{
+                                        borderRadius: 2,
+                                        backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                        border: "1px solid rgba(16, 185, 129, 0.2)",
+                                      }}
+                                    >
+                                      <Typography variant="body2">
+                                        🎉 Congratulations! Your candidacy has been approved. You can now participate in
+                                        the election.
+                                      </Typography>
+                                    </Alert>
+                                  )}
+
+                                  {request.status === "pending" && (
+                                    <Alert
+                                      severity="info"
+                                      sx={{
+                                        borderRadius: 2,
+                                        backgroundColor: "rgba(59, 130, 246, 0.1)",
+                                        border: "1px solid rgba(59, 130, 246, 0.2)",
+                                      }}
+                                    >
+                                      <Typography variant="body2">
+                                        Your request is under review. You'll be notified once a decision is made.
+                                      </Typography>
+                                    </Alert>
                                   )}
                                 </CardContent>
-                              </Card>
+                              </Paper>
                             </Grow>
                           ))}
-                        </div>
+                        </Box>
                       )}
                     </CardContent>
-                  </Card>
+                  </Paper>
                 </Grow>
               </div>
             </div>
           </Fade>
         </div>
 
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialog.open}
+          onClose={closeDeleteDialog}
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(20px)",
+            },
+          }}
+        >
+          <DialogTitle sx={{ pb: 1 }}>
+            <Typography variant="h6" className="font-bold text-gray-800">
+              Delete Candidacy Request
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText sx={{ color: "#6b7280" }}>
+              Are you sure you want to delete this candidacy request? This action cannot be undone. You can only delete
+              requests that are in pending status.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button
+              onClick={closeDeleteDialog}
+              variant="outlined"
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 600,
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleDeleteRequest(deleteDialog.requestId)}
+              variant="contained"
+              disabled={deleting}
+              startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 600,
+                backgroundColor: "#ef4444",
+                "&:hover": {
+                  backgroundColor: "#dc2626",
+                },
+              }}
+            >
+              {deleting ? "Deleting..." : "Delete Request"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
           <Alert
             onClose={handleCloseSnackbar}
             severity={snackbarSeverity}
-            className="rounded-2xl shadow-xl"
             variant="filled"
+            sx={{
+              borderRadius: 3,
+              fontWeight: 500,
+            }}
           >
             {snackbarMessage}
           </Alert>
         </Snackbar>
-      </div>
-    </>
+      </Box>
+    </Box>
   )
 }
 

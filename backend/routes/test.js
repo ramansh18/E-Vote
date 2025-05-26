@@ -1,16 +1,22 @@
+// routes/test.js
 const express = require("express");
-const { protect } = require("../middleware/auth");
-
 const router = express.Router();
 
-router.get("/user-details", protect, (req, res) => {
-  console.log("User from token:", req.user); // Log to check if it's populated
+router.get("/emit-test", (req, res) => {
+  const io = req.app.get("io");
+  if (!io) {
+    return res.status(500).json({ message: "Socket.IO not initialized" });
+  }
 
-  // Example logic to return user details (you could adjust this based on your app)
-  res.status(200).json({
-    message: "User details",
-    user: req.user, // Returning the user object populated by token
+  io.emit("newActivity", {
+    type: "test_event",
+    message: "This is a test activity from backend.",
+    timestamp: new Date().toISOString(),
   });
+
+  console.log("📡 Emitted test newActivity event");
+
+  res.json({ success: true, message: "Test activity emitted" });
 });
 
 module.exports = router;
