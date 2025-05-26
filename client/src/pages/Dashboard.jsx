@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import {
-  Card,
   CardContent,
   Typography,
   Grid,
@@ -25,13 +24,13 @@ import {
   Fade,
   Grow,
   Backdrop,
+  Box,
 } from "@mui/material"
 import {
   HowToVote as VoteIcon,
   CalendarToday as CalendarIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
-  Warning as WarningIcon,
   Notifications as NotificationsIcon,
   Analytics as AnalyticsIcon,
   History as HistoryIcon,
@@ -42,7 +41,9 @@ import {
   HowToReg as HowToRegIcon,
   Campaign as CampaignIcon,
   Dashboard as DashboardIcon,
-  Star as StarIcon,
+  TrendingUp,
+  Security,
+  Public,
 } from "@mui/icons-material"
 
 const Dashboard = () => {
@@ -251,186 +252,512 @@ const Dashboard = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <Fade in timeout={800}>
-          <Card className="w-full max-w-md shadow-2xl rounded-3xl border-0">
-            <CardContent className="text-center p-8">
-              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+      <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        <Box className="relative z-10 flex justify-center items-center min-h-screen">
+          <Fade in timeout={800}>
+            <Paper
+              elevation={24}
+              sx={{
+                borderRadius: 4,
+                background: "rgba(255,255,255,0.95)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                p: 6,
+                textAlign: "center",
+                maxWidth: 500,
+              }}
+            >
+              <Box className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl">
                 <ErrorIcon className="text-white text-3xl" />
-              </div>
+              </Box>
               <Typography variant="h4" className="font-bold text-gray-800 mb-4">
                 Access Denied
               </Typography>
               <Typography variant="body1" className="text-gray-600">
                 Please log in to access your voting dashboard.
               </Typography>
-            </CardContent>
-          </Card>
-        </Fade>
-      </div>
+            </Paper>
+          </Fade>
+        </Box>
+      </Box>
     )
   }
 
   return (
     <>
-      <Backdrop open={loading} className="z-50 bg-black bg-opacity-50">
-        <div className="text-center text-white">
-          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center animate-pulse">
-            <DashboardIcon className="text-white text-3xl" />
+      {/* Loading Backdrop */}
+      <Backdrop open={loading} className="z-50">
+        <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden w-full">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
           </div>
-          <Typography variant="h6">Loading your dashboard...</Typography>
-        </div>
+
+          <Box className="relative z-10 flex justify-center items-center min-h-screen">
+            <Box className="text-center">
+              <Box className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center animate-pulse shadow-2xl">
+                <DashboardIcon className="text-white text-4xl" />
+              </Box>
+              <Typography variant="h5" className="text-gray-700 mb-2">
+                Loading your dashboard...
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
       </Backdrop>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <Container maxWidth="xl" className="py-8">
+      <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-bounce"></div>
+        </div>
+
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-ping"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+              }}
+            ></div>
+          ))}
+        </div>
+
+        <Container maxWidth="xl" className="relative z-10 py-8">
           <Fade in={!loading} timeout={1000}>
             <div>
               {/* Header Section */}
-              <div className="mb-8 p-8 rounded-3xl shadow-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white relative overflow-hidden">
-                {/* Background decorations */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full transform translate-x-48 -translate-y-48"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full transform -translate-x-32 translate-y-32"></div>
+              <Box className="text-center mb-8">
+                <Box className="flex justify-center mb-6">
+                  <Box className="relative">
+                    <Box className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
+                      <DashboardIcon className="text-white text-4xl" />
+                    </Box>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
+                  </Box>
+                </Box>
+                <Typography
+                  variant="h3"
+                  className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
+                >
+                  Voting Dashboard
+                </Typography>
+                <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                  Welcome back, {userDetails?.name}! Manage your voting activities and stay updated with the latest
+                  elections
+                </Typography>
+              </Box>
 
-                <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                  <div className="flex items-center gap-6">
-                    <div className="relative group">
-                      <div className="absolute -inset-3 bg-white rounded-full opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-                      <Avatar
-                        src={userDetails?.avatar || "/placeholder.svg"}
-                        className="relative w-20 h-20 border-4 border-white shadow-2xl"
-                        sx={{ bgcolor: "#1e40af" }}
+              {/* User Profile Card */}
+              <Grow in timeout={600}>
+                <Paper
+                  elevation={24}
+                  sx={{
+                    borderRadius: 4,
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    overflow: "hidden",
+                    mb: 4,
+                  }}
+                >
+                  {/* Profile Header */}
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                      p: 4,
+                      position: "relative",
+                      color: "white",
+                    }}
+                  >
+                    {/* Decorative elements */}
+                    <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></Box>
+                    <Box className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></Box>
+                    <Box className="absolute top-1/2 right-1/4 w-16 h-16 bg-white/5 rounded-full"></Box>
+
+                    <Box className="relative z-10">
+                      <Grid container spacing={4} alignItems="center">
+                        <Grid item xs={12} md={4} className="text-center md:text-left">
+                          {/* Profile Avatar */}
+                          <Box className="relative inline-block mb-4 md:mb-0">
+                            <Avatar
+                              sx={{
+                                width: 100,
+                                height: 100,
+                                background: "rgba(255,255,255,0.2)",
+                                backdropFilter: "blur(10px)",
+                                border: "3px solid rgba(255,255,255,0.3)",
+                                fontSize: "2rem",
+                                fontWeight: "bold",
+                                mx: { xs: "auto", md: 0 },
+                              }}
+                            >
+                              {userDetails?.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase() || "U"}
+                            </Avatar>
+                            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Box className="text-center md:text-left">
+                            <Typography variant="h4" className="font-bold mb-2">
+                              {userDetails?.name || "User Name"}
+                            </Typography>
+                            <Typography variant="h6" className="opacity-90 mb-4">
+                              Member since {new Date(userDetails?.registrationDate || "").getFullYear()}
+                            </Typography>
+                            <Box className="flex flex-wrap gap-2 justify-center md:justify-start">
+                              <Chip
+                                icon={<VerifiedIcon sx={{ color: "white" }} />}
+                                label={userDetails?.isVerified ? "Verified Voter" : "Verification Pending"}
+                                sx={{
+                                  background: userDetails?.isVerified
+                                    ? "rgba(16, 185, 129, 0.3)"
+                                    : "rgba(245, 158, 11, 0.3)",
+                                  color: "white",
+                                  fontWeight: 600,
+                                  backdropFilter: "blur(10px)",
+                                }}
+                              />
+                              <Chip
+                                icon={<Security sx={{ color: "white" }} />}
+                                label="Secure Account"
+                                sx={{
+                                  background: "rgba(255,255,255,0.2)",
+                                  color: "white",
+                                  fontWeight: 600,
+                                  backdropFilter: "blur(10px)",
+                                }}
+                              />
+                              <Chip
+                                icon={<Public sx={{ color: "white" }} />}
+                                label="Active Voter"
+                                sx={{
+                                  background: "rgba(255,255,255,0.2)",
+                                  color: "white",
+                                  fontWeight: 600,
+                                  backdropFilter: "blur(10px)",
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        </Grid>
+
+                        <Grid item xs={12} md={2} className="text-center">
+                          <Box className="flex flex-col gap-3">
+                            <IconButton
+                              onClick={fetchRealTimeUpdates}
+                              disabled={refreshing}
+                              sx={{
+                                backgroundColor: "rgba(255,255,255,0.2)",
+                                color: "white",
+                                "&:hover": {
+                                  backgroundColor: "rgba(255,255,255,0.3)",
+                                  transform: "scale(1.1)",
+                                },
+                              }}
+                            >
+                              <RefreshIcon className={refreshing ? "animate-spin" : ""} />
+                            </IconButton>
+                            <Badge badgeContent={notifications.filter((n) => !n.read).length} color="error">
+                              <Button
+                                variant="outlined"
+                                startIcon={<NotificationsIcon />}
+                                sx={{
+                                  color: "white",
+                                  borderColor: "rgba(255,255,255,0.3)",
+                                  borderRadius: 3,
+                                  fontWeight: 600,
+                                  "&:hover": {
+                                    backgroundColor: "rgba(255,255,255,0.1)",
+                                    borderColor: "rgba(255,255,255,0.5)",
+                                  },
+                                }}
+                              >
+                                Alerts
+                              </Button>
+                            </Badge>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Box>
+                </Paper>
+              </Grow>
+
+              {/* Stats Cards */}
+              <Grid container spacing={3} className="mb-8">
+                {[
+                  {
+                    title: "Total Votes",
+                    value: votingHistory.length,
+                    icon: <VoteIcon />,
+                    gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    color: "#667eea",
+                  },
+                  {
+                    title: "Active Elections",
+                    value: elections.filter((e) => e.status === "active").length,
+                    icon: <TrendingUp />,
+                    gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                    color: "#f093fb",
+                  },
+                  {
+                    title: "Participation Rate",
+                    value: "85%",
+                    icon: <AnalyticsIcon />,
+                    gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                    color: "#4facfe",
+                  },
+                  {
+                    title: "Account Status",
+                    value: userDetails?.isVerified ? "Verified" : "Pending",
+                    icon: <CheckCircleIcon />,
+                    gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+                    color: "#43e97b",
+                  },
+                ].map((stat, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={index}>
+                    <Grow in timeout={800 + index * 200}>
+                      <Paper
+                        elevation={12}
+                        sx={{
+                          borderRadius: 4,
+                          background: "rgba(255,255,255,0.95)",
+                          backdropFilter: "blur(20px)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            transform: "translateY(-8px) scale(1.02)",
+                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                          },
+                        }}
                       >
-                        <Typography variant="h4" className="font-bold text-white">
-                          {userDetails?.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </Typography>
-                      </Avatar>
-                    </div>
-                    <div>
-                      <Typography variant="h3" className="font-bold mb-3">
-                        Welcome back, {userDetails?.name}!
-                      </Typography>
-                      <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <Chip
-                          icon={userDetails?.isVerified ? <VerifiedIcon /> : <WarningIcon />}
-                          label={userDetails?.isVerified ? "Verified Voter" : "Verification Pending"}
-                          className={`${
-                            userDetails?.isVerified ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
-                          } font-semibold`}
-                          size="medium"
-                        />
-                        <Chip
-                          icon={<StarIcon />}
-                          label="Premium Member"
-                          className="bg-white bg-opacity-20 text-white font-semibold"
-                          size="medium"
-                        />
-                      </div>
-                      <Typography variant="body1" className="opacity-90">
-                        Member since {new Date(userDetails?.registrationDate || "").getFullYear()} • Manage your voting
-                        preferences and participate in elections
-                      </Typography>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <IconButton
-                      onClick={fetchRealTimeUpdates}
-                      disabled={refreshing}
-                      className="text-white hover:bg-white hover:bg-opacity-20 transition-all duration-200"
-                    >
-                      <RefreshIcon className={refreshing ? "animate-spin" : ""} />
-                    </IconButton>
-                    <Badge badgeContent={notifications.filter((n) => !n.read).length} color="error">
-                      <Button
-                        variant="outlined"
-                        startIcon={<NotificationsIcon />}
-                        className="text-white border-white border-2 hover:bg-white hover:text-blue-600 font-semibold rounded-2xl px-6 py-3"
-                      >
-                        Notifications
-                      </Button>
-                    </Badge>
-                  </div>
-                </div>
-              </div>
+                        <CardContent sx={{ p: 3, textAlign: "center" }}>
+                          <Box
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 3,
+                              background: stat.gradient,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              mx: "auto",
+                              mb: 2,
+                              boxShadow: `0 8px 32px ${stat.color}30`,
+                            }}
+                          >
+                            {stat.icon}
+                          </Box>
+                          <Typography variant="h5" className="font-bold text-gray-800 mb-1">
+                            {stat.value}
+                          </Typography>
+                          <Typography variant="body2" className="text-gray-600">
+                            {stat.title}
+                          </Typography>
+                        </CardContent>
+                      </Paper>
+                    </Grow>
+                  </Grid>
+                ))}
+              </Grid>
 
               {/* Registration Section */}
-              <div className="mb-8 p-8 rounded-3xl shadow-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-72 h-72 bg-white opacity-10 rounded-full transform -translate-x-36 -translate-y-36"></div>
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full transform translate-x-48 translate-y-48"></div>
+              <Grow in timeout={1000}>
+                <Paper
+                  elevation={24}
+                  sx={{
+                    borderRadius: 4,
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    overflow: "hidden",
+                    mb: 4,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #10b981, #059669)",
+                      p: 4,
+                      position: "relative",
+                      color: "white",
+                    }}
+                  >
+                    {/* Decorative elements */}
+                    <Box className="absolute top-0 left-0 w-72 h-72 bg-white/10 rounded-full -translate-x-36 -translate-y-36"></Box>
+                    <Box className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-48 translate-y-48"></Box>
 
-                <div className="relative z-10 text-center mb-8">
-                  <Typography variant="h4" className="font-bold mb-4">
-                    Join the Democratic Process
-                  </Typography>
-                  <Typography variant="h6" className="opacity-90 max-w-2xl mx-auto">
-                    Take part in shaping your community's future by registering as a voter or candidate
-                  </Typography>
-                </div>
+                    <Box className="relative z-10 text-center mb-6">
+                      <Typography variant="h4" className="font-bold mb-4">
+                        Join the Democratic Process
+                      </Typography>
+                      <Typography variant="h6" className="opacity-90 max-w-2xl mx-auto">
+                        Take part in shaping your community's future by registering as a voter or candidate
+                      </Typography>
+                    </Box>
 
-                <Grid container spacing={4} justifyContent="center">
-                  <Grid item xs={12} sm={6} md={5}>
-                    <div
-                      className="bg-white bg-opacity-10 backdrop-blur-lg border border-white border-opacity-20 rounded-3xl p-8 hover:bg-opacity-20 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
-                      onClick={handleRegisterAsVoter}
-                    >
-                      <div className="text-center">
-                        <div className="w-20 h-20 mx-auto mb-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                          <HowToRegIcon className="text-white text-3xl" />
-                        </div>
-                        <Typography variant="h5" className="font-bold mb-4">
-                          Register as Voter
-                        </Typography>
-                        <Typography variant="body1" className="mb-6 opacity-90 leading-relaxed">
-                          Get verified to participate in all elections and make your voice heard in democratic decisions
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          startIcon={<PersonAddIcon />}
-                          className="bg-white text-emerald-600 hover:bg-gray-100 font-bold rounded-2xl py-4 text-lg shadow-lg"
+                    <Grid container spacing={4} justifyContent="center">
+                      <Grid item xs={12} sm={6} md={5}>
+                        <Box
+                          sx={{
+                            background: "rgba(255,255,255,0.1)",
+                            backdropFilter: "blur(10px)",
+                            borderRadius: 4,
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            p: 4,
+                            textAlign: "center",
+                            transition: "all 0.3s ease",
+                            cursor: "pointer",
+                            "&:hover": {
+                              background: "rgba(255,255,255,0.2)",
+                              transform: "translateY(-4px) scale(1.02)",
+                              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                            },
+                          }}
+                          onClick={handleRegisterAsVoter}
                         >
-                          Register as Voter
-                        </Button>
-                      </div>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={5}>
-                    <div
-                      className="bg-white bg-opacity-10 backdrop-blur-lg border border-white border-opacity-20 rounded-3xl p-8 hover:bg-opacity-20 transition-all duration-300 cursor-pointer transform hover:scale-105 hover:shadow-2xl"
-                      onClick={handleRegisterAsCandidate}
-                    >
-                      <div className="text-center">
-                        <div className="w-20 h-20 mx-auto mb-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                          <CampaignIcon className="text-white text-3xl" />
-                        </div>
-                        <Typography variant="h5" className="font-bold mb-4">
-                          Register as Candidate
-                        </Typography>
-                        <Typography variant="body1" className="mb-6 opacity-90 leading-relaxed">
-                          Run for office and represent your community's interests in important electoral positions
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          fullWidth
-                          startIcon={<CampaignIcon />}
-                          className="bg-white text-emerald-600 hover:bg-gray-100 font-bold rounded-2xl py-4 text-lg shadow-lg"
+                          <Box
+                            sx={{
+                              width: 64,
+                              height: 64,
+                              borderRadius: 3,
+                              background: "rgba(255,255,255,0.2)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              mx: "auto",
+                              mb: 3,
+                            }}
+                          >
+                            <HowToRegIcon sx={{ fontSize: 32 }} />
+                          </Box>
+                          <Typography variant="h5" className="font-bold mb-3">
+                            Register as Voter
+                          </Typography>
+                          <Typography variant="body1" className="mb-4 opacity-90 leading-relaxed">
+                            Get verified to participate in all elections and make your voice heard
+                          </Typography>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            startIcon={<PersonAddIcon />}
+                            sx={{
+                              background: "rgba(255,255,255,0.9)",
+                              color: "#059669",
+                              fontWeight: 700,
+                              borderRadius: 3,
+                              py: 2,
+                              "&:hover": {
+                                background: "white",
+                                transform: "translateY(-2px)",
+                              },
+                            }}
+                          >
+                            Register as Voter
+                          </Button>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={5}>
+                        <Box
+                          sx={{
+                            background: "rgba(255,255,255,0.1)",
+                            backdropFilter: "blur(10px)",
+                            borderRadius: 4,
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            p: 4,
+                            textAlign: "center",
+                            transition: "all 0.3s ease",
+                            cursor: "pointer",
+                            "&:hover": {
+                              background: "rgba(255,255,255,0.2)",
+                              transform: "translateY(-4px) scale(1.02)",
+                              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                            },
+                          }}
+                          onClick={handleRegisterAsCandidate}
                         >
-                          Register as Candidate
-                        </Button>
-                      </div>
-                    </div>
-                  </Grid>
-                </Grid>
-              </div>
+                          <Box
+                            sx={{
+                              width: 64,
+                              height: 64,
+                              borderRadius: 3,
+                              background: "rgba(255,255,255,0.2)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              mx: "auto",
+                              mb: 3,
+                            }}
+                          >
+                            <CampaignIcon sx={{ fontSize: 32 }} />
+                          </Box>
+                          <Typography variant="h5" className="font-bold mb-3">
+                            Register as Candidate
+                          </Typography>
+                          <Typography variant="body1" className="mb-4 opacity-90 leading-relaxed">
+                            Run for office and represent your community's interests
+                          </Typography>
+                          <Button
+                            variant="contained"
+                            fullWidth
+                            startIcon={<CampaignIcon />}
+                            sx={{
+                              background: "rgba(255,255,255,0.9)",
+                              color: "#059669",
+                              fontWeight: 700,
+                              borderRadius: 3,
+                              py: 2,
+                              "&:hover": {
+                                background: "white",
+                                transform: "translateY(-2px)",
+                              },
+                            }}
+                          >
+                            Register as Candidate
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Paper>
+              </Grow>
 
               {/* Error Alert */}
               {error && (
                 <Grow in timeout={500}>
-                  <Alert severity="error" className="mb-6 shadow-lg rounded-2xl border-0" icon={<ErrorIcon />}>
+                  <Alert
+                    severity="error"
+                    sx={{
+                      mb: 4,
+                      borderRadius: 3,
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                    }}
+                    icon={<ErrorIcon />}
+                  >
                     <Typography variant="h6" className="font-semibold">
                       {error}
                     </Typography>
@@ -438,366 +765,609 @@ const Dashboard = () => {
                 </Grow>
               )}
 
-              {/* Main Content */}
-              <Paper className="shadow-2xl rounded-3xl overflow-hidden border-0">
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  <Tabs
-                    value={activeTab}
-                    onChange={handleTabChange}
-                    variant="fullWidth"
-                    className="px-6"
-                    TabIndicatorProps={{
-                      style: {
-                        height: 4,
-                        borderRadius: 2,
-                        background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
-                      },
+              {/* Main Content Tabs */}
+              <Grow in timeout={1200}>
+                <Paper
+                  elevation={24}
+                  sx={{
+                    borderRadius: 4,
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Tab Navigation */}
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
+                      backdropFilter: "blur(10px)",
+                      borderBottom: "1px solid rgba(255,255,255,0.1)",
                     }}
                   >
-                    <Tab icon={<VoteIcon />} label="Elections" className="font-bold text-lg py-6 min-h-20" />
-                    <Tab icon={<HistoryIcon />} label="Voting History" className="font-bold text-lg py-6 min-h-20" />
-                    <Tab
-                      icon={<NotificationsIcon />}
-                      label="Notifications"
-                      className="font-bold text-lg py-6 min-h-20"
-                    />
-                    <Tab icon={<AnalyticsIcon />} label="Analytics" className="font-bold text-lg py-6 min-h-20" />
-                  </Tabs>
-                </div>
+                    <Tabs
+                      value={activeTab}
+                      onChange={handleTabChange}
+                      variant="fullWidth"
+                      TabIndicatorProps={{
+                        style: {
+                          height: 4,
+                          borderRadius: 2,
+                          background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
+                        },
+                      }}
+                    >
+                      <Tab
+                        icon={<VoteIcon />}
+                        label="Elections"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          py: 3,
+                          minHeight: 80,
+                          color: "#6b7280",
+                          "&.Mui-selected": {
+                            color: "#3b82f6",
+                          },
+                        }}
+                      />
+                      <Tab
+                        icon={<HistoryIcon />}
+                        label="Voting History"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          py: 3,
+                          minHeight: 80,
+                          color: "#6b7280",
+                          "&.Mui-selected": {
+                            color: "#3b82f6",
+                          },
+                        }}
+                      />
+                      <Tab
+                        icon={<NotificationsIcon />}
+                        label="Notifications"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          py: 3,
+                          minHeight: 80,
+                          color: "#6b7280",
+                          "&.Mui-selected": {
+                            color: "#3b82f6",
+                          },
+                        }}
+                      />
+                      <Tab
+                        icon={<AnalyticsIcon />}
+                        label="Analytics"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: "1rem",
+                          py: 3,
+                          minHeight: 80,
+                          color: "#6b7280",
+                          "&.Mui-selected": {
+                            color: "#3b82f6",
+                          },
+                        }}
+                      />
+                    </Tabs>
+                  </Box>
 
-                {/* Elections Tab */}
-                {activeTab === 0 && (
-                  <div className="p-8">
-                    <div className="text-center mb-8">
-                      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                        Active & Upcoming Elections
-                      </Typography>
-                      <Typography variant="h6" className="text-gray-600">
-                        Elections you can participate in or are scheduled to vote
-                      </Typography>
-                    </div>
+                  {/* Elections Tab */}
+                  {activeTab === 0 && (
+                    <Box sx={{ p: 4 }}>
+                      <Box className="text-center mb-8">
+                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
+                          Active & Upcoming Elections
+                        </Typography>
+                        <Typography variant="h6" className="text-gray-600">
+                          Elections you can participate in or are scheduled to vote
+                        </Typography>
+                      </Box>
 
-                    <div className="space-y-6">
-                      {elections
-                        .filter((e) => e.status !== "completed")
-                        .map((election, index) => (
-                          <Grow in timeout={600 + index * 200} key={election.id}>
-                            <Card className="shadow-lg hover:shadow-2xl transition-all duration-300 rounded-3xl border-0 overflow-hidden">
-                              <CardContent className="p-8">
-                                <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
-                                  <div className="flex-1">
-                                    <div className="flex flex-wrap items-center gap-3 mb-4">
-                                      <Typography variant="h5" className="font-bold text-gray-800">
-                                        {election.title}
-                                      </Typography>
-                                      <Chip
-                                        icon={getElectionStatusIcon(election.status)}
-                                        label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
-                                        color={getElectionStatusColor(election.status)}
-                                        className="font-semibold"
-                                      />
-                                      {election.hasVoted && (
+                      <Box className="space-y-6">
+                        {elections
+                          .filter((e) => e.status !== "completed")
+                          .map((election, index) => (
+                            <Grow in timeout={600 + index * 200} key={election.id}>
+                              <Paper
+                                elevation={12}
+                                sx={{
+                                  borderRadius: 4,
+                                  background: "rgba(255,255,255,0.95)",
+                                  backdropFilter: "blur(20px)",
+                                  border: "1px solid rgba(255,255,255,0.2)",
+                                  transition: "all 0.3s ease",
+                                  "&:hover": {
+                                    transform: "translateY(-4px)",
+                                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                                  },
+                                }}
+                              >
+                                <CardContent sx={{ p: 4 }}>
+                                  <Grid container spacing={4} alignItems="center">
+                                    <Grid item xs={12} md={8}>
+                                      <Box className="flex flex-wrap items-center gap-3 mb-4">
+                                        <Typography variant="h5" className="font-bold text-gray-800">
+                                          {election.title}
+                                        </Typography>
                                         <Chip
-                                          icon={<CheckCircleIcon />}
-                                          label="Voted"
-                                          color="success"
-                                          variant="outlined"
-                                          className="font-semibold"
+                                          icon={getElectionStatusIcon(election.status)}
+                                          label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
+                                          color={getElectionStatusColor(election.status)}
+                                          sx={{ fontWeight: 600 }}
                                         />
-                                      )}
-                                    </div>
-                                    <Typography variant="body1" className="text-gray-600 mb-6 leading-relaxed">
-                                      {election.description}
-                                    </Typography>
-                                    <div className="flex flex-wrap items-center gap-6 text-gray-500 mb-6">
-                                      <div className="flex items-center gap-2">
-                                        <CalendarIcon className="text-blue-500" />
-                                        <span className="font-medium">
-                                          Ends: {new Date(election.endDate).toLocaleDateString()}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-2">
-                                        <VoteIcon className="text-green-500" />
-                                        <span className="font-medium">{election.candidates} candidates</span>
-                                      </div>
-                                      <div className="flex items-center gap-2">
-                                        <AnalyticsIcon className="text-purple-500" />
-                                        <span className="font-medium">
-                                          {election.totalVotes.toLocaleString()} votes cast
-                                        </span>
-                                      </div>
-                                    </div>
-                                    {election.status === "active" && (
-                                      <div className="mb-4">
-                                        <div className="flex justify-between items-center mb-2">
-                                          <Typography variant="body2" className="text-gray-600 font-medium">
-                                            Voting Progress
+                                        {election.hasVoted && (
+                                          <Chip
+                                            icon={<CheckCircleIcon />}
+                                            label="Voted"
+                                            color="success"
+                                            variant="outlined"
+                                            sx={{ fontWeight: 600 }}
+                                          />
+                                        )}
+                                      </Box>
+                                      <Typography variant="body1" className="text-gray-600 mb-4 leading-relaxed">
+                                        {election.description}
+                                      </Typography>
+                                      <Box className="flex flex-wrap items-center gap-4 text-gray-500 mb-4">
+                                        <Box className="flex items-center gap-2">
+                                          <CalendarIcon sx={{ color: "#3b82f6", fontSize: 20 }} />
+                                          <Typography variant="body2" className="font-medium">
+                                            Ends: {new Date(election.endDate).toLocaleDateString()}
                                           </Typography>
-                                          <Typography variant="body2" className="text-gray-600 font-bold">
-                                            75%
+                                        </Box>
+                                        <Box className="flex items-center gap-2">
+                                          <VoteIcon sx={{ color: "#10b981", fontSize: 20 }} />
+                                          <Typography variant="body2" className="font-medium">
+                                            {election.candidates} candidates
                                           </Typography>
-                                        </div>
-                                        <LinearProgress
-                                          variant="determinate"
-                                          value={75}
-                                          className="h-3 rounded-full"
-                                          sx={{
-                                            backgroundColor: "#e5e7eb",
-                                            "& .MuiLinearProgress-bar": {
-                                              background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
+                                        </Box>
+                                        <Box className="flex items-center gap-2">
+                                          <AnalyticsIcon sx={{ color: "#8b5cf6", fontSize: 20 }} />
+                                          <Typography variant="body2" className="font-medium">
+                                            {election.totalVotes.toLocaleString()} votes cast
+                                          </Typography>
+                                        </Box>
+                                      </Box>
+                                      {election.status === "active" && (
+                                        <Box>
+                                          <Box className="flex justify-between items-center mb-2">
+                                            <Typography variant="body2" className="text-gray-600 font-medium">
+                                              Voting Progress
+                                            </Typography>
+                                            <Typography variant="body2" className="text-gray-600 font-bold">
+                                              75%
+                                            </Typography>
+                                          </Box>
+                                          <LinearProgress
+                                            variant="determinate"
+                                            value={75}
+                                            sx={{
+                                              height: 8,
                                               borderRadius: 4,
+                                              backgroundColor: "#e5e7eb",
+                                              "& .MuiLinearProgress-bar": {
+                                                background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
+                                                borderRadius: 4,
+                                              },
+                                            }}
+                                          />
+                                        </Box>
+                                      )}
+                                    </Grid>
+                                    <Grid item xs={12} md={4} className="text-center">
+                                      {election.status === "active" && !election.hasVoted ? (
+                                        <Button
+                                          variant="contained"
+                                          size="large"
+                                          startIcon={<VoteIcon />}
+                                          sx={{
+                                            px: 6,
+                                            py: 3,
+                                            borderRadius: 4,
+                                            fontWeight: 700,
+                                            fontSize: "1.1rem",
+                                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                            boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
+                                            transition: "all 0.3s ease",
+                                            "&:hover": {
+                                              background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                                              transform: "translateY(-2px) scale(1.02)",
+                                              boxShadow: "0 12px 40px rgba(59, 130, 246, 0.4)",
                                             },
                                           }}
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col gap-3">
-                                    {election.status === "active" && !election.hasVoted ? (
-                                      <Button
-                                        variant="contained"
-                                        size="large"
-                                        startIcon={<VoteIcon />}
-                                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg rounded-2xl px-8 py-4 font-bold text-lg"
-                                      >
-                                        Vote Now
-                                      </Button>
-                                    ) : election.status === "completed" ? (
-                                      <Button
-                                        variant="outlined"
-                                        size="large"
-                                        startIcon={<AnalyticsIcon />}
-                                        className="rounded-2xl px-8 py-4 font-bold text-lg border-2"
-                                      >
-                                        View Results
-                                      </Button>
-                                    ) : (
-                                      <Button
-                                        variant="outlined"
-                                        size="large"
-                                        disabled
-                                        startIcon={<ScheduleIcon />}
-                                        className="rounded-2xl px-8 py-4 font-bold text-lg border-2"
-                                      >
-                                        Upcoming
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              </CardContent>
-                            </Card>
+                                        >
+                                          Vote Now
+                                        </Button>
+                                      ) : election.status === "completed" ? (
+                                        <Button
+                                          variant="outlined"
+                                          size="large"
+                                          startIcon={<AnalyticsIcon />}
+                                          sx={{
+                                            px: 6,
+                                            py: 3,
+                                            borderRadius: 4,
+                                            fontWeight: 700,
+                                            fontSize: "1.1rem",
+                                            borderWidth: 2,
+                                            "&:hover": {
+                                              borderWidth: 2,
+                                              transform: "translateY(-2px)",
+                                            },
+                                          }}
+                                        >
+                                          View Results
+                                        </Button>
+                                      ) : (
+                                        <Button
+                                          variant="outlined"
+                                          size="large"
+                                          disabled
+                                          startIcon={<ScheduleIcon />}
+                                          sx={{
+                                            px: 6,
+                                            py: 3,
+                                            borderRadius: 4,
+                                            fontWeight: 700,
+                                            fontSize: "1.1rem",
+                                            borderWidth: 2,
+                                          }}
+                                        >
+                                          Upcoming
+                                        </Button>
+                                      )}
+                                    </Grid>
+                                  </Grid>
+                                </CardContent>
+                              </Paper>
+                            </Grow>
+                          ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Voting History Tab */}
+                  {activeTab === 1 && (
+                    <Box sx={{ p: 4 }}>
+                      <Box className="text-center mb-8">
+                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
+                          Your Voting History
+                        </Typography>
+                        <Typography variant="h6" className="text-gray-600">
+                          Complete record of your participation in elections
+                        </Typography>
+                      </Box>
+
+                      <Box className="space-y-4">
+                        {votingHistory.map((vote, index) => (
+                          <Grow in timeout={400 + index * 150} key={vote.id}>
+                            <Paper
+                              elevation={12}
+                              sx={{
+                                borderRadius: 4,
+                                background: "rgba(255,255,255,0.95)",
+                                backdropFilter: "blur(20px)",
+                                border: "1px solid rgba(255,255,255,0.2)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                  transform: "translateY(-2px)",
+                                  boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
+                                },
+                              }}
+                            >
+                              <ListItem sx={{ p: 3 }}>
+                                <ListItemIcon>
+                                  <Box
+                                    sx={{
+                                      width: 48,
+                                      height: 48,
+                                      borderRadius: 3,
+                                      background: "linear-gradient(135deg, #10b981, #059669)",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      color: "white",
+                                    }}
+                                  >
+                                    <CheckCircleIcon />
+                                  </Box>
+                                </ListItemIcon>
+                                <ListItemText
+                                  primary={
+                                    <Typography variant="h6" className="font-bold text-gray-800 mb-2">
+                                      {vote.electionTitle}
+                                    </Typography>
+                                  }
+                                  secondary={
+                                    <Typography variant="body1" className="text-gray-600">
+                                      Voted on {new Date(vote.votedAt).toLocaleDateString()} at{" "}
+                                      {new Date(vote.votedAt).toLocaleTimeString()}
+                                    </Typography>
+                                  }
+                                />
+                                <Chip
+                                  icon={vote.status === "confirmed" ? <CheckCircleIcon /> : <ScheduleIcon />}
+                                  label={vote.status === "confirmed" ? "Confirmed" : "Pending"}
+                                  color={vote.status === "confirmed" ? "success" : "warning"}
+                                  sx={{ fontWeight: 600 }}
+                                />
+                              </ListItem>
+                            </Paper>
                           </Grow>
                         ))}
-                    </div>
-                  </div>
-                )}
+                      </Box>
+                    </Box>
+                  )}
 
-                {/* Voting History Tab */}
-                {activeTab === 1 && (
-                  <div className="p-8">
-                    <div className="text-center mb-8">
-                      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                        Your Voting History
-                      </Typography>
-                      <Typography variant="h6" className="text-gray-600">
-                        Complete record of your participation in elections
-                      </Typography>
-                    </div>
+                  {/* Notifications Tab */}
+                  {activeTab === 2 && (
+                    <Box sx={{ p: 4 }}>
+                      <Box className="text-center mb-8">
+                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
+                          Recent Notifications
+                        </Typography>
+                        <Typography variant="h6" className="text-gray-600">
+                          Important updates and announcements
+                        </Typography>
+                      </Box>
 
-                    <div className="space-y-4">
-                      {votingHistory.map((vote, index) => (
-                        <Grow in timeout={400 + index * 150} key={vote.id}>
-                          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl border-0">
-                            <ListItem className="p-6">
-                              <ListItemIcon>
-                                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                                  <CheckCircleIcon className="text-white" />
-                                </div>
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={
-                                  <Typography variant="h6" className="font-bold text-gray-800 mb-2">
-                                    {vote.electionTitle}
-                                  </Typography>
-                                }
-                                secondary={
-                                  <Typography variant="body1" className="text-gray-600">
-                                    Voted on {new Date(vote.votedAt).toLocaleDateString()} at{" "}
-                                    {new Date(vote.votedAt).toLocaleTimeString()}
-                                  </Typography>
-                                }
-                              />
-                              <Chip
-                                icon={vote.status === "confirmed" ? <CheckCircleIcon /> : <ScheduleIcon />}
-                                label={vote.status === "confirmed" ? "Confirmed" : "Pending"}
-                                color={vote.status === "confirmed" ? "success" : "warning"}
-                                className="font-semibold"
-                              />
-                            </ListItem>
-                          </Card>
-                        </Grow>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      <Box className="space-y-4">
+                        {notifications.map((notification, index) => (
+                          <Grow in timeout={400 + index * 150} key={notification.id}>
+                            <Alert
+                              severity={notification.type}
+                              sx={{
+                                borderRadius: 3,
+                                background: "rgba(255,255,255,0.95)",
+                                backdropFilter: "blur(20px)",
+                                border: !notification.read
+                                  ? "2px solid rgba(59, 130, 246, 0.3)"
+                                  : "1px solid rgba(255,255,255,0.2)",
+                                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                              }}
+                            >
+                              <Typography variant="h6" className="font-bold mb-2">
+                                {notification.title}
+                              </Typography>
+                              <Typography variant="body1" className="mb-3 leading-relaxed">
+                                {notification.message}
+                              </Typography>
+                              <Typography variant="caption" className="text-gray-500 font-medium">
+                                {new Date(notification.timestamp).toLocaleString()}
+                              </Typography>
+                            </Alert>
+                          </Grow>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
 
-                {/* Notifications Tab */}
-                {activeTab === 2 && (
-                  <div className="p-8">
-                    <div className="text-center mb-8">
-                      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                        Recent Notifications
-                      </Typography>
-                      <Typography variant="h6" className="text-gray-600">
-                        Important updates and announcements
-                      </Typography>
-                    </div>
+                  {/* Analytics Tab */}
+                  {activeTab === 3 && (
+                    <Box sx={{ p: 4 }}>
+                      <Box className="text-center mb-8">
+                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
+                          Analytics Dashboard
+                        </Typography>
+                        <Typography variant="h6" className="text-gray-600">
+                          Your voting statistics and insights
+                        </Typography>
+                      </Box>
 
-                    <div className="space-y-4">
-                      {notifications.map((notification, index) => (
-                        <Grow in timeout={400 + index * 150} key={notification.id}>
-                          <Alert
-                            severity={notification.type}
-                            className={`rounded-2xl shadow-lg border-0 ${
-                              !notification.read ? "ring-2 ring-blue-500 ring-opacity-50" : ""
-                            }`}
+                      <Grid container spacing={4}>
+                        <Grid item xs={12} md={6}>
+                          <Paper
+                            elevation={12}
+                            sx={{
+                              borderRadius: 4,
+                              background: "rgba(255,255,255,0.95)",
+                              backdropFilter: "blur(20px)",
+                              border: "1px solid rgba(255,255,255,0.2)",
+                              height: "100%",
+                            }}
                           >
-                            <Typography variant="h6" className="font-bold mb-2">
-                              {notification.title}
-                            </Typography>
-                            <Typography variant="body1" className="mb-3 leading-relaxed">
-                              {notification.message}
-                            </Typography>
-                            <Typography variant="caption" className="text-gray-500 font-medium">
-                              {new Date(notification.timestamp).toLocaleString()}
-                            </Typography>
-                          </Alert>
-                        </Grow>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Analytics Tab */}
-                {activeTab === 3 && (
-                  <div className="p-8">
-                    <div className="text-center mb-8">
-                      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                        Analytics Dashboard
-                      </Typography>
-                      <Typography variant="h6" className="text-gray-600">
-                        Your voting statistics and insights
-                      </Typography>
-                    </div>
-
-                    <Grid container spacing={6}>
-                      <Grid item xs={12} md={6}>
-                        <Card className="shadow-xl rounded-3xl h-full border-0">
-                          <CardContent className="p-8">
-                            <div className="flex items-center gap-4 mb-6">
-                              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center">
-                                <AnalyticsIcon className="text-white text-2xl" />
-                              </div>
-                              <Typography variant="h5" className="font-bold text-gray-800">
-                                Your Participation
-                              </Typography>
-                            </div>
-                            <div className="space-y-6">
-                              <div className="p-4 bg-blue-50 rounded-2xl">
-                                <div className="flex justify-between items-center mb-2">
-                                  <Typography variant="body1" className="text-gray-700 font-medium">
-                                    Participation Rate
-                                  </Typography>
-                                  <Typography variant="h5" className="font-bold text-blue-600">
-                                    80%
-                                  </Typography>
-                                </div>
-                                <LinearProgress
-                                  variant="determinate"
-                                  value={80}
-                                  className="h-3 rounded-full"
+                            <CardContent sx={{ p: 4 }}>
+                              <Box className="flex items-center gap-4 mb-6">
+                                <Box
                                   sx={{
-                                    backgroundColor: "#dbeafe",
-                                    "& .MuiLinearProgress-bar": {
-                                      background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
-                                      borderRadius: 4,
-                                    },
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: 3,
+                                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
                                   }}
-                                />
-                              </div>
+                                >
+                                  <AnalyticsIcon sx={{ fontSize: 28 }} />
+                                </Box>
+                                <Typography variant="h5" className="font-bold text-gray-800">
+                                  Your Participation
+                                </Typography>
+                              </Box>
+                              <Box className="space-y-6">
+                                <Box
+                                  sx={{
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Box className="flex justify-between items-center mb-2">
+                                    <Typography variant="body1" className="text-gray-700 font-medium">
+                                      Participation Rate
+                                    </Typography>
+                                    <Typography variant="h5" className="font-bold text-blue-600">
+                                      85%
+                                    </Typography>
+                                  </Box>
+                                  <LinearProgress
+                                    variant="determinate"
+                                    value={85}
+                                    sx={{
+                                      height: 8,
+                                      borderRadius: 4,
+                                      backgroundColor: "rgba(59, 130, 246, 0.2)",
+                                      "& .MuiLinearProgress-bar": {
+                                        background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
+                                        borderRadius: 4,
+                                      },
+                                    }}
+                                  />
+                                </Box>
 
-                              <div className="flex justify-between items-center p-4 bg-green-50 rounded-2xl">
-                                <Typography variant="h6" className="text-gray-700 font-medium">
-                                  Elections Voted
-                                </Typography>
-                                <Typography variant="h4" className="font-bold text-green-600">
-                                  12
-                                </Typography>
-                              </div>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Typography variant="h6" className="text-gray-700 font-medium">
+                                    Elections Voted
+                                  </Typography>
+                                  <Typography variant="h4" className="font-bold text-green-600">
+                                    {votingHistory.length}
+                                  </Typography>
+                                </Box>
 
-                              <div className="flex justify-between items-center p-4 bg-purple-50 rounded-2xl">
-                                <Typography variant="h6" className="text-gray-700 font-medium">
-                                  Total Available
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Typography variant="h6" className="text-gray-700 font-medium">
+                                    Total Available
+                                  </Typography>
+                                  <Typography variant="h4" className="font-bold text-purple-600">
+                                    {elections.length + 3}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </CardContent>
+                          </Paper>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Paper
+                            elevation={12}
+                            sx={{
+                              borderRadius: 4,
+                              background: "rgba(255,255,255,0.95)",
+                              backdropFilter: "blur(20px)",
+                              border: "1px solid rgba(255,255,255,0.2)",
+                              height: "100%",
+                            }}
+                          >
+                            <CardContent sx={{ p: 4 }}>
+                              <Box className="flex items-center gap-4 mb-6">
+                                <Box
+                                  sx={{
+                                    width: 56,
+                                    height: 56,
+                                    borderRadius: 3,
+                                    background: "linear-gradient(135deg, #10b981, #059669)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    boxShadow: "0 8px 32px rgba(16, 185, 129, 0.3)",
+                                  }}
+                                >
+                                  <DashboardIcon sx={{ fontSize: 28 }} />
+                                </Box>
+                                <Typography variant="h5" className="font-bold text-gray-800">
+                                  System Statistics
                                 </Typography>
-                                <Typography variant="h4" className="font-bold text-purple-600">
-                                  15
-                                </Typography>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                              </Box>
+                              <Box className="space-y-4">
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Typography variant="h6" className="text-gray-700 font-medium">
+                                    Total Votes Cast
+                                  </Typography>
+                                  <Typography variant="h4" className="font-bold text-blue-600">
+                                    18,750
+                                  </Typography>
+                                </Box>
+
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Typography variant="h6" className="text-gray-700 font-medium">
+                                    Active Elections
+                                  </Typography>
+                                  <Typography variant="h4" className="font-bold text-green-600">
+                                    {elections.filter((e) => e.status === "active").length}
+                                  </Typography>
+                                </Box>
+
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    p: 3,
+                                    background:
+                                      "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1))",
+                                    borderRadius: 3,
+                                  }}
+                                >
+                                  <Typography variant="h6" className="text-gray-700 font-medium">
+                                    Registered Voters
+                                  </Typography>
+                                  <Typography variant="h4" className="font-bold text-purple-600">
+                                    5,420
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </CardContent>
+                          </Paper>
+                        </Grid>
                       </Grid>
-
-                      <Grid item xs={12} md={6}>
-                        <Card className="shadow-xl rounded-3xl h-full border-0">
-                          <CardContent className="p-8">
-                            <div className="flex items-center gap-4 mb-6">
-                              <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center">
-                                <DashboardIcon className="text-white text-2xl" />
-                              </div>
-                              <Typography variant="h5" className="font-bold text-gray-800">
-                                System Statistics
-                              </Typography>
-                            </div>
-                            <div className="space-y-4">
-                              <div className="flex justify-between items-center p-4 bg-blue-50 rounded-2xl">
-                                <Typography variant="h6" className="text-gray-700 font-medium">
-                                  Total Votes Cast
-                                </Typography>
-                                <Typography variant="h4" className="font-bold text-blue-600">
-                                  18,750
-                                </Typography>
-                              </div>
-
-                              <div className="flex justify-between items-center p-4 bg-green-50 rounded-2xl">
-                                <Typography variant="h6" className="text-gray-700 font-medium">
-                                  Active Elections
-                                </Typography>
-                                <Typography variant="h4" className="font-bold text-green-600">
-                                  3
-                                </Typography>
-                              </div>
-
-                              <div className="flex justify-between items-center p-4 bg-purple-50 rounded-2xl">
-                                <Typography variant="h6" className="text-gray-700 font-medium">
-                                  Registered Voters
-                                </Typography>
-                                <Typography variant="h4" className="font-bold text-purple-600">
-                                  5,420
-                                </Typography>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    </Grid>
-                  </div>
-                )}
-              </Paper>
+                    </Box>
+                  )}
+                </Paper>
+              </Grow>
             </div>
           </Fade>
         </Container>
-      </div>
+      </Box>
     </>
   )
 }

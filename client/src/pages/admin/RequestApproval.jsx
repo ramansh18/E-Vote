@@ -1,163 +1,749 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { Button, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Snackbar } from '@mui/material';
-import { Alert } from '@mui/material';
+"use client"
 
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
+import { useSelector } from "react-redux"
+import {
+  Button,
+  CircularProgress,
+  Paper,
+  Typography,
+  Box,
+  Avatar,
+  Chip,
+  Fade,
+  Grow,
+  Grid,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Alert,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Container,
+} from "@mui/material"
+import {
+  CheckCircle,
+  Cancel,
+  Person,
+  Group,
+  Event,
+  AccountBalanceWallet,
+  ArrowBack,
+  Pending,
+  FilterList,
+  Search,
+  Refresh,
+  Assignment,
+  Schedule,
+  Verified,
+  Error as ErrorIcon,
+  Dashboard,
+  Assessment,
+} from "@mui/icons-material"
 
 const RequestApproval = () => {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const token = useSelector((state) => state.auth.token);
+  const [requests, setRequests] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState("")
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success")
+  const [processingId, setProcessingId] = useState(null)
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+  })
+
+  const token = useSelector((state) => state.auth.token)
+  const navigate = useNavigate()
 
   // Fetch requests function
   const fetchRequests = async () => {
-    if (!token) return; // Exit if no token is present
+    if (!token) return
 
     try {
-      const response = await axios.get('http://localhost:5000/api/candidate/all-requests', {
+      setLoading(true)
+      const response = await axios.get("http://localhost:5000/api/candidate/all-requests", {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
-      // Filter out approved requests
-      const filteredRequests = response.data.requests.filter((request) => request.status === 'pending');
-      
-      setRequests(filteredRequests);
-      setLoading(false);
+      // Filter out approved requests for display, but keep all for stats
+      const allRequests = response.data.requests
+      const filteredRequests = allRequests.filter((request) => request.status === "pending")
+
+      setRequests(filteredRequests)
+
+      // Calculate stats
+      const statsData = {
+        total: allRequests.length,
+        pending: allRequests.filter((r) => r.status === "pending").length,
+        approved: allRequests.filter((r) => r.status === "approved").length,
+        rejected: allRequests.filter((r) => r.status === "rejected").length,
+      }
+      setStats(statsData)
+
+      setLoading(false)
     } catch (err) {
-      console.error("Error fetching candidate requests:", err);
-      setError('Failed to load requests');
-      setLoading(false);
+      console.error("Error fetching candidate requests:", err)
+      setError("Failed to load requests")
+      setLoading(false)
     }
-  };
+  }
 
-  // Fetch requests when token changes
   useEffect(() => {
     if (token) {
-      fetchRequests();
+      fetchRequests()
     }
-  }, [token]);
+  }, [token])
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/candidate/approve-candidate/${id}`,{}, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      setProcessingId(id)
+      await axios.put(
+        `http://localhost:5000/api/candidate/approve-candidate/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      fetchRequests(); // Refresh list after approval
-      setSnackbarMessage('Candidate approved successfully!');
-      setSnackbarOpen(true);
+      )
+      fetchRequests()
+      showSnackbar("Candidate approved successfully!", "success")
     } catch (err) {
-      console.error("Approval failed:", err);
-      setSnackbarMessage('Error approving candidate.');
-      setSnackbarOpen(true);
+      console.error("Approval failed:", err)
+      showSnackbar("Error approving candidate.", "error")
+    } finally {
+      setProcessingId(null)
     }
-  };
+  }
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/candidate/reject-candidate/${id}`,{}, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      setProcessingId(id)
+      await axios.put(
+        `http://localhost:5000/api/candidate/reject-candidate/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
-      fetchRequests(); // Refresh list after rejection
-      setSnackbarMessage('Candidate rejected successfully!');
-      setSnackbarOpen(true);
+      )
+      fetchRequests()
+      showSnackbar("Candidate rejected successfully!", "success")
     } catch (err) {
-      console.error("Rejection failed:", err);
-      setSnackbarMessage('Error rejecting candidate.');
-      setSnackbarOpen(true);
+      console.error("Rejection failed:", err)
+      showSnackbar("Error rejecting candidate.", "error")
+    } finally {
+      setProcessingId(null)
     }
-  };
+  }
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message)
+    setSnackbarSeverity(severity)
+    setSnackbarOpen(true)
+  }
 
   const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
+    setSnackbarOpen(false)
+  }
 
-  if (loading) return <div className="flex justify-center items-center h-screen"><CircularProgress /></div>;
-  if (error) return <p>{error}</p>;
+  const handleBackToDashboard = () => {
+    navigate("/admin/dashboard")
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "approved":
+        return "success"
+      case "rejected":
+        return "error"
+      case "pending":
+        return "warning"
+      default:
+        return "default"
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "approved":
+        return <Verified />
+      case "rejected":
+        return <ErrorIcon />
+      case "pending":
+        return <Schedule />
+      default:
+        return <Pending />
+    }
+  }
+
+  if (loading) {
+    return (
+      <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        {/* Centered Loading Content */}
+        <Box className="relative z-10 min-h-screen flex items-center justify-center">
+          <Container maxWidth="sm">
+            <Box className="text-center">
+              <Box className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center animate-pulse shadow-2xl">
+                <Assignment className="text-white text-4xl" />
+              </Box>
+              <Typography variant="h5" className="text-gray-700 mb-2">
+                Loading Candidate Requests...
+              </Typography>
+              <CircularProgress size={40} sx={{ color: "#3b82f6" }} />
+            </Box>
+          </Container>
+        </Box>
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        {/* Centered Error Content */}
+        <Box className="relative z-10 min-h-screen flex items-center justify-center">
+          <Container maxWidth="sm">
+            <Paper
+              elevation={24}
+              sx={{
+                p: 6,
+                borderRadius: 4,
+                background: "rgba(255,255,255,0.95)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                textAlign: "center",
+              }}
+            >
+              <ErrorIcon sx={{ fontSize: 64, color: "#ef4444", mb: 3 }} />
+              <Typography variant="h5" className="text-gray-800 mb-3">
+                Error Loading Requests
+              </Typography>
+              <Typography variant="body1" className="text-gray-600 mb-4">
+                {error}
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={fetchRequests}
+                startIcon={<Refresh />}
+                sx={{
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 3,
+                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                  fontWeight: 600,
+                  textTransform: "none",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 8px 25px rgba(59, 130, 246, 0.3)",
+                  },
+                }}
+              >
+                Try Again
+              </Button>
+            </Paper>
+          </Container>
+        </Box>
+      </Box>
+    )
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Candidate Requests</h1>
-      {requests.length === 0 ? (
-        <p className="text-lg text-gray-600">No pending requests found.</p>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table className="min-w-full" aria-label="candidate requests table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Candidate Name</TableCell>
-                <TableCell>Party</TableCell>
-                <TableCell>Election Title</TableCell>
-                <TableCell>Wallet Address</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {requests.map((request) => (
-                <TableRow key={request._id}>
-                  <TableCell>{request.userId?.name || 'N/A'}</TableCell>
-                  <TableCell>{request.party || 'N/A'}</TableCell>
-                  <TableCell>{request.electionId?.title || 'N/A'}</TableCell>
-                  <TableCell>{request.walletAddress || request.userId?.walletAddress || 'N/A'}</TableCell>
-                  <TableCell>{request.status}</TableCell>
-                  <TableCell>
-  <div className="flex">
-    <div className="mr-2">
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => handleApprove(request._id)}
-        disabled={request.status !== 'pending'}
-      >
-        Approve
-      </Button>
-    </div>
-    <div>
-      <Button
-        variant="contained"
-        color="secondary"
-        onClick={() => handleReject(request._id)}
-        disabled={request.status !== 'pending'}
-      >
-        Reject
-      </Button>
-    </div>
-  </div>
-</TableCell>
+    <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-bounce"></div>
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-ping"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`,
+            }}
+          ></div>
+        ))}
+      </div>
+
+      {/* Centered Main Content */}
+      <Box className="relative z-10 min-h-screen flex flex-col">
+        <Container maxWidth="xl" sx={{ flex: 1, display: "flex", flexDirection: "column", py: 4 }}>
+          <Fade in timeout={1000}>
+            <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {/* Centered Header Section */}
+              <Box className="text-center mb-8">
+                <Box className="flex items-center justify-center mb-6">
+                  <IconButton
+                    onClick={handleBackToDashboard}
+                    sx={{
+                      mr: 3,
+                      background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                      color: "white",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                        transform: "scale(1.1)",
+                      },
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    <ArrowBack />
+                  </IconButton>
+                  <Box>
+                    <Typography
+                      variant="h3"
+                      className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2"
+                    >
+                      Candidate Requests
+                    </Typography>
+                    <Typography variant="h6" className="text-gray-600">
+                      Review and manage candidate applications
+                    </Typography>
+                  </Box>
+                </Box>
+
+               
+              </Box>
+
+              {/* Centered Statistics Cards */}
+        <Box className="flex justify-center mb-8">
+  <Box sx={{ maxWidth: 1000, width: "100%" }}>
+    <Grid container spacing={2} justifyContent="center">
+      {[
+        {
+          label: "Total Requests",
+          value: stats.total,
+          icon: <Assignment fontSize="medium" />,
+          gradient: "linear-gradient(135deg, #d6dfff 0%, #d6cfff 100%)",
+          color: "#4c5ce5",
+        },
+        {
+          label: "Pending Review",
+          value: stats.pending,
+          icon: <Schedule fontSize="medium" />,
+          gradient: "linear-gradient(135deg, #ffe0f0 0%, #fbe0e0 100%)",
+          color: "#e85a92",
+        },
+        {
+          label: "Approved",
+          value: stats.approved,
+          icon: <CheckCircle fontSize="medium" />,
+          gradient: "linear-gradient(135deg, #e0f7ff 0%, #d0f4fd 100%)",
+          color: "#00a6d6",
+        },
+        {
+          label: "Rejected",
+          value: stats.rejected,
+          icon: <Cancel fontSize="medium" />,
+          gradient: "linear-gradient(135deg, #ffe3e3 0%, #ffe6cc 100%)",
+          color: "#f35b5b",
+        },
+      ].map((stat, index) => (
+        <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grow in timeout={300 + index * 150}>
+            <Paper
+              elevation={3}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                padding: 2,
+                borderRadius: 3,
+                height: 90,
+                width: "100%", // full width within grid
+                minWidth: 200,
+                maxWidth: 250, // ensures consistency
+                background: "#fff",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.015)",
+                  boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                },
+              }}
+            >
+              {/* Icon */}
+              <Box
+                sx={{
+                  width: 50,
+                  height: 50,
+                  minWidth: 50,
+                  minHeight: 50,
+                  borderRadius: 2,
+                  background: stat.gradient,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  marginRight: 2,
+                }}
+              >
+                {stat.icon}
+              </Box>
+
+              {/* Content */}
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: "#333", mb: 0.2, fontSize: "0.85rem" }}
+                >
+                  {stat.label}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    color: stat.color,
+                    fontSize: "1.05rem",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {stat.value.toLocaleString()}
+                </Typography>
+              </Box>
+            </Paper>
+          </Grow>
+        </Grid>
+      ))}
+    </Grid>
+  </Box>
+</Box>
 
 
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
 
-      {/* Snackbar for success or error messages */}
+
+              {/* Centered Content Area */}
+              <Box className="flex justify-center flex-1">
+                <Box sx={{ maxWidth: 1400, width: "100%" }}>
+                  {requests.length === 0 ? (
+                    <Fade in timeout={800}>
+                      <Box className="flex justify-center">
+                        <Paper
+                          elevation={24}
+                          sx={{
+                            borderRadius: 4,
+                            background: "rgba(255,255,255,0.95)",
+                            backdropFilter: "blur(20px)",
+                            border: "1px solid rgba(255,255,255,0.2)",
+                            p: 8,
+                            textAlign: "center",
+                            maxWidth: 600,
+                            width: "100%",
+                          }}
+                        >
+                          <Box className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                            <Assignment className="text-gray-400 text-4xl" />
+                          </Box>
+                          <Typography variant="h5" className="text-gray-600 mb-3">
+                            No Pending Requests
+                          </Typography>
+                          <Typography variant="body1" className="text-gray-500">
+                            All candidate requests have been processed. New requests will appear here for your review.
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Fade>
+                  ) : (
+                    <Fade in timeout={800}>
+                      <Paper
+                        elevation={24}
+                        sx={{
+                          borderRadius: 4,
+                          background: "rgba(255,255,255,0.95)",
+                          backdropFilter: "blur(20px)",
+                          border: "1px solid rgba(255,255,255,0.2)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {/* Table Header */}
+                        <Box
+                          sx={{
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            p: 4,
+                            position: "relative",
+                            textAlign: "center",
+                          }}
+                        >
+                          <Box className="flex items-center justify-center space-x-4">
+                            <Box className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                              <Assignment className="text-white" />
+                            </Box>
+                            <Box>
+                              <Typography variant="h5" className="font-bold text-white mb-1">
+                                Pending Candidate Requests
+                              </Typography>
+                              <Typography variant="body2" className="text-blue-100">
+                                {requests.length} request{requests.length !== 1 ? "s" : ""} awaiting review
+                              </Typography>
+                            </Box>
+                          </Box>
+
+                          {/* Decorative elements */}
+                          <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></Box>
+                          <Box className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></Box>
+                        </Box>
+
+                        {/* Centered Table */}
+                        <Box sx={{ p: 4 }}>
+                          <TableContainer>
+                            <Table
+                              sx={{
+                                "& .MuiTableHead-root": {
+                                  "& .MuiTableCell-root": {
+                                    background: "linear-gradient(135deg, #f8fafc, #e2e8f0)",
+                                    fontWeight: 700,
+                                    fontSize: "1rem",
+                                    color: "#374151",
+                                    borderBottom: "2px solid #e5e7eb",
+                                    textAlign: "center",
+                                  },
+                                },
+                                "& .MuiTableBody-root": {
+                                  "& .MuiTableRow-root": {
+                                    transition: "all 0.3s ease",
+                                    "&:hover": {
+                                      backgroundColor: "rgba(59, 130, 246, 0.05)",
+                                      transform: "scale(1.01)",
+                                    },
+                                  },
+                                  "& .MuiTableCell-root": {
+                                    borderBottom: "1px solid #f3f4f6",
+                                    py: 3,
+                                    textAlign: "center",
+                                    fontSize: "0.95rem",
+                                  },
+                                },
+                              }}
+                            >
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>
+                                    <Box className="flex items-center justify-center space-x-2">
+                                      <Person className="text-blue-600" />
+                                      <span>Candidate Name</span>
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box className="flex items-center justify-center space-x-2">
+                                      <Group className="text-purple-600" />
+                                      <span>Party</span>
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box className="flex items-center justify-center space-x-2">
+                                      <Event className="text-green-600" />
+                                      <span>Election</span>
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box className="flex items-center justify-center space-x-2">
+                                      <AccountBalanceWallet className="text-orange-600" />
+                                      <span>Wallet Address</span>
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box className="flex items-center justify-center space-x-2">
+                                      <Assessment className="text-indigo-600" />
+                                      <span>Status</span>
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>Actions</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {requests.map((request, index) => (
+                                  <Grow in timeout={600 + index * 200} key={request._id}>
+                                    <TableRow>
+                                      <TableCell>
+                                        <Box className="flex items-center justify-center space-x-3">
+                                          <Avatar
+                                            sx={{
+                                              width: 40,
+                                              height: 40,
+                                              background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                            }}
+                                          >
+                                            <Person />
+                                          </Avatar>
+                                          <Typography variant="body1" className="font-semibold text-gray-800">
+                                            {request.userId?.name || "Unknown"}
+                                          </Typography>
+                                        </Box>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Typography variant="body1" className="font-medium text-gray-700">
+                                          {request.party || "N/A"}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Typography variant="body1" className="font-medium text-gray-700">
+                                          {request.electionId?.title || "N/A"}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Typography
+                                          variant="body2"
+                                          className="font-mono text-gray-600"
+                                          sx={{ fontSize: "0.8rem" }}
+                                        >
+                                          {request.walletAddress || request.userId?.walletAddress || "N/A"}
+                                        </Typography>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Chip
+                                          icon={getStatusIcon(request.status)}
+                                          label={request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                          color={getStatusColor(request.status)}
+                                          sx={{
+                                            fontWeight: 600,
+                                            borderRadius: 2,
+                                          }}
+                                        />
+                                      </TableCell>
+                                      <TableCell>
+                                        <Box className="flex items-center justify-center space-x-2">
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={
+                                              processingId === request._id ? (
+                                                <CircularProgress size={16} color="inherit" />
+                                              ) : (
+                                                <CheckCircle />
+                                              )
+                                            }
+                                            onClick={() => handleApprove(request._id)}
+                                            disabled={request.status !== "pending" || processingId === request._id}
+                                            sx={{
+                                              px: 2,
+                                              py: 1,
+                                              borderRadius: 2,
+                                              background: "linear-gradient(135deg, #10b981, #059669)",
+                                              fontWeight: 600,
+                                              textTransform: "none",
+                                              fontSize: "0.875rem",
+                                              "&:hover": {
+                                                background: "linear-gradient(135deg, #059669, #047857)",
+                                                transform: "translateY(-2px)",
+                                                boxShadow: "0 4px 15px rgba(16, 185, 129, 0.3)",
+                                              },
+                                              "&:disabled": {
+                                                background: "linear-gradient(135deg, #9ca3af, #6b7280)",
+                                              },
+                                            }}
+                                          >
+                                            Approve
+                                          </Button>
+
+                                          <Button
+                                            variant="contained"
+                                            size="small"
+                                            startIcon={
+                                              processingId === request._id ? (
+                                                <CircularProgress size={16} color="inherit" />
+                                              ) : (
+                                                <Cancel />
+                                              )
+                                            }
+                                            onClick={() => handleReject(request._id)}
+                                            disabled={request.status !== "pending" || processingId === request._id}
+                                            sx={{
+                                              px: 2,
+                                              py: 1,
+                                              borderRadius: 2,
+                                              background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                                              fontWeight: 600,
+                                              textTransform: "none",
+                                              fontSize: "0.875rem",
+                                              "&:hover": {
+                                                background: "linear-gradient(135deg, #dc2626, #b91c1c)",
+                                                transform: "translateY(-2px)",
+                                                boxShadow: "0 4px 15px rgba(239, 68, 68, 0.3)",
+                                              },
+                                              "&:disabled": {
+                                                background: "linear-gradient(135deg, #9ca3af, #6b7280)",
+                                              },
+                                            }}
+                                          >
+                                            Reject
+                                          </Button>
+                                        </Box>
+                                      </TableCell>
+                                    </TableRow>
+                                  </Grow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        </Box>
+                      </Paper>
+                    </Fade>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          </Fade>
+        </Container>
+      </Box>
+
+      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarMessage.includes('Error') ? 'error' : 'success'}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          variant="filled"
+          sx={{
+            borderRadius: 3,
+            fontWeight: 500,
+          }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
-  );
-};
+    </Box>
+  )
+}
 
-export default RequestApproval;
+export default RequestApproval

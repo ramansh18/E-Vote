@@ -67,7 +67,16 @@ exports.registerVoter = async (req, res) => {
     const tx = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
     console.log("Voter registration successful:", tx.transactionHash);
-
+    const io = req.app.get("io")
+    io.emit("newActivity", {
+      id: Date.now(), // unique id
+      action: `Voter "${user.name}" registered`,
+      user: name,
+      time: "Just now",
+      type: "voter",
+      avatar: "/placeholder.svg?height=40&width=40",
+    })
+     console.log("📡 Emitted test newActivity event");
     res.status(201).json({
       message: "Voter registered successfully!",
       txHash: tx.transactionHash,

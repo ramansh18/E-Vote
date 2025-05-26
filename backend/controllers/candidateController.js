@@ -5,6 +5,7 @@ const { candidateRegistrationContract } = contracts;
 const { generateWallet } = require("../utils/wallet");
 const deployedAddresses = require("../../contractAddresses.json");
 const User = require("../models/User");
+const Activity = require("../models/activity")
 require("dotenv").config({ path: "../.env" });
 
 exports.getNominationStatus = async (req, res) => {
@@ -142,7 +143,20 @@ exports.submitCandidateRequest = async (req, res) => {
     });
 
     await newCandidateRequest.save();
+    const candidate = await User.findById(userId);
+    const candidateName = candidate.name;
+    console.log(candidateName)
+    const activity = new Activity({
+  action: "New candidate request received",
+  user: candidateName,  // Get from user data
+  type: "candidate",
+});
 
+await activity.save(); // ✅ Save to DB
+
+// Emit to socket
+const io = req.app.get("io");
+io.emit("newActivity", activity);
     res.status(200).json({ message: "Candidate request submitted successfully." });
   } catch (err) {
     console.error(err);
@@ -172,7 +186,8 @@ exports.rejectCandidateRequest = async (req, res) => {
 
 exports.approveCandidateRequest = async (req, res) => {
   const { requestId } = req.params;
-  console.log("request id",requestId)
+  const io = req.app.get('io');
+    console.log("🧪 IO instance:", io);
   try {
     const request = await Candidate.findById(requestId);
     if (!request || request.status !== "pending") {
@@ -236,7 +251,18 @@ exports.approveCandidateRequest = async (req, res) => {
     await election.save(); // Save the updated election
 
     await request.save(); // Save the updated candidate request
+    
+    const activity = new Activity({
+  action: "New candidate request approved",
+  user: candidateName,  // Get from user data
+  type: "candidate",
+});
 
+await activity.save(); // ✅ Save to DB
+
+// Emit to socket
+const io = req.app.get("io");
+io.emit("newActivity", activity);
     res.status(200).json({
       message: "Candidate approved and registered on blockchain.",
       txHash: tx.transactionHash,
@@ -271,17 +297,33 @@ exports.getAllCandidateRequests = async (req, res) => {
 
 exports.getMyCandidateRequest = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming `req.user` is populated by auth middleware
+    const userId = req.user.id; // Assuming `req.user` is populated by auth middleware
     // Find candidate request by the user
-    const request = await Candidate.findOne({ userId, status: "pending" });
+    console.log(userId)
+    const requests = await Candidate.find({
+      userId,
+      status: { $in: ["pending", "approved"] },
+    }).populate({
+      path: "electionId",
+      select: "title", // fetch only electionTitle from Election model
+    }).select("_id party electionId status createdAt"); // Select required fields from Candidate
 
-    if (!request) {
-      return res.status(404).json({ message: "No pending request found." });
+    if (requests.length === 0) {
+      return res.status(404).json({ message: "No pending or approved requests found." });
     }
 
+    // Format the output as requested
+    const formattedRequests = requests.map((req) => ({
+      _id: req._id.toString(),
+      party: req.party,
+      electionId: req.electionId._id?.toString() || "", // fallback in case of missing election
+      electionTitle: req.electionId?.title || "N/A",
+      status: req.status,
+      submittedAt: req.createdAt,
+    }));
     res.status(200).json({
       message: "Your candidate request fetched successfully!",
-      request,
+      formattedRequests,
     });
   } catch (error) {
     console.error("Error fetching candidate request:", error);
@@ -295,7 +337,7 @@ exports.getMyCandidateRequest = async (req, res) => {
 exports.deleteCandidateRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
-    const userId = req.user._id; // Assuming `req.user` is populated by auth middleware
+    const userId = req.user.id; // Assuming `req.user` is populated by auth middleware
 
     // Find the candidate request by ID
     const request = await Candidate.findById(requestId);

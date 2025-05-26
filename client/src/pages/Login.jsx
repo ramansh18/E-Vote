@@ -62,9 +62,9 @@ const Login = () => {
         if (isAdmin) {
           navigate("/admin/dashboard")
         } else {
-          navigate("/profile")
+          navigate("/dashboard")
         }
-      }, 1500)
+      }, 1000)
     } catch (error) {
       setSnackbar({
         open: true,

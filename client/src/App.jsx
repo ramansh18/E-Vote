@@ -22,23 +22,26 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ApprovedCandidates from "./pages/admin/ApprovedCandidates";
 import VoterListPage from "./pages/admin/VoterListPage";
 import Results from "./pages/admin/Results";
-import ProfileUpdate from "./components/profileUpdate";
+import Profile from "./pages/Profile";
 import Elections from "./pages/Elections";
 import ElectionDetail from "./pages/ElectionDetail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
-
+import ProfileUpdate from "./components/profileUpdate"
+import NotAdmin from "./components/NotAdmin";
+import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, isLoggedIn }) => {
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }
-  return children; // Allow access to the children routes
+  return children; 
 };
 
 const AdminProtectedRoute = ({ children, isAdmin }) => {
   if (!isAdmin) {
-    return <Navigate to="/user-not-found" />;
+    return <Navigate to="/not-admin" />;
   }
   return children; // Allow access to the admin routes
 };
@@ -107,7 +110,7 @@ function App() {
 
         {/* Admin Routes */}
         <Route
-          path="/election-list"
+          path="/admin/election-list"
           element={
             <ProtectedRoute isLoggedIn={isLoggedIn}>
               <ElectionList />
@@ -172,11 +175,15 @@ function App() {
         />
 
         <Route path="/results/:electionId" element={<ResultPage />} />
-        <Route path="/profile" element={<ProfileUpdate />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile-new" element={<ProfileUpdate />} />
         <Route path="/elections" element={<Elections />} />
         <Route path="/election/:id" element={<ElectionDetail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path='/not-admin' element={<NotAdmin />} />
+        <Route path='/about' element={<AboutUs />} />
+        <Route path='/contact' element={<ContactUs />} />
       </Routes>
       <Footer />
     </Router>
