@@ -14,7 +14,10 @@ const adminRoutes = require("./routes/adminRoutes.js")
 const voterRegistration = require('./routes/voterRegistration.js')
 const profileUpdateRoutes = require('./routes/profileUpdateRoutes.js')
 const test = require("./routes/test.js")
+<<<<<<< HEAD
 const uploadRoute = require('./routes/uploadRoute')
+=======
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 const activityRoutes = require("./routes/activityRoutes");
 const server = http.createServer(app); // create HTTP server
 // Setup socket.io server

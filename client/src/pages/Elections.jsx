@@ -351,12 +351,19 @@ const Elections = () => {
               >
                 Elections Dashboard
               </Typography>
+<<<<<<< HEAD
               <Box className="flex justify-center">
                 <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
                 Participate in democratic processes and make your voice heard. View all available elections and cast
                 your vote.
               </Typography>
               </Box>
+=======
+              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
+                Participate in democratic processes and make your voice heard. View all available elections and cast
+                your vote.
+              </Typography>
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
              
             </Box>
@@ -376,8 +383,39 @@ const Elections = () => {
                   mb: 4,
                 }}
               >
+<<<<<<< HEAD
                 <Grid container spacing={3} alignItems="center" justifyContent="space-between">
                   
+=======
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      placeholder="Search elections..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search sx={{ color: "#6b7280" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          "&:hover fieldset": {
+                            borderColor: "#3b82f6",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#3b82f6",
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                   <Grid item xs={12} md={6}>
                     <Tabs
                       value={activeTab}
@@ -417,6 +455,7 @@ const Elections = () => {
                       />
                     </Tabs>
                   </Grid>
+<<<<<<< HEAD
                   
                   <Grid item xs={12} md={6}>
                     <TextField
@@ -446,6 +485,8 @@ const Elections = () => {
                     />
                   </Grid>
                   
+=======
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                 </Grid>
               </Paper>
             </Grow>
@@ -502,7 +543,10 @@ const Elections = () => {
                           backdropFilter: "blur(20px)",
                           border: "1px solid rgba(255,255,255,0.2)",
                           height: "100%",
+<<<<<<< HEAD
                           width:370,
+=======
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           transition: "all 0.3s ease",
                           "&:hover": {
                             transform: "translateY(-8px) scale(1.02)",
@@ -553,7 +597,11 @@ const Elections = () => {
                           </Box>
                         </Box>
 
+<<<<<<< HEAD
                         <CardContent sx={{ p: 3, height: "100%", }}>
+=======
+                        <CardContent sx={{ p: 3, height: "100%" }}>
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           <Typography variant="body2" className="text-gray-600 mb-4 leading-relaxed">
                             {election.description}
                           </Typography>
@@ -574,14 +622,22 @@ const Elections = () => {
                                 {new Date(election.endTime).toLocaleTimeString()}
                               </Typography>
                             </Box>
+<<<<<<< HEAD
                             {/* {election.status === "active" && (
+=======
+                            {election.status === "active" && (
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                               <Box className="flex items-center gap-2">
                                 <Warning sx={{ color: "#f59e0b", fontSize: 18 }} />
                                 <Typography variant="body2" className="text-amber-600 font-semibold">
                                   {getTimeRemaining(election.endTime)}
                                 </Typography>
                               </Box>
+<<<<<<< HEAD
                             )} */}
+=======
+                            )}
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           </Box>
 
                           {/* Statistics */}
@@ -598,7 +654,11 @@ const Elections = () => {
                               </Typography>
                             </Box>
 
+<<<<<<< HEAD
                             {/* {election.status === "active" && (
+=======
+                            {election.status === "active" && (
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                               <Box>
                                 <Box className="flex justify-between items-center mb-2">
                                   <Typography variant="body2" className="text-gray-600">
@@ -622,7 +682,11 @@ const Elections = () => {
                                   }}
                                 />
                               </Box>
+<<<<<<< HEAD
                             )} */}
+=======
+                            )}
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           </Box>
 
                           {/* Action Button */}

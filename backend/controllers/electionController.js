@@ -86,6 +86,16 @@ exports.getUpcomingElections = async (req, res) => {
         res.status(500).json({ message: "Error fetching elections", error });
     }
 };
+exports.getUpcomingElections = async (req, res) => {
+    try {
+        const elections = await Election.find({
+        status: { $in: [ "upcoming"] },
+      });
+        res.status(200).json(elections);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching elections", error });
+    }
+};
 exports.getAvailableElections = async (req, res) => {
     try {
       const elections = await Election.find({

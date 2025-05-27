@@ -19,7 +19,10 @@
     "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
+<<<<<<< HEAD
     "dayjs": "^1.11.13",
+=======
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
     "framer-motion": "^12.9.6",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",

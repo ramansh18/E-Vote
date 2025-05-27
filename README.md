@@ -32,8 +32,7 @@ A decentralized, blockchain-based voting platform designed to ensure secure, tra
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/dVoting.git
-cd dVoting
+git clone https://github.com/ramansh18/E-Vote.git
 ```
 
 #### 2. Install Global Dependencies
@@ -46,7 +45,7 @@ npm install -g ganache-cli
 #### 3. Start Local Blockchain
 
 ```bash
-ganache-cli -m "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat"
+ganache-cli --mnemonic "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat" --accounts 10 --port 8545
 ```
 
 > This mnemonic is required to match relayer and frontend wallet addresses.
@@ -56,7 +55,8 @@ Alternatively, open **Ganache GUI**, create a new workspace, and paste the same 
 #### 4. Deploy Smart Contracts
 
 ```bash
-truffle migrate --reset
+truffle migrate --network development
+
 ```
 
 ---

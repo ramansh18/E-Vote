@@ -218,13 +218,20 @@ const ResultPage = () => {
               <Typography variant="h5" className="text-gray-800 font-semibold mb-2">
                 National Leadership Election 2025
               </Typography>
+<<<<<<< HEAD
               <Box className="flex justify-center">
                 <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
+=======
+              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                 {election?.status === "completed"
                   ? "Final results are now available. Thank you for participating in this democratic process."
                   : "Live results are being updated as votes are counted."}
               </Typography>
+<<<<<<< HEAD
               </Box>
+=======
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
             </Box>
 
             {/* Stats Section */}

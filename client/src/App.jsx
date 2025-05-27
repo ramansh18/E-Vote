@@ -174,7 +174,11 @@ function App() {
           }
         />
 
+<<<<<<< HEAD
         <Route path="/result/:electionId" element={<ResultPage />} />
+=======
+        <Route path="/results/:electionId" element={<ResultPage />} />
+>>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile-new" element={<ProfileUpdate />} />
         <Route path="/elections" element={<Elections />} />
