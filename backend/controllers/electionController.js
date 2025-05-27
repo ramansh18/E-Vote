@@ -5,11 +5,10 @@ const { votingContract,candidateRegistrationContract } = contracts;
 const deployedAddresses = require("../../contractAddresses.json");
 require("dotenv").config({ path: "../.env" });
 const Candidate = require("../models/Candidate.js")
+const User = require("../models/User");
 
+const axios = require('axios');
 
-
-
-// ✅ Create Election (Off-chain)
 exports.createElection = async (req, res) => {
     try {
         const { title, description, candidates, startTime, endTime } = req.body;
@@ -36,13 +35,47 @@ exports.createElection = async (req, res) => {
 
 // ✅ Get All Elections (Off-chain)
 exports.getElections = async (req, res) => {
-    try {
-        const elections = await Election.find();
-        res.status(200).json(elections);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching elections", error });
-    }
+  try {
+    const elections = await Election.find({ status: { $ne: "completed" } });
+
+    // You may also want to get user's voting history here if needed for hasVoted.
+    // Assuming you have req.user.id from auth middleware:
+    // const user = await User.findById(req.user.id);
+    // const userVotingHistory = user ? user.votingHistory : [];
+
+    // For now, assume empty userVotingHistory or get from your logic:
+    const userVotingHistory = []; // TODO: Replace with real user's votingHistory if needed
+
+    const transformedElections = elections.map((election) => {
+      // sum votes of all candidates
+      const totalVotes = election.candidates.reduce((sum, c) => sum + (c.votes || 0), 0);
+
+      // check if user voted (match election._id with votingHistory.electionId)
+      const hasVoted = userVotingHistory.some(
+        (vote) => vote.electionId.toString() === election._id.toString()
+      );
+
+      return {
+        id: election._id,
+        title: election.title,
+        description: election.description,
+        startDate: election.startTime ? election.startTime.toISOString().split("T")[0] : null,
+        endDate: election.endTime ? election.endTime.toISOString().split("T")[0] : null,
+        status: election.status==="ongoing" ? "active": election.status,
+        totalVotes,
+        hasVoted,
+        category: election.category || "General",
+        candidates: election.candidates.length,
+      };
+    });
+
+    res.status(200).json(transformedElections);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching elections", error });
+  }
 };
+
+
 exports.getUpcomingElections = async (req, res) => {
     try {
         const elections = await Election.find({
@@ -337,7 +370,6 @@ exports.getApprovedCandidatesForElection = async (req, res) => {
     try {
       const { electionId } = req.params;
   
-      // Find the election with candidate details
       const election = await Election.findById(electionId);
   
       if (!election) {
@@ -368,3 +400,77 @@ exports.getApprovedCandidatesForElection = async (req, res) => {
       res.status(500).json({ message: 'Failed to fetch election results' });
     }
   };
+
+
+
+
+exports.getAllCompletedElectionResults = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    const userId = req.user.id;
+    const response = await axios.get('http://localhost:5000/api/voter/all',{
+  headers: {
+    Authorization: `Bearer ${token}`, // forward token
+  },});
+    console.log(response.data.votersData.length)
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    const completedElections = await Election.find({ status: "completed" });
+
+    if (completedElections.length === 0) {
+      return res.status(404).json({ message: "No completed elections found." });
+    }
+
+    // Get total eligible voters count (assuming all voters are eligible for all elections)
+    const totalEligibleVoters =response.data.votersData.length
+
+    const results = completedElections.map((election) => {
+      // Sum votes from candidates
+      const totalVotes = election.candidates.reduce((sum, c) => sum + c.votes, 0);
+
+      // Determine winner candidate (max votes)
+      const winnerCandidate = election.candidates.reduce(
+        (max, c) => (c.votes > max.votes ? c : max),
+        { votes: -1 }
+      );
+
+      // Calculate participation rate
+      const participationRate =
+        totalEligibleVoters > 0 ? ((totalVotes / totalEligibleVoters) * 100).toFixed(1) : "0.0";
+
+      // Check if user has voted in this election (assuming votingHistory contains election IDs as strings)
+      const hasVoted = user.votingHistory.includes(election._id.toString());
+
+      return {
+        id: election._id,
+        title: election.title,
+        description: election.description,
+        startTime: election.startTime,
+        endTime: election.endTime,
+        status: election.status,
+        totalVotes,
+        totalEligibleVoters,
+        participationRate: parseFloat(participationRate),
+        hasVoted,
+        category: "Student Union", // Hardcoded as per your instruction
+        winner: {
+          name: winnerCandidate.name,
+          votes: winnerCandidate.votes,
+          percentage: totalVotes > 0 ? parseFloat(((winnerCandidate.votes / totalVotes) * 100).toFixed(1)) : 0,
+        },
+        candidates: election.candidates.map((candidate) => ({
+          name: candidate.name,
+          votes: candidate.votes,
+          percentage: totalVotes > 0 ? parseFloat(((candidate.votes / totalVotes) * 100).toFixed(1)) : 0,
+        })),
+      };
+    });
+
+    res.status(200).json({ completedElections: results });
+  } catch (error) {
+    console.error("Error fetching completed election results:", error);
+    res.status(500).json({ message: "Server error. Could not retrieve results." });
+  }
+};
+

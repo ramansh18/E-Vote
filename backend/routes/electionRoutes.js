@@ -7,7 +7,7 @@ const {
     startElection,
     endElection,
     deleteElection,getApprovedCandidatesForElection,
-    getAvailableElections,updateElectionVotes,getElectionResults,getUpcomingElections
+    getAvailableElections,updateElectionVotes,getElectionResults,getUpcomingElections,getAllCompletedElectionResults
 } = require("../controllers/electionController");
 
 const { protect, adminOnly } = require("../middleware/auth");
@@ -16,6 +16,7 @@ const { protect, adminOnly } = require("../middleware/auth");
 router.post("/", protect, adminOnly, createElection);   // Create election
 router.get("/", getElections);
 router.get('/upcoming-election',protect,getUpcomingElections)
+router.get("/completed",protect, getAllCompletedElectionResults);
 router.get("/available", getAvailableElections);                          // Get all elections
 router.get("/:id", getElectionById);                    // Get single election
 router.put("/:id/start", protect, adminOnly, startElection);  // Start election

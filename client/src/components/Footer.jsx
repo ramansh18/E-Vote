@@ -156,7 +156,7 @@ const Footer = () => {
           </div>
 
           {/* Newsletter Section */}
-          <div className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-white/10">
+          {/* <div className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-white/10">
             <div className="text-center">
               <h4 className="text-xl font-semibold mb-3 text-white">Stay Updated</h4>
               <p className="text-gray-300 mb-6">Get the latest news about elections and voting updates</p>
@@ -171,7 +171,7 @@ const Footer = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.1)" }} />

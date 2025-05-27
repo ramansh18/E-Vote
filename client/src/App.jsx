@@ -118,7 +118,7 @@ function App() {
           }
         />
         <Route
-          path="/elections/create"
+          path="/admin/create-election"
           element={
             <ProtectedRoute isLoggedIn={isLoggedIn}>
               <CreateElection />
@@ -174,7 +174,7 @@ function App() {
           }
         />
 
-        <Route path="/results/:electionId" element={<ResultPage />} />
+        <Route path="/result/:electionId" element={<ResultPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile-new" element={<ProfileUpdate />} />
         <Route path="/elections" element={<Elections />} />

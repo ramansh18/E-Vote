@@ -28,8 +28,9 @@ import {
   Home,
   Person,
   Notifications,
-  Settings,
   Close,
+  Info,
+  ContactMail,
 } from "@mui/icons-material"
 
 const Header = () => {
@@ -150,12 +151,31 @@ const Header = () => {
     }
   }, [isLoggedIn])
 
+  // Updated navigation items - Home only shows when NOT logged in
   const navigationItems = [
     {
       label: "Home",
       path: "/",
       icon: <Home />,
-      show: true,
+      show: !isLoggedIn, // Only show when user is NOT logged in
+    },
+    {
+      label: "About Us",
+      path: "/about",
+      icon: <Info />,
+      show: true, // Always show
+    },
+    {
+      label: "Contact",
+      path: "/contact",
+      icon: <ContactMail />,
+      show: true, // Always show
+    },
+    {
+      label: "Elections",
+      path: "/elections",
+      icon: <HowToVote />,
+      show: isLoggedIn && !isAdmin, // Only show for logged-in non-admin users
     },
     {
       label: "Dashboard",
@@ -367,7 +387,10 @@ const Header = () => {
                           </Box>
                         </Box>
 
+                        {/* Updated Menu Item - Profile instead of Settings */}
                         <MenuItem
+                          component={Link}
+                          to="/profile"
                           onClick={closeMenu}
                           sx={{
                             py: 1.5,
@@ -377,8 +400,8 @@ const Header = () => {
                             },
                           }}
                         >
-                          <Settings sx={{ mr: 2, color: "#6b7280" }} />
-                          <Typography variant="body2">Settings</Typography>
+                          <Person sx={{ mr: 2, color: "#6b7280" }} />
+                          <Typography variant="body2">Profile</Typography>
                         </MenuItem>
 
                         <Box sx={{ p: 2, pt: 1 }}>
@@ -388,7 +411,7 @@ const Header = () => {
                     </Box>
                   </>
                 ) : (
-                  <Box className="flex items-center space-x-3">
+                  <Box className="flex items-center space-x-4" sx={{ gap: 1 }}>
                     <Button
                       component={Link}
                       to="/login"
@@ -598,13 +621,16 @@ const Header = () => {
                     </Badge>
                   </IconButton>
                   <IconButton
+                    component={Link}
+                    to="/profile"
+                    onClick={closeMobileMenu}
                     size="small"
                     sx={{
                       backgroundColor: "rgba(59, 130, 246, 0.1)",
                       color: "#3b82f6",
                     }}
                   >
-                    <Settings fontSize="small" />
+                    <Person fontSize="small" />
                   </IconButton>
                 </Box>
               </Box>

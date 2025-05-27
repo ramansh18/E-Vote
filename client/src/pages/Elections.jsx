@@ -351,10 +351,12 @@ const Elections = () => {
               >
                 Elections Dashboard
               </Typography>
-              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
+              <Box className="flex justify-center">
+                <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
                 Participate in democratic processes and make your voice heard. View all available elections and cast
                 your vote.
               </Typography>
+              </Box>
 
              
             </Box>
@@ -374,34 +376,8 @@ const Elections = () => {
                   mb: 4,
                 }}
               >
-                <Grid container spacing={3} alignItems="center">
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      placeholder="Search elections..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search sx={{ color: "#6b7280" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 3,
-                          background: "rgba(255,255,255,0.8)",
-                          "&:hover fieldset": {
-                            borderColor: "#3b82f6",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "#3b82f6",
-                          },
-                        },
-                      }}
-                    />
-                  </Grid>
+                <Grid container spacing={3} alignItems="center" justifyContent="space-between">
+                  
                   <Grid item xs={12} md={6}>
                     <Tabs
                       value={activeTab}
@@ -441,6 +417,35 @@ const Elections = () => {
                       />
                     </Tabs>
                   </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      placeholder="Search elections..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Search sx={{ color: "#6b7280" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          "&:hover fieldset": {
+                            borderColor: "#3b82f6",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#3b82f6",
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                  
                 </Grid>
               </Paper>
             </Grow>
@@ -497,6 +502,7 @@ const Elections = () => {
                           backdropFilter: "blur(20px)",
                           border: "1px solid rgba(255,255,255,0.2)",
                           height: "100%",
+                          width:370,
                           transition: "all 0.3s ease",
                           "&:hover": {
                             transform: "translateY(-8px) scale(1.02)",
@@ -547,7 +553,7 @@ const Elections = () => {
                           </Box>
                         </Box>
 
-                        <CardContent sx={{ p: 3, height: "100%" }}>
+                        <CardContent sx={{ p: 3, height: "100%", }}>
                           <Typography variant="body2" className="text-gray-600 mb-4 leading-relaxed">
                             {election.description}
                           </Typography>
@@ -568,14 +574,14 @@ const Elections = () => {
                                 {new Date(election.endTime).toLocaleTimeString()}
                               </Typography>
                             </Box>
-                            {election.status === "active" && (
+                            {/* {election.status === "active" && (
                               <Box className="flex items-center gap-2">
                                 <Warning sx={{ color: "#f59e0b", fontSize: 18 }} />
                                 <Typography variant="body2" className="text-amber-600 font-semibold">
                                   {getTimeRemaining(election.endTime)}
                                 </Typography>
                               </Box>
-                            )}
+                            )} */}
                           </Box>
 
                           {/* Statistics */}
@@ -592,7 +598,7 @@ const Elections = () => {
                               </Typography>
                             </Box>
 
-                            {election.status === "active" && (
+                            {/* {election.status === "active" && (
                               <Box>
                                 <Box className="flex justify-between items-center mb-2">
                                   <Typography variant="body2" className="text-gray-600">
@@ -616,7 +622,7 @@ const Elections = () => {
                                   }}
                                 />
                               </Box>
-                            )}
+                            )} */}
                           </Box>
 
                           {/* Action Button */}

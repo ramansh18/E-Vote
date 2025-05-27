@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom"
 import { useSelector } from "react-redux"
 import {
   Card,
@@ -16,17 +16,21 @@ import {
   Box,
   Avatar,
   Chip,
-  Fade,
-  Grow,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   useTheme,
   useMediaQuery,
+  Paper,
+  Fade,
+  Grow,
 } from "@mui/material"
-import { HowToVote, CheckCircle, Verified, Timer, Warning, Person } from "@mui/icons-material"
+import { HowToVote, Timer, CheckCircle, Verified, Person, Warning } from "@mui/icons-material"
+import dayjs from "dayjs"
+import duration from "dayjs/plugin/duration"
+
+dayjs.extend(duration)
 
 const VotePage = () => {
   const token = useSelector((state) => state.auth.token)
@@ -35,46 +39,16 @@ const VotePage = () => {
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [confirmDialog, setConfirmDialog] = useState(false)
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  })
-
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
+  const [electionTime, setElectionTime] = useState(null)
   const [timeRemaining, setTimeRemaining] = useState({
     days: 0,
-    hours: 2,
-    minutes: 15,
-    seconds: 30,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    ended: false,
   })
-  const { electionId } = useParams();
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        let { days, hours, minutes, seconds } = prev
-
-        if (seconds > 0) {
-          seconds--
-        } else if (minutes > 0) {
-          minutes--
-          seconds = 59
-        } else if (hours > 0) {
-          hours--
-          minutes = 59
-          seconds = 59
-        } else if (days > 0) {
-          days--
-          hours = 23
-          minutes = 59
-          seconds = 59
-        }
-
-        return { days, hours, minutes, seconds }
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
+  const { electionId } = useParams()
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -87,13 +61,11 @@ const VotePage = () => {
     setSnackbar({ ...snackbar, open: false })
   }
 
-  // Generate party symbol from party name
   const generatePartySymbol = (partyName) => {
     if (!partyName) return "UN"
     return partyName.substring(0, 2).toUpperCase()
   }
 
-  // Get party color based on party name
   const getPartyColor = (partyName) => {
     const colors = [
       "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -105,11 +77,10 @@ const VotePage = () => {
       "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
       "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
     ]
-    const hash = partyName.split("").reduce((a, b) => a + b.charCodeAt(0), 0)
+    const hash = partyName?.split("").reduce((a, b) => a + b.charCodeAt(0), 0) || 0
     return colors[hash % colors.length]
   }
 
-  // Mock candidate data enhancement
   const enhanceCandidateData = (candidate) => {
     const mottos = [
       "Building a better tomorrow together",
@@ -121,20 +92,17 @@ const VotePage = () => {
       "Innovation for a sustainable future",
       "Transparency, accountability, progress",
     ]
-
     const descriptions = [
-      "Experienced leader with 15+ years in public service, focusing on education reform and economic development.",
-      "Former business executive turned public servant, advocating for healthcare accessibility and job creation.",
-      "Community organizer and environmental advocate, championing sustainable development and social justice.",
-      "Legal professional with expertise in constitutional law, promoting transparency and government accountability.",
-      "Healthcare professional dedicated to improving public health systems and emergency preparedness.",
-      "Education specialist working to enhance learning opportunities and technological advancement in schools.",
-      "Economic policy expert focused on small business support and infrastructure development.",
-      "Social worker and community leader advocating for affordable housing and social welfare programs.",
+      "Experienced leader with 15+ years in public service...",
+      "Former business executive turned public servant...",
+      "Community organizer and environmental advocate...",
+      "Legal professional with expertise in constitutional law...",
+      "Healthcare professional dedicated to improving public health...",
+      "Education specialist working to enhance learning...",
+      "Economic policy expert focused on small business support...",
+      "Social worker and community leader advocating for affordable housing...",
     ]
-
-    const hash = candidate.user.name.split("").reduce((a, b) => a + b.charCodeAt(0), 0)
-
+    const hash = candidate?.user?.name?.split("").reduce((a, b) => a + b.charCodeAt(0), 0) || 0
     return {
       ...candidate,
       motto: mottos[hash % mottos.length],
@@ -147,9 +115,7 @@ const VotePage = () => {
       try {
         setInitialLoading(true)
         const res = await axios.get(`http://localhost:5000/api/election/${electionId}/candidates/approved`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         })
         const enhancedCandidates = (res.data.candidates || []).map(enhanceCandidateData)
         setCandidates(enhancedCandidates)
@@ -160,8 +126,77 @@ const VotePage = () => {
         setInitialLoading(false)
       }
     }
-    fetchCandidates()
-  }, [token])
+
+    if (token && electionId) {
+      fetchCandidates()
+    }
+  }, [token, electionId])
+
+  useEffect(() => {
+    const fetchElectionTime = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/election/${electionId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const election = res.data
+        setElectionTime(election)
+
+        // Immediately check if election has ended
+        const now = dayjs()
+        const end = dayjs(election.endTime)
+        const diff = end.diff(now)
+
+        if (diff <= 0) {
+          setTimeRemaining({
+            days: 0,
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            ended: true,
+          })
+        }
+      } catch (err) {
+        showSnackbar("Failed to fetch election time", "error")
+        console.error(err)
+      }
+    }
+
+    if (token && electionId) {
+      fetchElectionTime()
+    }
+  }, [electionId, token])
+
+  useEffect(() => {
+    if (!electionTime?.endTime) return
+
+    const interval = setInterval(() => {
+      const now = dayjs()
+      const end = dayjs(electionTime.endTime)
+      const diff = end.diff(now)
+
+      if (diff <= 0) {
+        setTimeRemaining({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          ended: true,
+        })
+        clearInterval(interval)
+      } else {
+        const dur = dayjs.duration(diff)
+        setTimeRemaining({
+          days: dur.days(),
+          hours: dur.hours(),
+          minutes: dur.minutes(),
+          seconds: dur.seconds(),
+          ended: false,
+        })
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [electionTime])
 
   const handleCandidateSelect = (candidateAddress) => {
     setSelectedCandidate(candidateAddress)
@@ -180,7 +215,7 @@ const VotePage = () => {
       setLoading(true)
       const res = await axios.post(
         "http://localhost:5000/api/voting/vote",
-        { candidateAddress: selectedCandidate,electionId },
+        { candidateAddress: selectedCandidate, electionId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -190,11 +225,10 @@ const VotePage = () => {
       showSnackbar("Vote cast successfully!", "success")
       setConfirmDialog(false)
       setSelectedCandidate("")
-    
     } catch (err) {
       console.log(err)
-      const fullMessage = err?.response?.data?.error?.cause?.message || err?.response?.data?.message ||""
-      console.log("msg--",fullMessage)
+      const fullMessage = err?.response?.data?.error?.cause?.message || err?.response?.data?.message || ""
+      console.log("msg--", fullMessage)
       const userFriendlyMessage = fullMessage.includes("revert")
         ? fullMessage.split("revert")[1].trim()
         : "An unexpected error occurred."
@@ -272,10 +306,12 @@ const VotePage = () => {
               >
                 Cast Your Vote
               </Typography>
-              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
+              <Box className='flex justify-center'>
+                <Typography variant="h6" className="text-gray-600 max-w-xl mx-auto leading-relaxed mb-6">
                 Choose your candidate and participate in shaping the future. Your voice matters in this democratic
                 process.
               </Typography>
+              </Box>
 
               {/* Election Timer */}
               <Paper
@@ -299,324 +335,387 @@ const VotePage = () => {
                     left: 0,
                     right: 0,
                     height: 4,
-                    background: "linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e)",
+                    background: timeRemaining.ended
+                      ? "linear-gradient(90deg, #ef4444, #dc2626)"
+                      : "linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e)",
                   }}
                 />
 
                 <Box className="flex items-center justify-center gap-2 mb-3">
-                  <Timer sx={{ color: "#ef4444", fontSize: 28 }} />
+                  <Timer sx={{ color: timeRemaining.ended ? "#dc2626" : "#ef4444", fontSize: 28 }} />
                   <Typography variant="h5" className="font-bold text-gray-800">
-                    Election Ends In
+                    {timeRemaining.ended ? "Election Has Ended" : "Election Ends In"}
                   </Typography>
                 </Box>
 
-                <Box className="flex justify-center gap-4">
-                  {timeRemaining.days > 0 && (
-                    <Box className="text-center">
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          mb: 1,
-                          boxShadow: "0 4px 16px rgba(239, 68, 68, 0.3)",
-                        }}
-                      >
-                        <Typography variant="h5" className="font-bold text-white">
-                          {timeRemaining.days}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" className="text-gray-600 font-semibold">
-                        DAYS
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #f97316, #ea580c)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(249, 115, 22, 0.3)",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.hours).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      HOURS
-                    </Typography>
-                  </Box>
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #eab308, #ca8a04)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.minutes).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      MINUTES
-                    </Typography>
-                  </Box>
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
-                        animation:
-                          timeRemaining.hours === 0 && timeRemaining.minutes < 5 ? "pulse 1s infinite" : "none",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.seconds).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      SECONDS
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {timeRemaining.hours === 0 && timeRemaining.minutes < 10 && (
-                  <Box className="mt-3 text-center">
-                    <Typography variant="body2" className="text-red-600 font-semibold animate-pulse">
-                      ⚠️ Election closing soon! Cast your vote now.
-                    </Typography>
-                  </Box>
-                )}
-              </Paper>
-            </Box>
-
-            {/* Candidates Section */}
-            <Box className="mb-8">
-              <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
-                Choose Your Candidate
-              </Typography>
-              <Typography variant="body1" className="text-gray-600 mb-8 text-center">
-                Select the candidate that best represents your vision for the future
-              </Typography>
-
-              {candidates.length > 0 ? (
-                <div className="space-y-6">
-                  {candidates.map((candidate, index) => {
-                    const isSelected = selectedCandidate === candidate.walletAddress
-                    const partyGradient = getPartyColor(candidate.party)
-
-                    return (
-                      <Grow in timeout={1000 + index * 200} key={candidate._id}>
-                        <Card
-                          onClick={() => handleCandidateSelect(candidate.walletAddress)}
-                          sx={{
-                            borderRadius: 4,
-                            background: "rgba(255,255,255,0.95)",
-                            backdropFilter: "blur(20px)",
-                            border: isSelected ? "2px solid #3b82f6" : "1px solid rgba(255,255,255,0.2)",
-                            overflow: "hidden",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease",
-                            position: "relative",
-                            "&:hover": {
-                              transform: "translateY(-4px) scale(1.01)",
-                              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                            },
-                            ...(isSelected && {
-                              boxShadow: "0 20px 60px rgba(59, 130, 246, 0.3)",
-                              transform: "translateY(-4px) scale(1.01)",
-                            }),
-                          }}
-                        >
-                          {/* Top accent bar */}
+                {!timeRemaining.ended ? (
+                  <>
+                    <Box className="flex justify-center gap-4">
+                      {timeRemaining.days > 0 && (
+                        <Box className="text-center">
                           <Box
                             sx={{
-                              height: 4,
-                              background: isSelected ? "linear-gradient(90deg, #3b82f6, #8b5cf6)" : partyGradient,
+                              width: 60,
+                              height: 60,
+                              borderRadius: 2,
+                              background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              mb: 1,
+                              boxShadow: "0 4px 16px rgba(239, 68, 68, 0.3)",
                             }}
-                          />
+                          >
+                            <Typography variant="h5" className="font-bold text-white">
+                              {timeRemaining.days}
+                            </Typography>
+                          </Box>
+                          <Typography variant="caption" className="text-gray-600 font-semibold">
+                            DAYS
+                          </Typography>
+                        </Box>
+                      )}
 
-                          {/* Selection indicator */}
-                          {isSelected && (
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: 16,
-                                right: 16,
-                                zIndex: 2,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: "50%",
-                                  background: "linear-gradient(135deg, #10b981, #059669)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)",
-                                  animation: "pulse 2s infinite",
-                                }}
-                              >
-                                <CheckCircle sx={{ color: "white", fontSize: 20 }} />
-                              </Box>
-                            </Box>
-                          )}
+                      <Box className="text-center">
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            background: "linear-gradient(135deg, #f97316, #ea580c)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mb: 1,
+                            boxShadow: "0 4px 16px rgba(249, 115, 22, 0.3)",
+                          }}
+                        >
+                          <Typography variant="h5" className="font-bold text-white">
+                            {String(timeRemaining.hours).padStart(2, "0")}
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" className="text-gray-600 font-semibold">
+                          HOURS
+                        </Typography>
+                      </Box>
 
-                          <CardContent sx={{ p: 3 }}>
-                            <Box className="flex items-start gap-6">
-                              {/* Party Symbol */}
-                              <Box className="flex-shrink-0">
-                                <Avatar
-                                  sx={{
-                                    width: 80,
-                                    height: 80,
-                                    background: partyGradient,
-                                    fontSize: 24,
-                                    fontWeight: "bold",
-                                    color: "white",
-                                    boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-                                    border: "3px solid rgba(255,255,255,0.8)",
-                                  }}
-                                >
-                                  {generatePartySymbol(candidate.party)}
-                                </Avatar>
-                              </Box>
+                      <Box className="text-center">
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            background: "linear-gradient(135deg, #eab308, #ca8a04)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mb: 1,
+                            boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
+                          }}
+                        >
+                          <Typography variant="h5" className="font-bold text-white">
+                            {String(timeRemaining.minutes).padStart(2, "0")}
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" className="text-gray-600 font-semibold">
+                          MINUTES
+                        </Typography>
+                      </Box>
 
-                              {/* Candidate Information */}
-                              <Box className="flex-1 min-w-0">
-                                <Box className="flex items-center gap-3 mb-3">
-                                  <Typography variant="h5" className="font-bold text-gray-800 capitalize">
-                                    {candidate.user.name}
-                                  </Typography>
-                                  <Chip
-                                    icon={<Verified sx={{ color: "white" }} />}
-                                    label="Verified"
-                                    size="small"
-                                    sx={{
-                                      background: "linear-gradient(135deg, #10b981, #059669)",
-                                      color: "white",
-                                      fontWeight: 600,
-                                    }}
-                                  />
-                                </Box>
+                      <Box className="text-center">
+                        <Box
+                          sx={{
+                            width: 60,
+                            height: 60,
+                            borderRadius: 2,
+                            background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mb: 1,
+                            boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
+                            animation:
+                              timeRemaining.hours === 0 && timeRemaining.minutes < 5 ? "pulse 1s infinite" : "none",
+                          }}
+                        >
+                          <Typography variant="h5" className="font-bold text-white">
+                            {String(timeRemaining.seconds).padStart(2, "0")}
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" className="text-gray-600 font-semibold">
+                          SECONDS
+                        </Typography>
+                      </Box>
+                    </Box>
 
-                                <Box className="flex items-center gap-2 mb-4">
-                                  <Chip
-                                    label={candidate.party}
-                                    sx={{
-                                      background: partyGradient,
-                                      color: "white",
-                                      fontWeight: 600,
-                                      fontSize: "0.875rem",
-                                    }}
-                                  />
-                                </Box>
-
-                                <Typography
-                                  variant="h6"
-                                  className="text-blue-600 font-semibold mb-3 italic"
-                                  sx={{ fontSize: "1.1rem" }}
-                                >
-                                  "{candidate.motto}"
-                                </Typography>
-
-                                <Typography
-                                  variant="body1"
-                                  className="text-gray-700 leading-relaxed"
-                                  sx={{ lineHeight: 1.6 }}
-                                >
-                                  {candidate.description}
-                                </Typography>
-
-                                {/* Additional candidate info */}
-                                <Box className="flex items-center gap-4 mt-4">
-                                  <Box className="flex items-center gap-1">
-                                    <Person sx={{ color: "#6b7280", fontSize: 18 }} />
-                                    <Typography variant="body2" className="text-gray-500">
-                                      Candidate ID: {candidate._id.slice(-6).toUpperCase()}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              </Box>
-                            </Box>
-                          </CardContent>
-                        </Card>
-                      </Grow>
-                    )
-                  })}
-                </div>
-              ) : (
-                <Fade in timeout={800}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      borderRadius: 4,
-                      background: "rgba(255,255,255,0.95)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      p: 8,
-                      textAlign: "center",
-                    }}
-                  >
+                    {timeRemaining.hours === 0 && timeRemaining.minutes < 10 && (
+                      <Box className="mt-3 text-center">
+                        <Typography variant="body2" className="text-red-600 font-semibold animate-pulse">
+                          ⚠️ Election closing soon! Cast your vote now.
+                        </Typography>
+                      </Box>
+                    )}
+                  </>
+                ) : (
+                  <Box className="text-center">
                     <Box
                       sx={{
                         width: 80,
                         height: 80,
                         borderRadius: 4,
-                        background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                        background: "linear-gradient(135deg, #dc2626, #991b1b)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         mx: "auto",
                         mb: 3,
-                        boxShadow: "0 8px 32px rgba(245, 158, 11, 0.3)",
+                        boxShadow: "0 8px 32px rgba(220, 38, 38, 0.3)",
                       }}
                     >
-                      <Warning sx={{ color: "white", fontSize: 40 }} />
+                      <Typography variant="h3" className="font-bold text-white">
+                        ⏰
+                      </Typography>
                     </Box>
-                    <Typography variant="h5" className="font-bold text-gray-800 mb-2">
-                      No Candidates Available
+                    <Typography variant="h6" className="text-red-600 font-bold mb-2">
+                      Voting Period Has Ended
                     </Typography>
-                    <Typography variant="body1" className="text-gray-600">
-                      There are currently no approved candidates for this election. Please check back later.
+                    <Typography variant="body1" className="text-gray-600 mb-4">
+                      This election is now closed. Thank you for your participation in the democratic process.
                     </Typography>
-                  </Paper>
-                </Fade>
-              )}
+
+                    {/* View Results Button */}
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={() => {
+                        // Navigate to results page - you can implement this navigation
+                        window.location.href = `/result/${electionId}`
+                      }}
+                      sx={{
+                        px: 6,
+                        py: 2,
+                        fontSize: 16,
+                        fontWeight: 700,
+                        borderRadius: 4,
+                        textTransform: "none",
+                        background: "linear-gradient(135deg, #059669, #047857)",
+                        boxShadow: "0 8px 32px rgba(5, 150, 105, 0.3)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #047857, #065f46)",
+                          boxShadow: "0 12px 40px rgba(5, 150, 105, 0.4)",
+                          transform: "translateY(-2px) scale(1.02)",
+                        },
+                      }}
+                    >
+                      🏆 View Election Results
+                    </Button>
+                  </Box>
+                )}
+              </Paper>
             </Box>
 
-            {/* Vote Button */}
-            {candidates.length > 0 && (
+            {/* Candidates Section - Only show when election is active */}
+            {!timeRemaining.ended && (
+              <Box className="mb-8">
+                <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
+                  Choose Your Candidate
+                </Typography>
+                <Typography variant="body1" className="text-gray-600 mb-8 text-center">
+                  Select the candidate that best represents your vision for the future
+                </Typography>
+
+                {candidates.length > 0 ? (
+                  <div className="space-y-6">
+                    {candidates.map((candidate, index) => {
+                      const isSelected = selectedCandidate === candidate.walletAddress
+                      const partyGradient = getPartyColor(candidate.party)
+
+                      return (
+                        <Grow in timeout={1000 + index * 200} key={candidate._id}>
+                          <Card
+                            onClick={() => handleCandidateSelect(candidate.walletAddress)}
+                            sx={{
+                              borderRadius: 4,
+                              background: "rgba(255,255,255,0.95)",
+                              backdropFilter: "blur(20px)",
+                              border: isSelected ? "2px solid #3b82f6" : "1px solid rgba(255,255,255,0.2)",
+                              overflow: "hidden",
+                              cursor: "pointer",
+                              transition: "all 0.3s ease",
+                              position: "relative",
+                              "&:hover": {
+                                transform: "translateY(-4px) scale(1.01)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                              },
+                              ...(isSelected && {
+                                boxShadow: "0 20px 60px rgba(59, 130, 246, 0.3)",
+                                transform: "translateY(-4px) scale(1.01)",
+                              }),
+                            }}
+                          >
+                            {/* Top accent bar */}
+                            <Box
+                              sx={{
+                                height: 4,
+                                background: isSelected ? "linear-gradient(90deg, #3b82f6, #8b5cf6)" : partyGradient,
+                              }}
+                            />
+
+                            {/* Selection indicator */}
+                            {isSelected && (
+                              <Box
+                                sx={{
+                                  position: "absolute",
+                                  top: 16,
+                                  right: 16,
+                                  zIndex: 2,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: "50%",
+                                    background: "linear-gradient(135deg, #10b981, #059669)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)",
+                                    animation: "pulse 2s infinite",
+                                  }}
+                                >
+                                  <CheckCircle sx={{ color: "white", fontSize: 20 }} />
+                                </Box>
+                              </Box>
+                            )}
+
+                            <CardContent sx={{ p: 3 }}>
+                              <Box className="flex items-start gap-6">
+                                {/* Party Symbol */}
+                                <Box className="flex-shrink-0">
+                                  <Avatar
+                                    sx={{
+                                      width: 80,
+                                      height: 80,
+                                      background: partyGradient,
+                                      fontSize: 24,
+                                      fontWeight: "bold",
+                                      color: "white",
+                                      boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+                                      border: "3px solid rgba(255,255,255,0.8)",
+                                    }}
+                                  >
+                                    {generatePartySymbol(candidate.party)}
+                                  </Avatar>
+                                </Box>
+
+                                {/* Candidate Information */}
+                                <Box className="flex-1 min-w-0">
+                                  <Box className="flex items-center gap-3 mb-3">
+                                    <Typography variant="h5" className="font-bold text-gray-800 capitalize">
+                                      {candidate.user?.name || "Unknown Candidate"}
+                                    </Typography>
+                                    <Chip
+                                      icon={<Verified sx={{ color: "white" }} />}
+                                      label="Verified"
+                                      size="small"
+                                      sx={{
+                                        background: "linear-gradient(135deg, #10b981, #059669)",
+                                        color: "white",
+                                        fontWeight: 600,
+                                      }}
+                                    />
+                                  </Box>
+
+                                  <Box className="flex items-center gap-2 mb-4">
+                                    <Chip
+                                      label={candidate.party || "Independent"}
+                                      sx={{
+                                        background: partyGradient,
+                                        color: "white",
+                                        fontWeight: 600,
+                                        fontSize: "0.875rem",
+                                      }}
+                                    />
+                                  </Box>
+
+                                  <Typography
+                                    variant="h6"
+                                    className="text-blue-600 font-semibold mb-3 italic"
+                                    sx={{ fontSize: "1.1rem" }}
+                                  >
+                                    "{candidate.motto}"
+                                  </Typography>
+
+                                  <Typography
+                                    variant="body1"
+                                    className="text-gray-700 leading-relaxed"
+                                    sx={{ lineHeight: 1.6 }}
+                                  >
+                                    {candidate.description}
+                                  </Typography>
+
+                                  {/* Additional candidate info */}
+                                  <Box className="flex items-center gap-4 mt-4">
+                                    <Box className="flex items-center gap-1">
+                                      <Person sx={{ color: "#6b7280", fontSize: 18 }} />
+                                      <Typography variant="body2" className="text-gray-500">
+                                        Candidate ID: {candidate._id?.slice(-6).toUpperCase() || "N/A"}
+                                      </Typography>
+                                    </Box>
+                                  </Box>
+                                </Box>
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        </Grow>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <Fade in timeout={800}>
+                    <Paper
+                      elevation={24}
+                      sx={{
+                        borderRadius: 4,
+                        background: "rgba(255,255,255,0.95)",
+                        backdropFilter: "blur(20px)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        p: 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: 4,
+                          background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          mx: "auto",
+                          mb: 3,
+                          boxShadow: "0 8px 32px rgba(245, 158, 11, 0.3)",
+                        }}
+                      >
+                        <Warning sx={{ color: "white", fontSize: 40 }} />
+                      </Box>
+                      <Typography variant="h5" className="font-bold text-gray-800 mb-2">
+                        No Candidates Available
+                      </Typography>
+                      <Typography variant="body1" className="text-gray-600">
+                        There are currently no approved candidates for this election. Please check back later.
+                      </Typography>
+                    </Paper>
+                  </Fade>
+                )}
+              </Box>
+            )}
+
+            {/* Vote Button - Only show when election is active */}
+            {!timeRemaining.ended && candidates.length > 0 && (
               <Box className="text-center">
                 <Button
                   variant="contained"
@@ -733,10 +832,10 @@ const VotePage = () => {
                     </Avatar>
                     <Box className="text-left">
                       <Typography variant="h6" className="font-bold text-gray-800">
-                        {candidate.user.name}
+                        {candidate.user?.name || "Unknown Candidate"}
                       </Typography>
                       <Typography variant="body2" className="text-gray-600">
-                        {candidate.party}
+                        {candidate.party || "Independent"}
                       </Typography>
                     </Box>
                   </Box>

@@ -4,6 +4,6 @@ const { protect,adminOnly } = require("../middleware/auth");
 const {registerVoter, getAllVoters } = require("../controllers/voterController");
 
 router.post("/register",protect, registerVoter);
-router.get("/all", protect, adminOnly, getAllVoters);
+router.get("/all", protect,  getAllVoters);
 
 module.exports = router;

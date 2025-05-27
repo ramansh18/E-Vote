@@ -14,6 +14,7 @@ const adminRoutes = require("./routes/adminRoutes.js")
 const voterRegistration = require('./routes/voterRegistration.js')
 const profileUpdateRoutes = require('./routes/profileUpdateRoutes.js')
 const test = require("./routes/test.js")
+const uploadRoute = require('./routes/uploadRoute')
 const activityRoutes = require("./routes/activityRoutes");
 const server = http.createServer(app); // create HTTP server
 // Setup socket.io server
@@ -51,6 +52,7 @@ app.use('/api/admin', adminRoutes);
 app.use("/api/election", electionRoutes);
 app.use('/api/user', profileUpdateRoutes);
 app.use('/api/test',test)
+app.use('/api', uploadRoute);
 app.use("/api/activity", activityRoutes);
 // const web3 = new Web3("http://127.0.0.1:8545"); // Connect to Ganache
 

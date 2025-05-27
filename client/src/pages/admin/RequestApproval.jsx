@@ -351,93 +351,139 @@ const RequestApproval = () => {
           label: "Total Requests",
           value: stats.total,
           icon: <Assignment fontSize="medium" />,
-          gradient: "linear-gradient(135deg, #d6dfff 0%, #d6cfff 100%)",
-          color: "#4c5ce5",
+          gradient: "linear-gradient(135deg, #6366f1, #4338ca)", // Bolder indigo
+          bgIcon: <Assignment />,
+          subtitle: "All submissions",
         },
         {
           label: "Pending Review",
           value: stats.pending,
           icon: <Schedule fontSize="medium" />,
-          gradient: "linear-gradient(135deg, #ffe0f0 0%, #fbe0e0 100%)",
-          color: "#e85a92",
+          gradient: "linear-gradient(135deg, #f43f5e, #be123c)", // Strong rose/red
+          bgIcon: <Schedule />,
+          subtitle: "Awaiting decision",
         },
         {
           label: "Approved",
           value: stats.approved,
           icon: <CheckCircle fontSize="medium" />,
-          gradient: "linear-gradient(135deg, #e0f7ff 0%, #d0f4fd 100%)",
-          color: "#00a6d6",
+          gradient: "linear-gradient(135deg, #14b8a6, #0f766e)", // Bold teal
+          bgIcon: <CheckCircle />,
+          subtitle: "Marked valid",
         },
         {
           label: "Rejected",
           value: stats.rejected,
           icon: <Cancel fontSize="medium" />,
-          gradient: "linear-gradient(135deg, #ffe3e3 0%, #ffe6cc 100%)",
-          color: "#f35b5b",
+          gradient: "linear-gradient(135deg, #f97316, #c2410c)", // Strong orange
+          bgIcon: <Cancel />,
+          subtitle: "Declined",
         },
       ].map((stat, index) => (
         <Grid item xs={12} sm={6} md={3} key={index}>
-          <Grow in timeout={300 + index * 150}>
-            <Paper
-              elevation={3}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                padding: 2,
-                borderRadius: 3,
-                height: 90,
-                width: "100%", // full width within grid
-                minWidth: 200,
-                maxWidth: 250, // ensures consistency
-                background: "#fff",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "scale(1.015)",
-                  boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-                },
-              }}
-            >
-              {/* Icon */}
+          <Grow in timeout={400 + index * 200}>
+         <Paper
+  elevation={3}
+  sx={{
+    borderRadius: 4,
+    background: "rgba(255,255,255,0.95)",
+    backdropFilter: "blur(20px)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    overflow: "hidden",
+    position: "relative",
+    width: "100%",
+    minHeight: 120, // Ensures uniform height
+    display: "flex",
+    alignItems: "center",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      transform: "translateY(-8px) scale(1.02)",
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+    },
+  }}
+>
+
+
+              {/* Background Pattern */}
               <Box
                 sx={{
-                  width: 50,
-                  height: 50,
-                  minWidth: 50,
-                  minHeight: 50,
-                  borderRadius: 2,
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: "100px",
+                  height: "100px",
                   background: stat.gradient,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  marginRight: 2,
+                  borderRadius: "0 0 0 100px",
+                  opacity: 0.15,
+                }}
+              />
+
+              {/* Background Icon */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  opacity: 0.12,
+                  fontSize: "4rem",
+                  background: stat.gradient,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
-                {stat.icon}
+                {stat.bgIcon}
               </Box>
 
-              {/* Content */}
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#333", mb: 0.2, fontSize: "0.85rem" }}
-                >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  variant="h6"
+              {/* Horizontal Layout */}
+              <CardContent
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  p: 3,
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
+                {/* Icon */}
+                <Box
                   sx={{
-                    fontWeight: 700,
-                    color: stat.color,
-                    fontSize: "1.05rem",
-                    lineHeight: 1.2,
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
+                    background: stat.gradient,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                    flexShrink: 0,
                   }}
                 >
-                  {stat.value.toLocaleString()}
-                </Typography>
-              </Box>
+                  {stat.icon}
+                </Box>
+
+                {/* Content */}
+                <Box>
+                  <Typography
+                    variant="h5"
+                    className="font-bold text-gray-800 leading-snug"
+                  >
+                    {typeof stat.value === "number"
+                      ? stat.value.toLocaleString()
+                      : stat.value}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    className="font-medium text-gray-700"
+                  >
+                    {stat.label}
+                  </Typography>
+                  <Typography variant="caption" className="text-gray-600">
+                    {stat.subtitle}
+                  </Typography>
+                </Box>
+              </CardContent>
             </Paper>
           </Grow>
         </Grid>
@@ -445,6 +491,7 @@ const RequestApproval = () => {
     </Grid>
   </Box>
 </Box>
+
 
 
 

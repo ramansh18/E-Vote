@@ -52,6 +52,18 @@ const ContactUs = () => {
     message: "",
     severity: "success",
   })
+  const textFieldStyle = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 3,
+    background: "rgba(255,255,255,0.8)",
+    "&:hover fieldset": {
+      borderColor: "#3b82f6",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
+    },
+  },
+};
 
   useEffect(() => {
     setShowContent(true)
@@ -103,7 +115,7 @@ const ContactUs = () => {
       icon: <Email />,
       title: "Email Support",
       description: "Get help via email",
-      contact: "support@e-vote.com",
+      contact: "ramansh8055@gmail.com",
       action: "Send Email",
       gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       responseTime: "Within 4 hours",
@@ -112,7 +124,7 @@ const ContactUs = () => {
       icon: <Phone />,
       title: "Phone Support",
       description: "Speak with our team",
-      contact: "+1 (555) 123-VOTE",
+      contact: "+91 8188875241",
       action: "Call Now",
       gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
       responseTime: "Immediate",
@@ -137,56 +149,6 @@ const ContactUs = () => {
     },
   ]
 
-  const offices = [
-    {
-      city: "San Francisco",
-      country: "USA",
-      address: "123 Democracy Street, Suite 400",
-      zipCode: "CA 94102",
-      phone: "+1 (555) 123-VOTE",
-      email: "sf@e-vote.com",
-      timezone: "PST (UTC-8)",
-      isHeadquarters: true,
-    },
-    {
-      city: "New York",
-      country: "USA",
-      address: "456 Liberty Avenue, Floor 15",
-      zipCode: "NY 10001",
-      phone: "+1 (555) 456-VOTE",
-      email: "ny@e-vote.com",
-      timezone: "EST (UTC-5)",
-      isHeadquarters: false,
-    },
-    {
-      city: "London",
-      country: "UK",
-      address: "789 Parliament Road, Level 8",
-      zipCode: "SW1A 1AA",
-      phone: "+44 20 7123 4567",
-      email: "london@e-vote.com",
-      timezone: "GMT (UTC+0)",
-      isHeadquarters: false,
-    },
-    {
-      city: "Toronto",
-      country: "Canada",
-      address: "321 Maple Street, Suite 200",
-      zipCode: "ON M5V 3A8",
-      phone: "+1 (416) 555-VOTE",
-      email: "toronto@e-vote.com",
-      timezone: "EST (UTC-5)",
-      isHeadquarters: false,
-    },
-  ]
-
-  const inquiryTypes = [
-    { value: "general", label: "General Inquiry", icon: <ContactSupport /> },
-    { value: "sales", label: "Sales & Pricing", icon: <Business /> },
-    { value: "support", label: "Technical Support", icon: <Support /> },
-    { value: "security", label: "Security Questions", icon: <Security /> },
-    { value: "partnership", label: "Partnership", icon: <Groups /> },
-  ]
 
   return (
     <Box className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
@@ -235,7 +197,8 @@ const ContactUs = () => {
                 Get in Touch
               </Typography>
 
-              <Typography
+              <Box className="flex justify-center mb-3">
+                <Typography
                 variant="h5"
                 className="text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8"
                 sx={{ fontSize: { xs: "1.2rem", md: "1.5rem" } }}
@@ -243,56 +206,183 @@ const ContactUs = () => {
                 Have questions about E-Vote? Need technical support? Want to discuss enterprise solutions? We're here to
                 help you every step of the way.
               </Typography>
-
-              <Box className="flex flex-wrap justify-center gap-4">
-                <Chip
-                  icon={<AccessTime />}
-                  label="24/7 Support Available"
-                  sx={{
-                    background: "linear-gradient(135deg, #10b981, #059669)",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "1rem",
-                    py: 3,
-                    px: 2,
-                  }}
-                />
-                <Chip
-                  icon={<Public />}
-                  label="Global Coverage"
-                  sx={{
-                    background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "1rem",
-                    py: 3,
-                    px: 2,
-                  }}
-                />
-                <Chip
-                  icon={<Language />}
-                  label="Multiple Languages"
-                  sx={{
-                    background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: "1rem",
-                    py: 3,
-                    px: 2,
-                  }}
-                />
               </Box>
+
+              
             </Box>
 
-            {/* Contact Methods */}
+            
+
+            {/* Contact Form and Office Locations */}
+         <Grid container spacing={6} justifyContent="center" className="mb-16">
+  {/* Contact Form */}
+  <Grid item xs={12} md={10} lg={10}>
+    <Grow in={showContent} timeout={1200}>
+      <Paper
+        elevation={24}
+        sx={{
+          borderRadius: 4,
+          background: "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          p: 6,
+          mx: "auto",
+          width: "100%",
+          maxWidth: "1000px",
+        }}
+      >
+        <Typography variant="h4" className="font-bold text-gray-800 mb-6">
+          Send Us a Message
+        </Typography>
+
+        <Box component="form" onSubmit={handleSubmit} >
+          <TextField
+            name="name"
+            label="Full Name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            variant="outlined"
+            sx={{
+                mt:3,
+                mb:2,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.8)",
+                "&:hover fieldset": {
+                  borderColor: "#3b82f6",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#3b82f6",
+                },
+              },
+            }}
+          />
+
+          <TextField
+            name="email"
+            label="Email Address"
+            type="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            variant="outlined"
+            sx={{
+                mb:2,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.8)",
+                "&:hover fieldset": {
+                  borderColor: "#3b82f6",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#3b82f6",
+                },
+              },
+            }}
+          />
+
+          <TextField
+            name="subject"
+            label="Subject"
+            value={formData.subject}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            variant="outlined"
+            sx={{
+                mb:2,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.8)",
+                "&:hover fieldset": {
+                  borderColor: "#3b82f6",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#3b82f6",
+                },
+              },
+            }}
+          />
+
+          <TextField
+            name="message"
+            label="Message"
+            value={formData.message}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+            sx={{
+                mb:2,
+              "& .MuiOutlinedInput-root": {
+                borderRadius: 3,
+                background: "rgba(255,255,255,0.8)",
+                "&:hover fieldset": {
+                  borderColor: "#3b82f6",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#3b82f6",
+                },
+              },
+            }}
+          />
+
+          <Box textAlign="center">
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
+              sx={{
+                px: 5,
+                py: 1.5,
+                fontSize: "1rem",
+                fontWeight: 700,
+                borderRadius: 4,
+                textTransform: "none",
+                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                  transform: "translateY(-2px) scale(1.02)",
+                  boxShadow: "0 12px 40px rgba(59, 130, 246, 0.4)",
+                },
+                "&:disabled": {
+                  background: "linear-gradient(135deg, #9ca3af, #6b7280)",
+                  transform: "none",
+                },
+              }}
+            >
+              {loading ? "Sending Message..." : "Send Message"}
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+    </Grow>
+  </Grid>
+</Grid>
+
+
+
+
+{/* Contact Methods */}
             <Box className="mb-16">
               <Box className="text-center mb-12">
                 <Typography variant="h3" className="font-bold text-gray-800 mb-4">
                   How Can We Help?
                 </Typography>
-                <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto">
+                <Box className="flex justify-center">
+                    <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto">
                   Choose the best way to reach us based on your needs and urgency
                 </Typography>
+                </Box>
               </Box>
 
               <Grid container spacing={4}>
@@ -375,367 +465,8 @@ const ContactUs = () => {
               </Grid>
             </Box>
 
-            {/* Contact Form and Office Locations */}
-            <Grid container spacing={6} className="mb-16">
-              {/* Contact Form */}
-              <Grid item xs={12} lg={7}>
-                <Grow in={showContent} timeout={1200}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      borderRadius: 4,
-                      background: "rgba(255,255,255,0.95)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      p: 4,
-                    }}
-                  >
-                    <Typography variant="h4" className="font-bold text-gray-800 mb-6">
-                      Send Us a Message
-                    </Typography>
 
-                    <Box component="form" onSubmit={handleSubmit} className="space-y-6">
-                      {/* Inquiry Type Selection */}
-                      <Box>
-                        <Typography variant="subtitle1" className="font-semibold text-gray-700 mb-3">
-                          What can we help you with?
-                        </Typography>
-                        <Box className="flex flex-wrap gap-2">
-                          {inquiryTypes.map((type) => (
-                            <Chip
-                              key={type.value}
-                              icon={type.icon}
-                              label={type.label}
-                              clickable
-                              onClick={() => setFormData({ ...formData, inquiryType: type.value })}
-                              sx={{
-                                background:
-                                  formData.inquiryType === type.value
-                                    ? "linear-gradient(135deg, #3b82f6, #8b5cf6)"
-                                    : "rgba(255,255,255,0.8)",
-                                color: formData.inquiryType === type.value ? "white" : "#6b7280",
-                                fontWeight: 600,
-                                border:
-                                  formData.inquiryType === type.value ? "none" : "1px solid rgba(107, 114, 128, 0.3)",
-                                "&:hover": {
-                                  background:
-                                    formData.inquiryType === type.value
-                                      ? "linear-gradient(135deg, #2563eb, #7c3aed)"
-                                      : "rgba(59, 130, 246, 0.1)",
-                                },
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </Box>
-
-                      {/* Form Fields */}
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            name="name"
-                            label="Full Name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            required
-                            fullWidth
-                            variant="outlined"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.8)",
-                                "&:hover fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                              },
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            name="email"
-                            label="Email Address"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            required
-                            fullWidth
-                            variant="outlined"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.8)",
-                                "&:hover fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                              },
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            name="company"
-                            label="Company/Organization (Optional)"
-                            value={formData.company}
-                            onChange={handleInputChange}
-                            fullWidth
-                            variant="outlined"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.8)",
-                                "&:hover fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                              },
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            name="subject"
-                            label="Subject"
-                            value={formData.subject}
-                            onChange={handleInputChange}
-                            required
-                            fullWidth
-                            variant="outlined"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.8)",
-                                "&:hover fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                              },
-                            }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <TextField
-                            name="message"
-                            label="Message"
-                            value={formData.message}
-                            onChange={handleInputChange}
-                            required
-                            fullWidth
-                            multiline
-                            rows={4}
-                            variant="outlined"
-                            sx={{
-                              "& .MuiOutlinedInput-root": {
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.8)",
-                                "&:hover fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "#3b82f6",
-                                },
-                              },
-                            }}
-                          />
-                        </Grid>
-                      </Grid>
-
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        size="large"
-                        disabled={loading}
-                        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-                        sx={{
-                          px: 6,
-                          py: 3,
-                          fontSize: "1.1rem",
-                          fontWeight: 700,
-                          borderRadius: 4,
-                          textTransform: "none",
-                          background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                          boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            background: "linear-gradient(135deg, #2563eb, #7c3aed)",
-                            transform: "translateY(-2px) scale(1.02)",
-                            boxShadow: "0 12px 40px rgba(59, 130, 246, 0.4)",
-                          },
-                          "&:disabled": {
-                            background: "linear-gradient(135deg, #9ca3af, #6b7280)",
-                            transform: "none",
-                          },
-                        }}
-                      >
-                        {loading ? "Sending Message..." : "Send Message"}
-                      </Button>
-                    </Box>
-                  </Paper>
-                </Grow>
-              </Grid>
-
-              {/* Office Locations */}
-              <Grid item xs={12} lg={5}>
-                <Grow in={showContent} timeout={1400}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      borderRadius: 4,
-                      background: "rgba(255,255,255,0.95)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      p: 4,
-                      height: "fit-content",
-                    }}
-                  >
-                    <Typography variant="h4" className="font-bold text-gray-800 mb-6">
-                      Our Offices
-                    </Typography>
-
-                    <Box className="space-y-4">
-                      {offices.map((office, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            p: 3,
-                            borderRadius: 3,
-                            background: "linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6))",
-                            border: "1px solid rgba(255,255,255,0.3)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                            },
-                          }}
-                        >
-                          <Box className="flex items-start justify-between mb-3">
-                            <Box>
-                              <Box className="flex items-center gap-2 mb-1">
-                                <Typography variant="h6" className="font-bold text-gray-800">
-                                  {office.city}
-                                </Typography>
-                                {office.isHeadquarters && (
-                                  <Chip
-                                    label="HQ"
-                                    size="small"
-                                    sx={{
-                                      background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                                      color: "white",
-                                      fontWeight: 600,
-                                      fontSize: "0.75rem",
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                              <Typography variant="body2" className="text-gray-600 font-medium">
-                                {office.country}
-                              </Typography>
-                            </Box>
-                            <LocationOn sx={{ color: "#3b82f6" }} />
-                          </Box>
-
-                          <Box className="space-y-2">
-                            <Box className="flex items-center gap-2">
-                              <LocationOn sx={{ color: "#6b7280", fontSize: 18 }} />
-                              <Typography variant="body2" className="text-gray-600">
-                                {office.address}, {office.zipCode}
-                              </Typography>
-                            </Box>
-                            <Box className="flex items-center gap-2">
-                              <Phone sx={{ color: "#6b7280", fontSize: 18 }} />
-                              <Typography variant="body2" className="text-gray-600">
-                                {office.phone}
-                              </Typography>
-                            </Box>
-                            <Box className="flex items-center gap-2">
-                              <Email sx={{ color: "#6b7280", fontSize: 18 }} />
-                              <Typography variant="body2" className="text-gray-600">
-                                {office.email}
-                              </Typography>
-                            </Box>
-                            <Box className="flex items-center gap-2">
-                              <Schedule sx={{ color: "#6b7280", fontSize: 18 }} />
-                              <Typography variant="body2" className="text-gray-600">
-                                {office.timezone}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Paper>
-                </Grow>
-              </Grid>
-            </Grid>
-
-            {/* FAQ Section */}
-            <Box>
-              <Grow in={showContent} timeout={1600}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    borderRadius: 6,
-                    background: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      background: "linear-gradient(135deg, #10b981, #059669)",
-                      p: { xs: 4, md: 6 },
-                      position: "relative",
-                      color: "white",
-                      textAlign: "center",
-                    }}
-                  >
-                    {/* Decorative elements */}
-                    <Box className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-24 translate-x-24"></Box>
-                    <Box className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></Box>
-
-                    <Box className="relative z-10">
-                      <Typography variant="h3" className="font-bold mb-4">
-                        Need Immediate Help?
-                      </Typography>
-                      <Typography variant="h6" className="opacity-90 mb-6 max-w-2xl mx-auto">
-                        Check out our comprehensive help center with guides, tutorials, and frequently asked questions.
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<Help />}
-                        sx={{
-                          background: "rgba(255,255,255,0.9)",
-                          color: "#059669",
-                          fontWeight: 700,
-                          borderRadius: 4,
-                          px: 6,
-                          py: 2,
-                          "&:hover": {
-                            background: "white",
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 8px 25px rgba(255,255,255,0.3)",
-                          },
-                        }}
-                      >
-                        Visit Help Center
-                      </Button>
-                    </Box>
-                  </Box>
-                </Paper>
-              </Grow>
-            </Box>
+           
           </div>
         </Fade>
       </Container>
