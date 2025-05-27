@@ -48,20 +48,12 @@ import {
   Error as ErrorIcon,
   ViewList,
   GridView,
-<<<<<<< HEAD
-=======
-  Assessment,
-  Campaign,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   AccessTime,
   CalendarToday,
   HowToVote,
   Timeline,
-<<<<<<< HEAD
   HourglassTop,
   HowToReg,TaskAlt
-=======
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 
@@ -469,7 +461,6 @@ const ElectionListPage = () => {
               </Box>
 
               {/* Centered Statistics Cards */}
-<<<<<<< HEAD
            <Box className="flex justify-center mb-8">
   <Box sx={{ maxWidth: 1200, width: "100%" }}>
     <Grid container spacing={2} justifyContent="center">
@@ -617,134 +608,6 @@ const ElectionListPage = () => {
 
 
 
-=======
-              <Box className="flex justify-center mb-8">
-                <Box sx={{ maxWidth: 1200, width: "100%" }}>
-                  <Grid container spacing={3} justifyContent="center">
-                    {[
-                      {
-                        label: "Total Elections",
-                        value: stats.total,
-                        icon: <Event />,
-                        gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-                        bgIcon: <Campaign />,
-                        subtitle: "All elections",
-                      },
-                      {
-                        label: "Upcoming",
-                        value: stats.upcoming,
-                        icon: <Schedule />,
-                        gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
-                        bgIcon: <AccessTime />,
-                        subtitle: "Scheduled",
-                      },
-                      {
-                        label: "Ongoing",
-                        value: stats.ongoing,
-                        icon: <PlayArrow />,
-                        gradient: "linear-gradient(135deg, #10b981, #059669)",
-                        bgIcon: <HowToVote />,
-                        subtitle: "Active now",
-                      },
-                      {
-                        label: "Completed",
-                        value: stats.completed,
-                        icon: <CheckCircle />,
-                        gradient: "linear-gradient(135deg, #3b82f6, #2563eb)",
-                        bgIcon: <Assessment />,
-                        subtitle: "Finished",
-                      },
-                    ].map((stat, index) => (
-                      <Grid item xs={12} sm={6} md={3} key={index}>
-                        <Grow in timeout={400 + index * 200}>
-                          <Paper
-                            elevation={24}
-                            sx={{
-                              borderRadius: 4,
-                              background: "rgba(255,255,255,0.95)",
-                              backdropFilter: "blur(20px)",
-                              border: "1px solid rgba(255,255,255,0.2)",
-                              overflow: "hidden",
-                              position: "relative",
-                              transition: "all 0.3s ease",
-                              "&:hover": {
-                                transform: "translateY(-8px) scale(1.02)",
-                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                              },
-                            }}
-                          >
-                            {/* Background Pattern */}
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: 0,
-                                right: 0,
-                                width: "100px",
-                                height: "100px",
-                                background: stat.gradient,
-                                borderRadius: "0 0 0 100px",
-                                opacity: 0.1,
-                              }}
-                            />
-
-                            {/* Background Icon */}
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: 16,
-                                right: 16,
-                                opacity: 0.1,
-                                fontSize: "4rem",
-                                background: stat.gradient,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                              }}
-                            >
-                              {stat.bgIcon}
-                            </Box>
-
-                            <CardContent sx={{ p: 3, position: "relative", zIndex: 1, textAlign: "center" }}>
-                              {/* Icon */}
-                              <Box
-                                sx={{
-                                  width: 64,
-                                  height: 64,
-                                  borderRadius: 4,
-                                  background: stat.gradient,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  color: "white",
-                                  boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-                                  mx: "auto",
-                                  mb: 3,
-                                }}
-                              >
-                                {stat.icon}
-                              </Box>
-
-                              {/* Main Value */}
-                              <Typography variant="h3" className="font-bold text-gray-800 mb-2">
-                                {stat.value.toLocaleString()}
-                              </Typography>
-
-                              {/* Label and Subtitle */}
-                              <Typography variant="h6" className="font-semibold text-gray-700 mb-1">
-                                {stat.label}
-                              </Typography>
-                              <Typography variant="body2" className="text-gray-500">
-                                {stat.subtitle}
-                              </Typography>
-                            </CardContent>
-                          </Paper>
-                        </Grow>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-              </Box>
-
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
               {/* Centered Content Area */}
               <Box className="flex justify-center flex-1">
                 <Box sx={{ maxWidth: 1400, width: "100%" }}>

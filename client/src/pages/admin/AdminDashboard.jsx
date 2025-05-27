@@ -43,10 +43,7 @@ import {
   TrendingDown,
   MoreVert,
   Assessment,
-<<<<<<< HEAD
   BarChartRounded
-=======
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 } from "@mui/icons-material"
 import { formatDistanceToNow } from "date-fns"
 import { io } from "socket.io-client"
@@ -202,19 +199,16 @@ const AdminDashboard = () => {
       route: "/admin/approved-candidates",
       count: "25 approved",
     },
-<<<<<<< HEAD
     {
     id: "results",
     title: "View Results",
     description: "Check results of completed elections",
-    icon: <BarChartRounded />, // Ensure you import this icon from @mui/icons-material
+    icon: <BarChartRounded />, 
     gradient: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
     route: "/admin/results",
     count: "View all",
   },
     
-=======
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   ]
 
   useEffect(() => {
@@ -342,7 +336,6 @@ const AdminDashboard = () => {
               >
                 Admin Dashboard
               </Typography>
-<<<<<<< HEAD
               <Box className="flex justify-center">
                 <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Manage elections, candidates, and voters with our comprehensive administrative platform
@@ -352,15 +345,6 @@ const AdminDashboard = () => {
 
             {/* Features Section */}
             {/* <Box className="mb-8">
-=======
-              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Manage elections, candidates, and voters with our comprehensive administrative platform
-              </Typography>
-            </Box>
-
-            {/* Features Section */}
-            <Box className="mb-8">
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {features.map((feature, index) => (
                   <Grow in timeout={600 + index * 200} key={index}>
@@ -382,11 +366,7 @@ const AdminDashboard = () => {
                   </Grow>
                 ))}
               </div>
-<<<<<<< HEAD
             </Box> */}
-=======
-            </Box>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
             {/* Navigation Tabs */}
             <Paper
@@ -448,11 +428,8 @@ const AdminDashboard = () => {
                           <Paper
                             elevation={24}
                             sx={{
-<<<<<<< HEAD
                               width:300,
                               height:260,
-=======
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                               borderRadius: 4,
                               background: "rgba(255,255,255,0.95)",
                               backdropFilter: "blur(20px)",
@@ -562,7 +539,6 @@ const AdminDashboard = () => {
 
                   {/* Quick Actions Section */}
                   <Box className="mb-8">
-<<<<<<< HEAD
   <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
     Quick Actions
   </Typography>
@@ -664,116 +640,6 @@ const AdminDashboard = () => {
   </Box>
 </Box>
 
-=======
-                    <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
-                      Quick Actions
-                    </Typography>
-                    <Typography variant="body1" className="text-gray-600 mb-8 text-center">
-                      Navigate to key administrative functions
-                    </Typography>
-
-                    <Grid container spacing={4}>
-                      {quickActions.map((action, index) => (
-                        <Grid item xs={12} sm={6} lg={4} key={action.id}>
-                          <Grow in timeout={600 + index * 200}>
-                            <Paper
-                              elevation={24}
-                              sx={{
-                                borderRadius: 4,
-                                background: "rgba(255,255,255,0.95)",
-                                backdropFilter: "blur(20px)",
-                                border: "1px solid rgba(255,255,255,0.2)",
-                                overflow: "hidden",
-                                cursor: "pointer",
-                                position: "relative",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                  transform: "translateY(-8px) scale(1.02)",
-                                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                                },
-                              }}
-                              onClick={() => handleActionClick(action.route)}
-                            >
-                              {/* Gradient Background */}
-                              <Box
-                                sx={{
-                                  height: "120px",
-                                  background: action.gradient,
-                                  position: "relative",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                {/* Background Pattern */}
-                                <Box
-                                  sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    right: 0,
-                                    width: "80px",
-                                    height: "80px",
-                                    background: "rgba(255,255,255,0.1)",
-                                    borderRadius: "0 0 0 80px",
-                                  }}
-                                />
-
-                                {/* Main Icon */}
-                                <Box
-                                  sx={{
-                                    fontSize: "3rem",
-                                    color: "white",
-                                    zIndex: 1,
-                                  }}
-                                >
-                                  {action.icon}
-                                </Box>
-
-                                {/* Arrow Icon */}
-                                <Box
-                                  sx={{
-                                    position: "absolute",
-                                    top: 16,
-                                    right: 16,
-                                    color: "rgba(255,255,255,0.8)",
-                                  }}
-                                >
-                                  <ArrowForward />
-                                </Box>
-                              </Box>
-
-                              <CardContent sx={{ p: 3 }}>
-                                <Typography variant="h6" className="font-bold text-gray-800 mb-2">
-                                  {action.title}
-                                </Typography>
-                                <Typography variant="body2" className="text-gray-600 mb-3">
-                                  {action.description}
-                                </Typography>
-
-                                {/* Count Badge */}
-                                <Box className="flex items-center justify-between">
-                                  <Chip
-                                    label={action.count}
-                                    size="small"
-                                    sx={{
-                                      background: action.gradient,
-                                      color: "white",
-                                      fontWeight: 600,
-                                      fontSize: "0.75rem",
-                                    }}
-                                  />
-                                  <Typography variant="caption" className="text-gray-400">
-                                    Click to navigate
-                                  </Typography>
-                                </Box>
-                              </CardContent>
-                            </Paper>
-                          </Grow>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
                   {/* Trust Indicators */}
                   <Box className="text-center">

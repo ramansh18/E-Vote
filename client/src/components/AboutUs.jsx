@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 "use client"
 import {
   Typography,
@@ -733,14 +732,3 @@ const About = () => {
 }
 
 export default About
-=======
-import React from 'react'
-
-const AboutUs = () => {
-  return (
-    <div>AboutUs</div>
-  )
-}
-
-export default AboutUs
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab

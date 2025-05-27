@@ -2,11 +2,7 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
-<<<<<<< HEAD
 import { useParams } from "react-router-dom"
-=======
-import { useParams } from 'react-router-dom';
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 import { useSelector } from "react-redux"
 import {
   Card,
@@ -20,19 +16,12 @@ import {
   Box,
   Avatar,
   Chip,
-<<<<<<< HEAD
-=======
-  Fade,
-  Grow,
-  Paper,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   useTheme,
   useMediaQuery,
-<<<<<<< HEAD
   Paper,
   Fade,
   Grow,
@@ -42,10 +31,6 @@ import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration"
 
 dayjs.extend(duration)
-=======
-} from "@mui/material"
-import { HowToVote, CheckCircle, Verified, Timer, Warning, Person } from "@mui/icons-material"
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
 const VotePage = () => {
   const token = useSelector((state) => state.auth.token)
@@ -54,7 +39,6 @@ const VotePage = () => {
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
   const [confirmDialog, setConfirmDialog] = useState(false)
-<<<<<<< HEAD
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
   const [electionTime, setElectionTime] = useState(null)
   const [timeRemaining, setTimeRemaining] = useState({
@@ -69,52 +53,6 @@ const VotePage = () => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
-=======
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  })
-
-  const [timeRemaining, setTimeRemaining] = useState({
-    days: 0,
-    hours: 2,
-    minutes: 15,
-    seconds: 30,
-  })
-  const { electionId } = useParams();
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        let { days, hours, minutes, seconds } = prev
-
-        if (seconds > 0) {
-          seconds--
-        } else if (minutes > 0) {
-          minutes--
-          seconds = 59
-        } else if (hours > 0) {
-          hours--
-          minutes = 59
-          seconds = 59
-        } else if (days > 0) {
-          days--
-          hours = 23
-          minutes = 59
-          seconds = 59
-        }
-
-        return { days, hours, minutes, seconds }
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({ open: true, message, severity })
   }
@@ -123,19 +61,11 @@ const VotePage = () => {
     setSnackbar({ ...snackbar, open: false })
   }
 
-<<<<<<< HEAD
-=======
-  // Generate party symbol from party name
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   const generatePartySymbol = (partyName) => {
     if (!partyName) return "UN"
     return partyName.substring(0, 2).toUpperCase()
   }
 
-<<<<<<< HEAD
-=======
-  // Get party color based on party name
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   const getPartyColor = (partyName) => {
     const colors = [
       "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -147,18 +77,10 @@ const VotePage = () => {
       "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
       "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
     ]
-<<<<<<< HEAD
     const hash = partyName?.split("").reduce((a, b) => a + b.charCodeAt(0), 0) || 0
     return colors[hash % colors.length]
   }
 
-=======
-    const hash = partyName.split("").reduce((a, b) => a + b.charCodeAt(0), 0)
-    return colors[hash % colors.length]
-  }
-
-  // Mock candidate data enhancement
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   const enhanceCandidateData = (candidate) => {
     const mottos = [
       "Building a better tomorrow together",
@@ -170,7 +92,6 @@ const VotePage = () => {
       "Innovation for a sustainable future",
       "Transparency, accountability, progress",
     ]
-<<<<<<< HEAD
     const descriptions = [
       "Experienced leader with 15+ years in public service...",
       "Former business executive turned public servant...",
@@ -182,22 +103,6 @@ const VotePage = () => {
       "Social worker and community leader advocating for affordable housing...",
     ]
     const hash = candidate?.user?.name?.split("").reduce((a, b) => a + b.charCodeAt(0), 0) || 0
-=======
-
-    const descriptions = [
-      "Experienced leader with 15+ years in public service, focusing on education reform and economic development.",
-      "Former business executive turned public servant, advocating for healthcare accessibility and job creation.",
-      "Community organizer and environmental advocate, championing sustainable development and social justice.",
-      "Legal professional with expertise in constitutional law, promoting transparency and government accountability.",
-      "Healthcare professional dedicated to improving public health systems and emergency preparedness.",
-      "Education specialist working to enhance learning opportunities and technological advancement in schools.",
-      "Economic policy expert focused on small business support and infrastructure development.",
-      "Social worker and community leader advocating for affordable housing and social welfare programs.",
-    ]
-
-    const hash = candidate.user.name.split("").reduce((a, b) => a + b.charCodeAt(0), 0)
-
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
     return {
       ...candidate,
       motto: mottos[hash % mottos.length],
@@ -210,13 +115,7 @@ const VotePage = () => {
       try {
         setInitialLoading(true)
         const res = await axios.get(`http://localhost:5000/api/election/${electionId}/candidates/approved`, {
-<<<<<<< HEAD
           headers: { Authorization: `Bearer ${token}` },
-=======
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         })
         const enhancedCandidates = (res.data.candidates || []).map(enhanceCandidateData)
         setCandidates(enhancedCandidates)
@@ -227,7 +126,6 @@ const VotePage = () => {
         setInitialLoading(false)
       }
     }
-<<<<<<< HEAD
 
     if (token && electionId) {
       fetchCandidates()
@@ -299,10 +197,6 @@ const VotePage = () => {
 
     return () => clearInterval(interval)
   }, [electionTime])
-=======
-    fetchCandidates()
-  }, [token])
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
   const handleCandidateSelect = (candidateAddress) => {
     setSelectedCandidate(candidateAddress)
@@ -321,11 +215,7 @@ const VotePage = () => {
       setLoading(true)
       const res = await axios.post(
         "http://localhost:5000/api/voting/vote",
-<<<<<<< HEAD
         { candidateAddress: selectedCandidate, electionId },
-=======
-        { candidateAddress: selectedCandidate,electionId },
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -335,18 +225,10 @@ const VotePage = () => {
       showSnackbar("Vote cast successfully!", "success")
       setConfirmDialog(false)
       setSelectedCandidate("")
-<<<<<<< HEAD
     } catch (err) {
       console.log(err)
       const fullMessage = err?.response?.data?.error?.cause?.message || err?.response?.data?.message || ""
       console.log("msg--", fullMessage)
-=======
-    
-    } catch (err) {
-      console.log(err)
-      const fullMessage = err?.response?.data?.error?.cause?.message || err?.response?.data?.message ||""
-      console.log("msg--",fullMessage)
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
       const userFriendlyMessage = fullMessage.includes("revert")
         ? fullMessage.split("revert")[1].trim()
         : "An unexpected error occurred."
@@ -424,19 +306,12 @@ const VotePage = () => {
               >
                 Cast Your Vote
               </Typography>
-<<<<<<< HEAD
               <Box className='flex justify-center'>
                 <Typography variant="h6" className="text-gray-600 max-w-xl mx-auto leading-relaxed mb-6">
                 Choose your candidate and participate in shaping the future. Your voice matters in this democratic
                 process.
               </Typography>
               </Box>
-=======
-              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
-                Choose your candidate and participate in shaping the future. Your voice matters in this democratic
-                process.
-              </Typography>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
               {/* Election Timer */}
               <Paper
@@ -460,18 +335,13 @@ const VotePage = () => {
                     left: 0,
                     right: 0,
                     height: 4,
-<<<<<<< HEAD
                     background: timeRemaining.ended
                       ? "linear-gradient(90deg, #ef4444, #dc2626)"
                       : "linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e)",
-=======
-                    background: "linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e)",
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                   }}
                 />
 
                 <Box className="flex items-center justify-center gap-2 mb-3">
-<<<<<<< HEAD
                   <Timer sx={{ color: timeRemaining.ended ? "#dc2626" : "#ef4444", fontSize: 28 }} />
                   <Typography variant="h5" className="font-bold text-gray-800">
                     {timeRemaining.ended ? "Election Has Ended" : "Election Ends In"}
@@ -640,123 +510,11 @@ const VotePage = () => {
                     >
                       🏆 View Election Results
                     </Button>
-=======
-                  <Timer sx={{ color: "#ef4444", fontSize: 28 }} />
-                  <Typography variant="h5" className="font-bold text-gray-800">
-                    Election Ends In
-                  </Typography>
-                </Box>
-
-                <Box className="flex justify-center gap-4">
-                  {timeRemaining.days > 0 && (
-                    <Box className="text-center">
-                      <Box
-                        sx={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: 2,
-                          background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          mb: 1,
-                          boxShadow: "0 4px 16px rgba(239, 68, 68, 0.3)",
-                        }}
-                      >
-                        <Typography variant="h5" className="font-bold text-white">
-                          {timeRemaining.days}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" className="text-gray-600 font-semibold">
-                        DAYS
-                      </Typography>
-                    </Box>
-                  )}
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #f97316, #ea580c)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(249, 115, 22, 0.3)",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.hours).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      HOURS
-                    </Typography>
-                  </Box>
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #eab308, #ca8a04)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(234, 179, 8, 0.3)",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.minutes).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      MINUTES
-                    </Typography>
-                  </Box>
-
-                  <Box className="text-center">
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 2,
-                        background: "linear-gradient(135deg, #22c55e, #16a34a)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mb: 1,
-                        boxShadow: "0 4px 16px rgba(34, 197, 94, 0.3)",
-                        animation:
-                          timeRemaining.hours === 0 && timeRemaining.minutes < 5 ? "pulse 1s infinite" : "none",
-                      }}
-                    >
-                      <Typography variant="h5" className="font-bold text-white">
-                        {String(timeRemaining.seconds).padStart(2, "0")}
-                      </Typography>
-                    </Box>
-                    <Typography variant="caption" className="text-gray-600 font-semibold">
-                      SECONDS
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {timeRemaining.hours === 0 && timeRemaining.minutes < 10 && (
-                  <Box className="mt-3 text-center">
-                    <Typography variant="body2" className="text-red-600 font-semibold animate-pulse">
-                      ⚠️ Election closing soon! Cast your vote now.
-                    </Typography>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                   </Box>
                 )}
               </Paper>
             </Box>
 
-<<<<<<< HEAD
             {/* Candidates Section - Only show when election is active */}
             {!timeRemaining.ended && (
               <Box className="mb-8">
@@ -958,207 +716,6 @@ const VotePage = () => {
 
             {/* Vote Button - Only show when election is active */}
             {!timeRemaining.ended && candidates.length > 0 && (
-=======
-            {/* Candidates Section */}
-            <Box className="mb-8">
-              <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
-                Choose Your Candidate
-              </Typography>
-              <Typography variant="body1" className="text-gray-600 mb-8 text-center">
-                Select the candidate that best represents your vision for the future
-              </Typography>
-
-              {candidates.length > 0 ? (
-                <div className="space-y-6">
-                  {candidates.map((candidate, index) => {
-                    const isSelected = selectedCandidate === candidate.walletAddress
-                    const partyGradient = getPartyColor(candidate.party)
-
-                    return (
-                      <Grow in timeout={1000 + index * 200} key={candidate._id}>
-                        <Card
-                          onClick={() => handleCandidateSelect(candidate.walletAddress)}
-                          sx={{
-                            borderRadius: 4,
-                            background: "rgba(255,255,255,0.95)",
-                            backdropFilter: "blur(20px)",
-                            border: isSelected ? "2px solid #3b82f6" : "1px solid rgba(255,255,255,0.2)",
-                            overflow: "hidden",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease",
-                            position: "relative",
-                            "&:hover": {
-                              transform: "translateY(-4px) scale(1.01)",
-                              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                            },
-                            ...(isSelected && {
-                              boxShadow: "0 20px 60px rgba(59, 130, 246, 0.3)",
-                              transform: "translateY(-4px) scale(1.01)",
-                            }),
-                          }}
-                        >
-                          {/* Top accent bar */}
-                          <Box
-                            sx={{
-                              height: 4,
-                              background: isSelected ? "linear-gradient(90deg, #3b82f6, #8b5cf6)" : partyGradient,
-                            }}
-                          />
-
-                          {/* Selection indicator */}
-                          {isSelected && (
-                            <Box
-                              sx={{
-                                position: "absolute",
-                                top: 16,
-                                right: 16,
-                                zIndex: 2,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: "50%",
-                                  background: "linear-gradient(135deg, #10b981, #059669)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.4)",
-                                  animation: "pulse 2s infinite",
-                                }}
-                              >
-                                <CheckCircle sx={{ color: "white", fontSize: 20 }} />
-                              </Box>
-                            </Box>
-                          )}
-
-                          <CardContent sx={{ p: 3 }}>
-                            <Box className="flex items-start gap-6">
-                              {/* Party Symbol */}
-                              <Box className="flex-shrink-0">
-                                <Avatar
-                                  sx={{
-                                    width: 80,
-                                    height: 80,
-                                    background: partyGradient,
-                                    fontSize: 24,
-                                    fontWeight: "bold",
-                                    color: "white",
-                                    boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-                                    border: "3px solid rgba(255,255,255,0.8)",
-                                  }}
-                                >
-                                  {generatePartySymbol(candidate.party)}
-                                </Avatar>
-                              </Box>
-
-                              {/* Candidate Information */}
-                              <Box className="flex-1 min-w-0">
-                                <Box className="flex items-center gap-3 mb-3">
-                                  <Typography variant="h5" className="font-bold text-gray-800 capitalize">
-                                    {candidate.user.name}
-                                  </Typography>
-                                  <Chip
-                                    icon={<Verified sx={{ color: "white" }} />}
-                                    label="Verified"
-                                    size="small"
-                                    sx={{
-                                      background: "linear-gradient(135deg, #10b981, #059669)",
-                                      color: "white",
-                                      fontWeight: 600,
-                                    }}
-                                  />
-                                </Box>
-
-                                <Box className="flex items-center gap-2 mb-4">
-                                  <Chip
-                                    label={candidate.party}
-                                    sx={{
-                                      background: partyGradient,
-                                      color: "white",
-                                      fontWeight: 600,
-                                      fontSize: "0.875rem",
-                                    }}
-                                  />
-                                </Box>
-
-                                <Typography
-                                  variant="h6"
-                                  className="text-blue-600 font-semibold mb-3 italic"
-                                  sx={{ fontSize: "1.1rem" }}
-                                >
-                                  "{candidate.motto}"
-                                </Typography>
-
-                                <Typography
-                                  variant="body1"
-                                  className="text-gray-700 leading-relaxed"
-                                  sx={{ lineHeight: 1.6 }}
-                                >
-                                  {candidate.description}
-                                </Typography>
-
-                                {/* Additional candidate info */}
-                                <Box className="flex items-center gap-4 mt-4">
-                                  <Box className="flex items-center gap-1">
-                                    <Person sx={{ color: "#6b7280", fontSize: 18 }} />
-                                    <Typography variant="body2" className="text-gray-500">
-                                      Candidate ID: {candidate._id.slice(-6).toUpperCase()}
-                                    </Typography>
-                                  </Box>
-                                </Box>
-                              </Box>
-                            </Box>
-                          </CardContent>
-                        </Card>
-                      </Grow>
-                    )
-                  })}
-                </div>
-              ) : (
-                <Fade in timeout={800}>
-                  <Paper
-                    elevation={24}
-                    sx={{
-                      borderRadius: 4,
-                      background: "rgba(255,255,255,0.95)",
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      p: 8,
-                      textAlign: "center",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: 4,
-                        background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mx: "auto",
-                        mb: 3,
-                        boxShadow: "0 8px 32px rgba(245, 158, 11, 0.3)",
-                      }}
-                    >
-                      <Warning sx={{ color: "white", fontSize: 40 }} />
-                    </Box>
-                    <Typography variant="h5" className="font-bold text-gray-800 mb-2">
-                      No Candidates Available
-                    </Typography>
-                    <Typography variant="body1" className="text-gray-600">
-                      There are currently no approved candidates for this election. Please check back later.
-                    </Typography>
-                  </Paper>
-                </Fade>
-              )}
-            </Box>
-
-            {/* Vote Button */}
-            {candidates.length > 0 && (
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
               <Box className="text-center">
                 <Button
                   variant="contained"
@@ -1275,17 +832,10 @@ const VotePage = () => {
                     </Avatar>
                     <Box className="text-left">
                       <Typography variant="h6" className="font-bold text-gray-800">
-<<<<<<< HEAD
                         {candidate.user?.name || "Unknown Candidate"}
                       </Typography>
                       <Typography variant="body2" className="text-gray-600">
                         {candidate.party || "Independent"}
-=======
-                        {candidate.user.name}
-                      </Typography>
-                      <Typography variant="body2" className="text-gray-600">
-                        {candidate.party}
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                       </Typography>
                     </Box>
                   </Box>

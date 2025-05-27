@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import {
@@ -9,28 +8,14 @@ import {
   Typography,
   Box,
   Avatar,
-<<<<<<< HEAD
-=======
-  Chip,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   Paper,
   IconButton,
   CircularProgress,
   Container,
   Fade,
   Grow,
-<<<<<<< HEAD
   MenuItem,
   Grid,
-=======
-  Select,
-  MenuItem,
-  FormControl,
-  Grid,
-  Card,
-  CardContent,
-  Divider,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 } from "@mui/material"
 import {
   Person,
@@ -40,25 +25,11 @@ import {
   Save,
   Cancel,
   PhotoCamera,
-<<<<<<< HEAD
-=======
-  Verified,
-  Security,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
   AccountCircle,
   Wallet,
   Cake,
   Wc,
-<<<<<<< HEAD
   Lock,
-=======
-  Shield,
-  Star,
-  TrendingUp,
-  CheckCircle,
-  Lock,
-  Public,
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 } from "@mui/icons-material"
 import axios from "axios"
 import { useSelector } from "react-redux"
@@ -76,12 +47,7 @@ function Profile() {
   const [initialLoading, setInitialLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
-<<<<<<< HEAD
   const token = useSelector((state) => state.auth.token)
-=======
-  const token = useSelector((state) => state.auth.token);
-  
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
   useEffect(() => {
     // Fetch user data from backend
@@ -231,7 +197,6 @@ function Profile() {
                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
                 </Box>
               </Box>
-<<<<<<< HEAD
 
               <Typography
                 variant="h3"
@@ -247,20 +212,6 @@ function Profile() {
                 </Typography>
               </Box>
             </Box>
-=======
-              <Typography
-                variant="h3"
-                className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
-              >
-                My Profile
-              </Typography>
-              <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Manage your personal information, account settings, and voting preferences
-              </Typography>
-            </Box>
-
-            
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
             {/* Main Profile Card */}
             <Grow in timeout={800}>
@@ -335,10 +286,6 @@ function Profile() {
                           <Typography variant="h6" className="opacity-90 mb-4">
                             {userData.email || "user@example.com"}
                           </Typography>
-<<<<<<< HEAD
-=======
-                          
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                         </Box>
                       </Grid>
                     </Grid>
@@ -428,7 +375,6 @@ function Profile() {
                       p: 4,
                     }}
                   >
-<<<<<<< HEAD
                     {/* Form Fields Grid - Consistent sizing */}
                     <Grid container spacing={4}>
                       {/* Full Name */}
@@ -489,66 +435,10 @@ function Profile() {
                                 }}
                               />
                             </Box>
-=======
-                    {/* Form Fields Grid */}
-                    <Grid container spacing={4}>
-                      {/* Full Name */}
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Full Name
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: editMode
-                              ? "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))"
-                              : "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: editMode
-                              ? "2px solid rgba(59, 130, 246, 0.2)"
-                              : "2px solid rgba(229, 231, 235, 0.5)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              ...(editMode && {
-                                border: "2px solid rgba(59, 130, 246, 0.4)",
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
-                              }),
-                            },
-                            "&:focus-within": {
-                              border: "2px solid #3b82f6",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 25px rgba(59, 130, 246, 0.25)",
-                            },
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Person sx={{ color: editMode ? "#3b82f6" : "#9ca3af", mr: 3, fontSize: 24 }} />
-                            <TextField
-                              name="name"
-                              value={userData.name}
-                              onChange={handleChange}
-                              disabled={!editMode}
-                              fullWidth
-                              variant="standard"
-                              placeholder="Enter your full name"
-                              InputProps={{
-                                disableUnderline: true,
-                                sx: {
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                  color: "#374151",
-                                  "& input": { padding: 0 },
-                                  "& input::placeholder": { color: "#9ca3af", opacity: 1 },
-                                },
-                              }}
-                            />
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           </Box>
                         </Box>
                       </Grid>
 
-<<<<<<< HEAD
                       {/* Email Address */}
                       <Grid item xs={12} sm={6} md={4}>
                         <Box sx={{ height: "140px",width:300, display: "flex", flexDirection: "column" }}>
@@ -705,139 +595,10 @@ function Profile() {
                           <Typography variant="caption" className="text-gray-500 mt-1 block" sx={{ minHeight: "16px" }}>
                             Wallet address is linked to your account
                           </Typography>
-=======
-                      {/* Email */}
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Email Address
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: "2px solid rgba(229, 231, 235, 0.5)",
-                            opacity: 0.8,
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Email sx={{ color: "#9ca3af", mr: 3, fontSize: 24 }} />
-                            <TextField
-                              name="email"
-                              type="email"
-                              value={userData.email}
-                              disabled={true}
-                              fullWidth
-                              variant="standard"
-                              InputProps={{
-                                disableUnderline: true,
-                                sx: {
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                  color: "#6b7280",
-                                  "& input": { padding: 0 },
-                                },
-                              }}
-                            />
-                            <Lock sx={{ color: "#9ca3af", ml: 2, fontSize: 20 }} />
-                          </Box>
-                        </Box>
-                        <Typography variant="caption" className="text-gray-500 mt-1 block">
-                          Email cannot be changed for security reasons
-                        </Typography>
-                      </Grid>
-
-                      {/* Wallet Address */}
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Wallet Address
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: "2px solid rgba(229, 231, 235, 0.5)",
-                            opacity: 0.8,
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Wallet sx={{ color: "#9ca3af", mr: 3, fontSize: 24 }} />
-                            <Box className="flex-1">
-                              <Typography variant="body1" className="font-mono text-gray-700">
-                                {userData.walletAddress}
-                              </Typography>
-                              <Typography variant="caption" className="text-gray-500">
-                                {truncateWallet(userData.walletAddress)} (Click to copy)
-                              </Typography>
-                            </Box>
-                            <Lock sx={{ color: "#9ca3af", ml: 2, fontSize: 20 }} />
-                          </Box>
-                        </Box>
-                        <Typography variant="caption" className="text-gray-500 mt-1 block">
-                          Wallet address is linked to your account and cannot be modified
-                        </Typography>
-                      </Grid>
-
-                      {/* Phone Number */}
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Phone Number
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: editMode
-                              ? "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))"
-                              : "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: editMode
-                              ? "2px solid rgba(59, 130, 246, 0.2)"
-                              : "2px solid rgba(229, 231, 235, 0.5)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              ...(editMode && {
-                                border: "2px solid rgba(59, 130, 246, 0.4)",
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
-                              }),
-                            },
-                            "&:focus-within": {
-                              border: "2px solid #3b82f6",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 25px rgba(59, 130, 246, 0.25)",
-                            },
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Phone sx={{ color: editMode ? "#3b82f6" : "#9ca3af", mr: 3, fontSize: 24 }} />
-                            <TextField
-                              name="phone"
-                              type="tel"
-                              value={userData.phone}
-                              onChange={handleChange}
-                              disabled={!editMode}
-                              fullWidth
-                              variant="standard"
-                              placeholder="Enter your phone number"
-                              InputProps={{
-                                disableUnderline: true,
-                                sx: {
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                  color: "#374151",
-                                  "& input": { padding: 0 },
-                                  "& input::placeholder": { color: "#9ca3af", opacity: 1 },
-                                },
-                              }}
-                            />
-                          </Box>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                         </Box>
                       </Grid>
 
                       {/* Gender */}
-<<<<<<< HEAD
                       <Grid item xs={12} sm={6} md={4}>
                         <Box sx={{ height: "140px",width:300, display: "flex", flexDirection: "column" }}>
                           <Typography
@@ -924,82 +685,11 @@ function Profile() {
                                 ]}
                               </TextField>
                             </Box>
-=======
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Gender
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: editMode
-                              ? "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))"
-                              : "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: editMode
-                              ? "2px solid rgba(59, 130, 246, 0.2)"
-                              : "2px solid rgba(229, 231, 235, 0.5)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              ...(editMode && {
-                                border: "2px solid rgba(59, 130, 246, 0.4)",
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
-                              }),
-                            },
-                            "&:focus-within": {
-                              border: "2px solid #3b82f6",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 25px rgba(59, 130, 246, 0.25)",
-                            },
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Wc sx={{ color: editMode ? "#3b82f6" : "#9ca3af", mr: 3, fontSize: 24 }} />
-                            {editMode ? (
-                              <FormControl fullWidth variant="standard">
-                                <Select
-                                  name="gender"
-                                  value={userData.gender}
-                                  onChange={handleChange}
-                                  disableUnderline
-                                  displayEmpty
-                                  sx={{
-                                    fontSize: "1.1rem",
-                                    fontWeight: 500,
-                                    color: "#374151",
-                                    "& .MuiSelect-select": { padding: 0 },
-                                  }}
-                                >
-                                  <MenuItem value="">
-                                    <em>Select Gender</em>
-                                  </MenuItem>
-                                  <MenuItem value="male">Male</MenuItem>
-                                  <MenuItem value="female">Female</MenuItem>
-                                  <MenuItem value="other">Other</MenuItem>
-                                  <MenuItem value="prefer-not-to-say">Prefer not to say</MenuItem>
-                                </Select>
-                              </FormControl>
-                            ) : (
-                              <Typography
-                                variant="body1"
-                                sx={{
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                  color: userData.gender ? "#374151" : "#9ca3af",
-                                  textTransform: "capitalize",
-                                }}
-                              >
-                                {userData.gender || "Not specified"}
-                              </Typography>
-                            )}
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                           </Box>
                         </Box>
                       </Grid>
 
                       {/* Age */}
-<<<<<<< HEAD
                       <Grid item xs={12} sm={6} md={6}>
                         <Box sx={{ height: "140px", width: 300, display: "flex", flexDirection: "column" }}>
                           <Typography
@@ -1062,61 +752,6 @@ function Profile() {
                             </Box>
                           </Box>
                
-=======
-                      <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" className="font-semibold text-gray-700 mb-3">
-                          Age
-                        </Typography>
-                        <Box
-                          sx={{
-                            position: "relative",
-                            background: editMode
-                              ? "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7))"
-                              : "linear-gradient(135deg, rgba(249,250,251,0.9), rgba(249,250,251,0.7))",
-                            borderRadius: 3,
-                            border: editMode
-                              ? "2px solid rgba(59, 130, 246, 0.2)"
-                              : "2px solid rgba(229, 231, 235, 0.5)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              ...(editMode && {
-                                border: "2px solid rgba(59, 130, 246, 0.4)",
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 8px 25px rgba(59, 130, 246, 0.15)",
-                              }),
-                            },
-                            "&:focus-within": {
-                              border: "2px solid #3b82f6",
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 8px 25px rgba(59, 130, 246, 0.25)",
-                            },
-                          }}
-                        >
-                          <Box className="flex items-center p-4">
-                            <Cake sx={{ color: editMode ? "#3b82f6" : "#9ca3af", mr: 3, fontSize: 24 }} />
-                            <TextField
-                              name="age"
-                              type="number"
-                              value={userData.age}
-                              onChange={handleChange}
-                              disabled={!editMode}
-                              fullWidth
-                              variant="standard"
-                              placeholder="Enter your age"
-                              inputProps={{ min: 18, max: 120 }}
-                              InputProps={{
-                                disableUnderline: true,
-                                sx: {
-                                  fontSize: "1.1rem",
-                                  fontWeight: 500,
-                                  color: "#374151",
-                                  "& input": { padding: 0 },
-                                  "& input::placeholder": { color: "#9ca3af", opacity: 1 },
-                                },
-                              }}
-                            />
-                          </Box>
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
                         </Box>
                       </Grid>
                     </Grid>
@@ -1160,11 +795,6 @@ function Profile() {
                 </Box>
               </Paper>
             </Grow>
-<<<<<<< HEAD
-=======
-
-            
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
           </div>
         </Fade>
       </Container>

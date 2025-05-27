@@ -351,46 +351,30 @@ const RequestApproval = () => {
           label: "Total Requests",
           value: stats.total,
           icon: <Assignment fontSize="medium" />,
-<<<<<<< HEAD
           gradient: "linear-gradient(135deg, #6366f1, #4338ca)", // Bolder indigo
           bgIcon: <Assignment />,
           subtitle: "All submissions",
-=======
-          gradient: "linear-gradient(135deg, #d6dfff 0%, #d6cfff 100%)",
-          color: "#4c5ce5",
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         },
         {
           label: "Pending Review",
           value: stats.pending,
           icon: <Schedule fontSize="medium" />,
-<<<<<<< HEAD
           gradient: "linear-gradient(135deg, #f43f5e, #be123c)", // Strong rose/red
           bgIcon: <Schedule />,
           subtitle: "Awaiting decision",
-=======
-          gradient: "linear-gradient(135deg, #ffe0f0 0%, #fbe0e0 100%)",
-          color: "#e85a92",
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         },
         {
           label: "Approved",
           value: stats.approved,
           icon: <CheckCircle fontSize="medium" />,
-<<<<<<< HEAD
           gradient: "linear-gradient(135deg, #14b8a6, #0f766e)", // Bold teal
           bgIcon: <CheckCircle />,
           subtitle: "Marked valid",
-=======
-          gradient: "linear-gradient(135deg, #e0f7ff 0%, #d0f4fd 100%)",
-          color: "#00a6d6",
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
         },
         {
           label: "Rejected",
           value: stats.rejected,
           icon: <Cancel fontSize="medium" />,
-<<<<<<< HEAD
           gradient: "linear-gradient(135deg, #f97316, #c2410c)", // Strong orange
           bgIcon: <Cancel />,
           subtitle: "Declined",
@@ -511,84 +495,6 @@ const RequestApproval = () => {
 
 
 
-=======
-          gradient: "linear-gradient(135deg, #ffe3e3 0%, #ffe6cc 100%)",
-          color: "#f35b5b",
-        },
-      ].map((stat, index) => (
-        <Grid item xs={12} sm={6} md={3} key={index}>
-          <Grow in timeout={300 + index * 150}>
-            <Paper
-              elevation={3}
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                padding: 2,
-                borderRadius: 3,
-                height: 90,
-                width: "100%", // full width within grid
-                minWidth: 200,
-                maxWidth: 250, // ensures consistency
-                background: "#fff",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "scale(1.015)",
-                  boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-                },
-              }}
-            >
-              {/* Icon */}
-              <Box
-                sx={{
-                  width: 50,
-                  height: 50,
-                  minWidth: 50,
-                  minHeight: 50,
-                  borderRadius: 2,
-                  background: stat.gradient,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  marginRight: 2,
-                }}
-              >
-                {stat.icon}
-              </Box>
-
-              {/* Content */}
-              <Box sx={{ flexGrow: 1 }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: "#333", mb: 0.2, fontSize: "0.85rem" }}
-                >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: 700,
-                    color: stat.color,
-                    fontSize: "1.05rem",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {stat.value.toLocaleString()}
-                </Typography>
-              </Box>
-            </Paper>
-          </Grow>
-        </Grid>
-      ))}
-    </Grid>
-  </Box>
-</Box>
-
-
-
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 
               {/* Centered Content Area */}
               <Box className="flex justify-center flex-1">
