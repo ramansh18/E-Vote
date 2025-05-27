@@ -7,11 +7,7 @@ const {
     startElection,
     endElection,
     deleteElection,getApprovedCandidatesForElection,
-<<<<<<< HEAD
     getAvailableElections,updateElectionVotes,getElectionResults,getUpcomingElections,getAllCompletedElectionResults
-=======
-    getAvailableElections,updateElectionVotes,getElectionResults,getUpcomingElections
->>>>>>> bd9fa6d383f7203ba5137105720a2020638346ab
 } = require("../controllers/electionController");
 
 const { protect, adminOnly } = require("../middleware/auth");
