@@ -219,7 +219,7 @@ const AdminElectionResults = () => {
   }
 
   const handleViewDetails = (electionId) => {
-    navigate(`/admin/election/${electionId}/results`)
+    navigate(`/result/${electionId}`)
   }
 
   if (loading) {
@@ -792,7 +792,7 @@ const AdminElectionResults = () => {
                                       <TableCell>
                                         <Tooltip title="View Details">
                                           <IconButton
-                                            onClick={() => handleViewDetails(election._id)}
+                                            onClick={() => handleViewDetails(election.id)}
                                             sx={{
                                               backgroundColor: "rgba(59, 130, 246, 0.1)",
                                               "&:hover": {

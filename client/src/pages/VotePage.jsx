@@ -133,48 +133,21 @@ const VotePage = () => {
   }, [token, electionId])
 
   useEffect(() => {
-    const fetchElectionTime = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/election/${electionId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const election = res.data
-        setElectionTime(election)
-
-        // Immediately check if election has ended
-        const now = dayjs()
-        const end = dayjs(election.endTime)
-        const diff = end.diff(now)
-
-        if (diff <= 0) {
-          setTimeRemaining({
-            days: 0,
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-            ended: true,
-          })
-        }
-      } catch (err) {
-        showSnackbar("Failed to fetch election time", "error")
-        console.error(err)
-      }
-    }
-
-    if (token && electionId) {
-      fetchElectionTime()
-    }
-  }, [electionId, token])
-
-  useEffect(() => {
-    if (!electionTime?.endTime) return
-
-    const interval = setInterval(() => {
+  const fetchElectionTime = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/election/${electionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const election = res.data
+      setElectionTime(election)
+      console.log(election)
+      // Check if election has been manually ended or naturally ended
       const now = dayjs()
-      const end = dayjs(electionTime.endTime)
+      const end = dayjs(election.endTime)
       const diff = end.diff(now)
 
-      if (diff <= 0) {
+      // Check if election is manually ended (status field) OR time has passed
+      if (election.status === 'ended' || election.status === 'completed' || diff <= 0) {
         setTimeRemaining({
           days: 0,
           hours: 0,
@@ -182,21 +155,63 @@ const VotePage = () => {
           seconds: 0,
           ended: true,
         })
-        clearInterval(interval)
-      } else {
-        const dur = dayjs.duration(diff)
-        setTimeRemaining({
-          days: dur.days(),
-          hours: dur.hours(),
-          minutes: dur.minutes(),
-          seconds: dur.seconds(),
-          ended: false,
-        })
       }
-    }, 1000)
+    } catch (err) {
+      showSnackbar("Failed to fetch election time", "error")
+      console.error(err)
+    }
+  }
 
-    return () => clearInterval(interval)
-  }, [electionTime])
+  if (token && electionId) {
+    fetchElectionTime()
+  }
+}, [electionId, token])
+
+  useEffect(() => {
+  if (!electionTime?.endTime) return
+
+  const interval = setInterval(() => {
+    // First check if election is manually ended
+    if (electionTime.status === 'ended' || electionTime.status === 'completed') {
+      setTimeRemaining({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        ended: true,
+      })
+      clearInterval(interval)
+      return
+    }
+
+    // Then check natural time expiration
+    const now = dayjs()
+    const end = dayjs(electionTime.endTime)
+    const diff = end.diff(now)
+
+    if (diff <= 0) {
+      setTimeRemaining({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        ended: true,
+      })
+      clearInterval(interval)
+    } else {
+      const dur = dayjs.duration(diff)
+      setTimeRemaining({
+        days: dur.days(),
+        hours: dur.hours(),
+        minutes: dur.minutes(),
+        seconds: dur.seconds(),
+        ended: false,
+      })
+    }
+  }, 1000)
+
+  return () => clearInterval(interval)
+}, [electionTime])
 
   const handleCandidateSelect = (candidateAddress) => {
     setSelectedCandidate(candidateAddress)

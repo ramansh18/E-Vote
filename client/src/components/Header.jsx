@@ -283,26 +283,8 @@ const Header = () => {
               <Box className="hidden md:flex items-center space-x-4">
                 {isLoggedIn ? (
                   <>
-                    {/* Notifications */}
-                    {/* <IconButton
-                      sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 2,
-                        backgroundColor: "rgba(59, 130, 246, 0.1)",
-                        color: "#3b82f6",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          backgroundColor: "rgba(59, 130, 246, 0.2)",
-                          transform: "scale(1.05)",
-                        },
-                      }}
-                    >
-                      <Badge badgeContent={3} color="error">
-                        <Notifications />
-                      </Badge>
-                    </IconButton> */}
-                    <NotificationDropdown />
+                    
+                    {isLoggedIn && !isAdmin &&<NotificationDropdown />}
                     {/* User Menu */}
                     <Box className="relative">
                       <IconButton ref={menuButtonRef} onClick={handleMenuClick} sx={{ p: 0 }} disableRipple>

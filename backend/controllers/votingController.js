@@ -99,7 +99,7 @@ exports.castVote = async (req, res) => {
     const notification = await Notification.create({
     user: userId,
     title: 'Vote Confirmed',
-    message: `Your vote for the "${electionName}" election has been successfully recorded.`,
+    message: `Your vote for the "${election.title}" election has been successfully recorded.`,
     type: 'VoteConfirmation',
   });
 

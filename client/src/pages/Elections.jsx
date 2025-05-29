@@ -120,31 +120,48 @@ const Elections = () => {
     filterElections()
   }, [elections, searchTerm, activeTab])
 
+
+  const categories = [
+  { value: "general", label: "General Election" },
+  { value: "local", label: "Local Election" },
+  { value: "student", label: "Student Election" },
+  { value: "corporate", label: "Corporate Election" },
+  { value: "community", label: "Community Election" },
+];
+  const getCategoryLabel = (value) => {
+  const category = categories.find((cat) => cat.value === value);
+  return category ? category.label : value;
+};
+
   const fetchElections = async () => {
     try {
     //   setLoading(true)
      // Replace with actual API call
      const TOTAL_VOTERS = 2500;
       const res = await axios.get("http://localhost:5000/api/election/available")
-      const categories = ["Student Government", "Faculty", "Community", "Organizations"];
+      console.log(res.data)
+      
       const transformed = res.data.map((election) => {
           const totalVotes = election.candidates.reduce(
             (sum, candidate) => sum + candidate.votes,
             0
           );
-          const category = categories[Math.floor(Math.random() * categories.length)];
+          
 
           return {
             _id: election._id,
             title: election.title,
-            description: election.description,
+            description:
+                          election.description.length > 40
+                            ? election.description.slice(0, 40) + "..."
+                            : election.description,
             startTime: election.startTime,
             endTime: election.endTime,
             status: election.status==="ongoing" ? "active" : election.status,
             totalVotes,
             totalVoters: TOTAL_VOTERS,
             candidates: election.candidates.length,
-            category, // Static or dynamic
+            category: getCategoryLabel(election.category), // Static or dynamic
             priority:
               totalVotes > 1000
                 ? "high"
