@@ -44,6 +44,6 @@ module.exports = async function (deployer) {
     voting: voting.address,
   };
 
-  fs.writeFileSync("../contractAddresses.json", JSON.stringify(contractAddresses, null, 2));
+  fs.writeFileSync("./contractAddresses.json", JSON.stringify(contractAddresses, null, 2));
   console.log("Contract addresses saved to contractAddresses.json");
 };

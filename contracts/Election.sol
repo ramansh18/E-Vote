@@ -3,55 +3,91 @@ pragma solidity ^0.8.0;
 
 contract Election {
     address public admin;
-    uint public electionStartTime;
-    uint public electionEndTime;
-    bool public isElectionStarted;
-    bool public isElectionEnded;
+    uint constant MINIMUM_REQUIRED_CANDIDATES = 2;
 
-    event ElectionStarted(uint startTime, uint endTime);
-    event ElectionEnded(uint endTime);
+    struct ElectionData {
+        bool started;
+        bool ended;
+        uint approvedCandidates;
+    }
+
+    mapping(uint => ElectionData) public elections;
+
+    event ElectionStarted(uint electionId);
+    event ElectionEnded(uint electionId);
+
+    // Debug events for tracing
+    event DebugMsg(string message, uint electionId);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only admin can perform this action");
         _;
     }
 
-    modifier electionNotStarted() {
-        require(!isElectionStarted, "Election already started");
+    modifier electionNotStarted(uint electionId) {
+        require(!elections[electionId].started, "Election already started");
         _;
     }
 
-    modifier electionOngoing() {
-        require(isElectionStarted && !isElectionEnded, "Election is not ongoing");
+    modifier electionOngoing(uint electionId) {
+        require(elections[electionId].started && !elections[electionId].ended, "Election is not ongoing");
         _;
     }
 
     constructor() {
         admin = msg.sender;
-        isElectionStarted = false;
-        isElectionEnded = false;
     }
 
-    function startElection(uint _durationInSeconds) public onlyAdmin electionNotStarted {
-        electionStartTime = block.timestamp;
-        electionEndTime = block.timestamp + _durationInSeconds;
-        isElectionStarted = true;
-        emit ElectionStarted(electionStartTime, electionEndTime);
+    function startElection(uint electionId, uint approvedCandidateCount) 
+        public 
+        onlyAdmin 
+        electionNotStarted(electionId)
+    {
+        emit DebugMsg("startElection called", electionId);
+
+        require(approvedCandidateCount >= MINIMUM_REQUIRED_CANDIDATES, "Not enough approved candidates to start election");
+        emit DebugMsg("Approved candidate count sufficient", electionId);
+
+        elections[electionId] = ElectionData({
+            started: true,
+            ended: false,
+            approvedCandidates: approvedCandidateCount
+        });
+        emit DebugMsg("ElectionData updated", electionId);
+
+        emit ElectionStarted(electionId);
+        emit DebugMsg("ElectionStarted event emitted", electionId);
     }
 
-    function endElection() public onlyAdmin electionOngoing {
-        require(block.timestamp >= electionEndTime, "Election duration not yet completed");
-        isElectionEnded = true;
-        emit ElectionEnded(block.timestamp);
+    function endElection(uint electionId) 
+        public 
+        onlyAdmin 
+        electionOngoing(electionId) 
+    {
+        elections[electionId].ended = true;
+        emit ElectionEnded(electionId);
     }
 
-    function getElectionStatus() public view returns (string memory) {
-        if (!isElectionStarted) {
-            return "Not Started";
-        } else if (isElectionStarted && !isElectionEnded) {
-            return "Ongoing";
-        } else {
-            return "Ended";
-        }
+   function getElectionStatus(uint electionId) public returns (string memory) {
+    ElectionData memory election = elections[electionId];
+
+    // Check if election data exists or not (based on default struct values)
+    if (
+        election.approvedCandidates == 0 &&
+        election.started == false &&
+        election.ended == false
+    ) {
+        emit DebugMsg("No election data found for electionId", electionId);
+        return "No Election Found";
     }
+
+    if (!election.started) {
+        return "Not Started";
+    } else if (!election.ended) {
+        return "Ongoing";
+    } else {
+        return "Ended";
+    }
+}
+
 }

@@ -461,7 +461,9 @@ const Elections = () => {
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255,255,255,0.2)",
                     p: 8,
+                
                     textAlign: "center",
+                    
                   }}
                 >
                   <Box
@@ -503,6 +505,7 @@ const Elections = () => {
                           border: "1px solid rgba(255,255,255,0.2)",
                           height: "100%",
                           width:370,
+                          ml:3,
                           transition: "all 0.3s ease",
                           "&:hover": {
                             transform: "translateY(-8px) scale(1.02)",

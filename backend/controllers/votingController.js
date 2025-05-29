@@ -6,6 +6,7 @@ const deployedAddresses = require("../../contractAddresses.json");
 const Election = require("../models/Election.js");
 const Activity = require("../models/activity");
 require("dotenv").config({ path: "../.env" });
+const Notification = require('../models/Notifications');
 exports.castVote = async (req, res) => {
   try {
     const { candidateAddress, electionId } = req.body;
@@ -95,13 +96,15 @@ exports.castVote = async (req, res) => {
       timestamp: new Date(),
     });
     await user.save();
-    const activity = new Activity({
-      action: "New vote casted",
-      user: "candidateName", // Get from user data
-      type: "candidate",
-    });
+    const notification = await Notification.create({
+    user: userId,
+    title: 'Vote Confirmed',
+    message: `Your vote for the "${electionName}" election has been successfully recorded.`,
+    type: 'VoteConfirmation',
+  });
 
-    await activity.save();
+  // Emit to all connected clients
+  req.io.to(userId.toString()).emit('new-notification', notification);
     res.status(200).json({
       message: "Vote cast successfully",
       transactionHash: receipt.transactionHash,

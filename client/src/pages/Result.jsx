@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useParams } from "react-router-dom"
@@ -54,6 +53,7 @@ const ResultPage = () => {
   const [loading, setLoading] = useState(true)
   const [winner, setWinner] = useState(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [showWinnerPopup, setShowWinnerPopup] = useState(false)
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -89,13 +89,19 @@ const ResultPage = () => {
         console.log(electionId)
         const res = await axios.get(`http://localhost:5000/api/election/${electionId}/results`)
         setElection(res.data.election)
-        console.log(res.data)
+        // console.log(res.data)
         setCandidates(res.data.candidates)
         const sorted = [...res.data.candidates].sort((a, b) => b.votes - a.votes)
         if (res.data.election.status === "completed" && sorted[0]?.votes > 0) {
           setWinner(sorted[0])
           setShowConfetti(true)
-          setTimeout(() => setShowConfetti(false), 5000) // Stop after 5s
+          setShowWinnerPopup(true)
+          
+          // Hide confetti and popup after 5 seconds
+          setTimeout(() => {
+            setShowConfetti(false)
+            setShowWinnerPopup(false)
+          }, 5000)
         }
         console.log("election kya hai", election)
       } catch (error) {
@@ -196,518 +202,600 @@ const ResultPage = () => {
         ))}
       </div>
 
-      <Container maxWidth="lg" className="relative z-10 py-8">
-        <Fade in timeout={1000}>
-          <div>
-            {/* Header Section */}
-            <Box className="text-center mb-8">
-              <Box className="flex justify-center mb-6">
-                <Box className="relative">
-                  <Box className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
-                    <Assessment className="text-white text-4xl" />
+      {/* Main Content with conditional blur */}
+      <motion.div
+        animate={{
+          filter: showWinnerPopup ? 'blur(8px)' : 'blur(0px)',
+        }}
+        transition={{
+          duration: 0.8,
+          ease: [0.4, 0.0, 0.2, 1], // Custom easing for smooth transition
+        }}
+        className="relative z-10"
+      >
+        <Container maxWidth="lg" className="py-8">
+          <Fade in timeout={1000}>
+            <div>
+              {/* Header Section */}
+              <Box className="text-center mb-8">
+                <Box className="flex justify-center mb-6">
+                  <Box className="relative">
+                    <Box className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
+                      <Assessment className="text-white text-4xl" />
+                    </Box>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
                   </Box>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-ping"></div>
+                </Box>
+                <Typography
+                  variant="h3"
+                  className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
+                >
+                  Election Results
+                </Typography>
+                <Typography variant="h5" className="text-gray-800 font-semibold mb-2">
+                  National Leadership Election 2025
+                </Typography>
+                <Box className="flex justify-center">
+                  <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                  {election?.status === "completed"
+                    ? "Final results are now available. Thank you for participating in this democratic process."
+                    : "Live results are being updated as votes are counted."}
+                </Typography>
                 </Box>
               </Box>
-              <Typography
-                variant="h3"
-                className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4"
-              >
-                Election Results
-              </Typography>
-              <Typography variant="h5" className="text-gray-800 font-semibold mb-2">
-                National Leadership Election 2025
-              </Typography>
-              <Box className="flex justify-center">
-                <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                {election?.status === "completed"
-                  ? "Final results are now available. Thank you for participating in this democratic process."
-                  : "Live results are being updated as votes are counted."}
-              </Typography>
-              </Box>
-            </Box>
 
-            {/* Stats Section */}
-            <Box className="mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {stats.map((stat, index) => (
-                  <Grow in timeout={600 + index * 200} key={index}>
-                    <Paper
-                      elevation={24}
-                      sx={{
-                        borderRadius: 4,
-                        background: "rgba(255,255,255,0.95)",
-                        backdropFilter: "blur(20px)",
-                        border: "1px solid rgba(255,255,255,0.2)",
-                        overflow: "hidden",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          transform: "translateY(-8px) scale(1.02)",
-                          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                        },
-                      }}
-                    >
-                      <CardContent sx={{ p: 3, textAlign: "center" }}>
-                        <Box
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 3,
-                            background: stat.gradient,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "white",
-                            mx: "auto",
-                            mb: 2,
-                            boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-                          }}
-                        >
-                          {stat.icon}
-                        </Box>
-                        <Typography variant="h4" className="font-bold text-gray-800 mb-1">
-                          {stat.value}
-                        </Typography>
-                        <Typography variant="body1" className="text-gray-600">
-                          {stat.label}
-                        </Typography>
-                      </CardContent>
-                    </Paper>
-                  </Grow>
-                ))}
-              </div>
-            </Box>
-
-            {/* Election Status Card */}
-            <Box className="mb-8">
-              <Fade in timeout={800}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    borderRadius: 4,
-                    background: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 4,
-                      background:
-                        election?.status === "completed"
-                          ? "linear-gradient(90deg, #10b981, #059669)"
-                          : "linear-gradient(90deg, #f59e0b, #d97706)",
-                    }}
-                  />
-                  <CardContent sx={{ p: 4, textAlign: "center" }}>
-                    <Box className="flex items-center justify-center gap-3 mb-3">
-                      {election?.status === "completed" ? (
-                        <CheckCircle sx={{ color: "#10b981", fontSize: 32 }} />
-                      ) : (
-                        <Timeline sx={{ color: "#f59e0b", fontSize: 32 }} />
-                      )}
-                      <Typography variant="h5" className="font-bold text-gray-800">
-                        {election?.status === "completed" ? "Election Completed" : "Election Ongoing"}
-                      </Typography>
-                    </Box>
-                    <Typography
-                      variant="h6"
-                      className={`font-semibold ${
-                        election?.status === "completed" ? "text-green-600" : "text-amber-600"
-                      }`}
-                    >
-                      {election?.status === "completed"
-                        ? "🎉 Final Results Available"
-                        : "📊 Live Results - Updates in Real Time"}
-                    </Typography>
-                  </CardContent>
-                </Paper>
-              </Fade>
-            </Box>
-
-            {/* Chart Section */}
-            <Box className="mb-8">
-              <Typography variant="h4" className="font-bold text-gray-800 mb-6 text-center">
-                Vote Distribution
-              </Typography>
-              <Fade in timeout={1000}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    borderRadius: 4,
-                    background: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    p: 4,
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height={400}>
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={140}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
-                        labelLine={false}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value, name) => [
-                          `${value} votes (${((value / totalVotes) * 100).toFixed(1)}%)`,
-                          name,
-                        ]}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Paper>
-              </Fade>
-            </Box>
-
-            {/* Detailed Results Section */}
-            <Box className="mb-8">
-              <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
-                Detailed Results
-              </Typography>
-              <Typography variant="body1" className="text-gray-600 mb-8 text-center">
-                Complete breakdown of votes received by each candidate
-              </Typography>
-
-              <div className="space-y-6">
-                {sortedCandidates.map((candidate, index) => {
-                  const percentage = totalVotes > 0 ? (candidate.votes / totalVotes) * 100 : 0
-                  const isWinner = index === 0 && election?.status === "completed" && candidate.votes > 0
-                  const partyGradient = getPartyColor(index)
-
-                  return (
-                    <Grow in timeout={1200 + index * 200} key={candidate._id || index}>
-                      <Card
+              {/* Stats Section */}
+              <Box className="mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {stats.map((stat, index) => (
+                    <Grow in timeout={600 + index * 200} key={index}>
+                      <Paper
+                        elevation={24}
                         sx={{
                           borderRadius: 4,
                           background: "rgba(255,255,255,0.95)",
                           backdropFilter: "blur(20px)",
-                          border: isWinner ? "2px solid #10b981" : "1px solid rgba(255,255,255,0.2)",
+                          border: "1px solid rgba(255,255,255,0.2)",
                           overflow: "hidden",
-                          position: "relative",
                           transition: "all 0.3s ease",
                           "&:hover": {
-                            transform: "translateY(-4px) scale(1.01)",
+                            transform: "translateY(-8px) scale(1.02)",
                             boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
                           },
-                          ...(isWinner && {
-                            boxShadow: "0 20px 60px rgba(16, 185, 129, 0.3)",
-                          }),
                         }}
                       >
-                        {/* Top accent bar */}
-                        <Box
-                          sx={{
-                            height: 4,
-                            background: isWinner ? "linear-gradient(90deg, #10b981, #059669)" : partyGradient,
-                          }}
-                        />
+                        <CardContent sx={{ p: 3, textAlign: "center" }}>
+                          <Box
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 3,
+                              background: stat.gradient,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              mx: "auto",
+                              mb: 2,
+                              boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+                            }}
+                          >
+                            {stat.icon}
+                          </Box>
+                          <Typography variant="h4" className="font-bold text-gray-800 mb-1">
+                            {stat.value}
+                          </Typography>
+                          <Typography variant="body1" className="text-gray-600">
+                            {stat.label}
+                          </Typography>
+                        </CardContent>
+                      </Paper>
+                    </Grow>
+                  ))}
+                </div>
+              </Box>
 
-                        {/* Winner crown */}
-                        {isWinner && (
+              {/* Election Status Card */}
+              <Box className="mb-8">
+                <Fade in timeout={800}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      borderRadius: 4,
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        height: 4,
+                        background:
+                          election?.status === "completed"
+                            ? "linear-gradient(90deg, #10b981, #059669)"
+                            : "linear-gradient(90deg, #f59e0b, #d97706)",
+                      }}
+                    />
+                    <CardContent sx={{ p: 4, textAlign: "center" }}>
+                      <Box className="flex items-center justify-center gap-3 mb-3">
+                        {election?.status === "completed" ? (
+                          <CheckCircle sx={{ color: "#10b981", fontSize: 32 }} />
+                        ) : (
+                          <Timeline sx={{ color: "#f59e0b", fontSize: 32 }} />
+                        )}
+                        <Typography variant="h5" className="font-bold text-gray-800">
+                          {election?.status === "completed" ? "Election Completed" : "Election Ongoing"}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="h6"
+                        className={`font-semibold ${
+                          election?.status === "completed" ? "text-green-600" : "text-amber-600"
+                        }`}
+                      >
+                        {election?.status === "completed"
+                          ? "🎉 Final Results Available"
+                          : "📊 Live Results - Updates in Real Time"}
+                      </Typography>
+                    </CardContent>
+                  </Paper>
+                </Fade>
+              </Box>
+
+              {/* Chart Section */}
+              <Box className="mb-8">
+                <Typography variant="h4" className="font-bold text-gray-800 mb-6 text-center">
+                  Vote Distribution
+                </Typography>
+                <Fade in timeout={1000}>
+                  <Paper
+                    elevation={24}
+                    sx={{
+                      borderRadius: 4,
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      p: 4,
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height={400}>
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          dataKey="value"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={140}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                          labelLine={false}
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value, name) => [
+                            `${value} votes (${((value / totalVotes) * 100).toFixed(1)}%)`,
+                            name,
+                          ]}
+                        />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </Paper>
+                </Fade>
+              </Box>
+
+              {/* Detailed Results Section */}
+              <Box className="mb-8">
+                <Typography variant="h4" className="font-bold text-gray-800 mb-2 text-center">
+                  Detailed Results
+                </Typography>
+                <Typography variant="body1" className="text-gray-600 mb-8 text-center">
+                  Complete breakdown of votes received by each candidate
+                </Typography>
+
+                <div className="space-y-6">
+                  {sortedCandidates.map((candidate, index) => {
+                    const percentage = totalVotes > 0 ? (candidate.votes / totalVotes) * 100 : 0
+                    const isWinner = index === 0 && election?.status === "completed" && candidate.votes > 0
+                    const partyGradient = getPartyColor(index)
+
+                    return (
+                      <Grow in timeout={1200 + index * 200} key={candidate._id || index}>
+                        <Card
+                          sx={{
+                            borderRadius: 4,
+                            background: "rgba(255,255,255,0.95)",
+                            backdropFilter: "blur(20px)",
+                            border: isWinner ? "2px solid #10b981" : "1px solid rgba(255,255,255,0.2)",
+                            overflow: "hidden",
+                            position: "relative",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              transform: "translateY(-4px) scale(1.01)",
+                              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                            },
+                            ...(isWinner && {
+                              boxShadow: "0 20px 60px rgba(16, 185, 129, 0.3)",
+                            }),
+                          }}
+                        >
+                          {/* Top accent bar */}
+                          <Box
+                            sx={{
+                              height: 4,
+                              background: isWinner ? "linear-gradient(90deg, #10b981, #059669)" : partyGradient,
+                            }}
+                          />
+
+                          {/* Winner crown */}
+                          {isWinner && (
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 16,
+                                right: 16,
+                                zIndex: 2,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: "50%",
+                                  background: "linear-gradient(135deg, #ffd700, #ffed4e)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: "0 4px 12px rgba(255, 215, 0, 0.4)",
+                                  animation: "pulse 2s infinite",
+                                }}
+                              >
+                                <EmojiEvents sx={{ color: "#b45309", fontSize: 24 }} />
+                              </Box>
+                            </Box>
+                          )}
+
+                          {/* Position badge */}
                           <Box
                             sx={{
                               position: "absolute",
                               top: 16,
-                              right: 16,
+                              left: 16,
                               zIndex: 2,
                             }}
                           >
-                            <Box
+                            <Chip
+                              label={`#${index + 1}`}
                               sx={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: "50%",
-                                background: "linear-gradient(135deg, #ffd700, #ffed4e)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: "0 4px 12px rgba(255, 215, 0, 0.4)",
-                                animation: "pulse 2s infinite",
+                                background: partyGradient,
+                                color: "white",
+                                fontWeight: "bold",
+                                fontSize: "0.875rem",
                               }}
-                            >
-                              <EmojiEvents sx={{ color: "#b45309", fontSize: 24 }} />
-                            </Box>
+                            />
                           </Box>
-                        )}
 
-                        {/* Position badge */}
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            top: 16,
-                            left: 16,
-                            zIndex: 2,
-                          }}
-                        >
-                          <Chip
-                            label={`#${index + 1}`}
-                            sx={{
-                              background: partyGradient,
-                              color: "white",
-                              fontWeight: "bold",
-                              fontSize: "0.875rem",
-                            }}
-                          />
-                        </Box>
-
-                        <CardContent sx={{ p: 4, pt: 6 }}>
-                          <Box className="flex items-start gap-6">
-                            {/* Party Symbol */}
-                            <Box className="flex-shrink-0">
-                              <Avatar
-                                sx={{
-                                  width: 80,
-                                  height: 80,
-                                  background: partyGradient,
-                                  fontSize: 24,
-                                  fontWeight: "bold",
-                                  color: "white",
-                                  boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-                                  border: "3px solid rgba(255,255,255,0.8)",
-                                }}
-                              >
-                                {generatePartySymbol(candidate.party)}
-                              </Avatar>
-                            </Box>
-
-                            {/* Candidate Information */}
-                            <Box className="flex-1 min-w-0">
-                              <Box className="flex items-center gap-3 mb-3">
-                                <Typography variant="h5" className="font-bold text-gray-800 capitalize">
-                                  {candidate.name}
-                                </Typography>
-                                <Chip
-                                  icon={<Verified sx={{ color: "white" }} />}
-                                  label="Verified"
-                                  size="small"
+                          <CardContent sx={{ p: 4, pt: 6 }}>
+                            <Box className="flex items-start gap-6">
+                              {/* Party Symbol */}
+                              <Box className="flex-shrink-0">
+                                <Avatar
                                   sx={{
-                                    background: "linear-gradient(135deg, #10b981, #059669)",
+                                    width: 80,
+                                    height: 80,
+                                    background: partyGradient,
+                                    fontSize: 24,
+                                    fontWeight: "bold",
                                     color: "white",
-                                    fontWeight: 600,
+                                    boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+                                    border: "3px solid rgba(255,255,255,0.8)",
                                   }}
-                                />
-                                {isWinner && (
+                                >
+                                  {generatePartySymbol(candidate.party)}
+                                </Avatar>
+                              </Box>
+
+                              {/* Candidate Information */}
+                              <Box className="flex-1 min-w-0">
+                                <Box className="flex items-center gap-3 mb-3">
+                                  <Typography variant="h5" className="font-bold text-gray-800 capitalize">
+                                    {candidate.name}
+                                  </Typography>
                                   <Chip
-                                    icon={<Star sx={{ color: "white" }} />}
-                                    label="Winner"
+                                    icon={<Verified sx={{ color: "white" }} />}
+                                    label="Verified"
                                     size="small"
                                     sx={{
-                                      background: "linear-gradient(135deg, #ffd700, #ffed4e)",
-                                      color: "#b45309",
-                                      fontWeight: "bold",
+                                      background: "linear-gradient(135deg, #10b981, #059669)",
+                                      color: "white",
+                                      fontWeight: 600,
                                     }}
                                   />
-                                )}
-                              </Box>
-
-                              <Box className="flex items-center gap-2 mb-4">
-                                <Chip
-                                  label={candidate.party || "Independent"}
-                                  sx={{
-                                    background: partyGradient,
-                                    color: "white",
-                                    fontWeight: 600,
-                                    fontSize: "0.875rem",
-                                  }}
-                                />
-                              </Box>
-
-                              {/* Vote Statistics */}
-                              <Box className="mb-4">
-                                <Box className="flex items-center justify-between mb-2">
-                                  <Typography variant="h6" className="font-semibold text-gray-800">
-                                    Votes Received
-                                  </Typography>
-                                  <Typography variant="h6" className="font-bold text-blue-600">
-                                    {candidate.votes.toLocaleString()} ({percentage.toFixed(1)}%)
-                                  </Typography>
+                                  {isWinner && (
+                                    <Chip
+                                      icon={<Star sx={{ color: "white" }} />}
+                                      label="Winner"
+                                      size="small"
+                                      sx={{
+                                        background: "linear-gradient(135deg, #ffd700, #ffed4e)",
+                                        color: "#b45309",
+                                        fontWeight: "bold",
+                                      }}
+                                    />
+                                  )}
                                 </Box>
 
-                                {/* Progress Bar */}
-                                <Box sx={{ position: "relative" }}>
-                                  <LinearProgress
-                                    variant="determinate"
-                                    value={percentage}
+                                <Box className="flex items-center gap-2 mb-4">
+                                  <Chip
+                                    label={candidate.party || "Independent"}
                                     sx={{
-                                      height: 12,
-                                      borderRadius: 6,
-                                      backgroundColor: "rgba(0,0,0,0.1)",
-                                      "& .MuiLinearProgress-bar": {
-                                        borderRadius: 6,
-                                        background: partyGradient,
-                                      },
+                                      background: partyGradient,
+                                      color: "white",
+                                      fontWeight: 600,
+                                      fontSize: "0.875rem",
                                     }}
                                   />
-                                  <Box
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      bottom: 0,
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                    }}
-                                  >
-                                    <Typography
-                                      variant="caption"
-                                      className="font-bold text-white"
-                                      sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}
+                                </Box>
+
+                                {/* Vote Statistics */}
+                                <Box className="mb-4">
+                                  <Box className="flex items-center justify-between mb-2">
+                                    <Typography variant="h6" className="font-semibold text-gray-800">
+                                      Votes Received
+                                    </Typography>
+                                    <Typography variant="h6" className="font-bold text-blue-600">
+                                      {candidate.votes.toLocaleString()} ({percentage.toFixed(1)}%)
+                                    </Typography>
+                                  </Box>
+
+                                  {/* Progress Bar */}
+                                  <Box sx={{ position: "relative" }}>
+                                    <LinearProgress
+                                      variant="determinate"
+                                      value={percentage}
+                                      sx={{
+                                        height: 12,
+                                        borderRadius: 6,
+                                        backgroundColor: "rgba(0,0,0,0.1)",
+                                        "& .MuiLinearProgress-bar": {
+                                          borderRadius: 6,
+                                          background: partyGradient,
+                                        },
+                                      }}
+                                    />
+                                    <Box
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
                                     >
-                                      {percentage.toFixed(1)}%
+                                      <Typography
+                                        variant="caption"
+                                        className="font-bold text-white"
+                                        sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}
+                                      >
+                                        {percentage.toFixed(1)}%
+                                      </Typography>
+                                    </Box>
+                                  </Box>
+                                </Box>
+
+                                {/* Additional Stats */}
+                                <Box className="flex items-center gap-4">
+                                  <Box className="flex items-center gap-1">
+                                    <TrendingUp sx={{ color: "#6b7280", fontSize: 18 }} />
+                                    <Typography variant="body2" className="text-gray-500">
+                                      Rank: #{index + 1}
+                                    </Typography>
+                                  </Box>
+                                  <Box className="flex items-center gap-1">
+                                    <People sx={{ color: "#6b7280", fontSize: 18 }} />
+                                    <Typography variant="body2" className="text-gray-500">
+                                      {((candidate.votes / totalVotes) * 100).toFixed(2)}% of total votes
                                     </Typography>
                                   </Box>
                                 </Box>
                               </Box>
-
-                              {/* Additional Stats */}
-                              <Box className="flex items-center gap-4">
-                                <Box className="flex items-center gap-1">
-                                  <TrendingUp sx={{ color: "#6b7280", fontSize: 18 }} />
-                                  <Typography variant="body2" className="text-gray-500">
-                                    Rank: #{index + 1}
-                                  </Typography>
-                                </Box>
-                                <Box className="flex items-center gap-1">
-                                  <People sx={{ color: "#6b7280", fontSize: 18 }} />
-                                  <Typography variant="body2" className="text-gray-500">
-                                    {((candidate.votes / totalVotes) * 100).toFixed(2)}% of total votes
-                                  </Typography>
-                                </Box>
-                              </Box>
                             </Box>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grow>
-                  )
-                })}
-              </div>
-            </Box>
+                          </CardContent>
+                        </Card>
+                      </Grow>
+                    )
+                  })}
+                </div>
+              </Box>
 
-            {/* Summary Card */}
-            <Box className="text-center">
-              <Paper
-                elevation={24}
-                sx={{
-                  borderRadius: 4,
-                  background: "rgba(255,255,255,0.95)",
-                  backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  p: 6,
-                  maxWidth: 600,
-                  mx: "auto",
-                }}
-              >
-                <Box
+              {/* Summary Card */}
+              <Box className="text-center">
+                <Paper
+                  elevation={24}
                   sx={{
-                    width: 64,
-                    height: 64,
                     borderRadius: 4,
-                    background: "linear-gradient(135deg, #10b981, #059669)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    p: 6,
+                    maxWidth: 600,
                     mx: "auto",
-                    mb: 3,
-                    boxShadow: "0 8px 32px rgba(16, 185, 129, 0.3)",
                   }}
                 >
-                  <CheckCircle sx={{ color: "white", fontSize: 32 }} />
-                </Box>
-                <Typography variant="h5" className="font-bold text-gray-800 mb-2">
-                  Election Summary
-                </Typography>
-                <Typography variant="body1" className="text-gray-600 mb-4">
-                  {election?.status === "completed"
-                    ? "This election has been completed successfully. All votes have been counted and verified."
-                    : "This election is currently ongoing. Results will be updated in real-time as votes are cast."}
-                </Typography>
-                <Typography variant="body2" className="text-gray-500">
-                  Total Participation: <span className="font-bold text-blue-600">{totalVotes.toLocaleString()}</span>{" "}
-                  votes cast across <span className="font-bold text-purple-600">{candidates.length}</span> candidates
-                </Typography>
-              </Paper>
-            </Box>
-          </div>
-        </Fade>
-      </Container>
+                  <Box
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 4,
+                      background: "linear-gradient(135deg, #10b981, #059669)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mx: "auto",
+                      mb: 3,
+                      boxShadow: "0 8px 32px rgba(16, 185, 129, 0.3)",
+                    }}
+                  >
+                    <CheckCircle sx={{ color: "white", fontSize: 32 }} />
+                  </Box>
+                  <Typography variant="h5" className="font-bold text-gray-800 mb-2">
+                    Election Summary
+                  </Typography>
+                  <Typography variant="body1" className="text-gray-600 mb-4">
+                    {election?.status === "completed"
+                      ? "This election has been completed successfully. All votes have been counted and verified."
+                      : "This election is currently ongoing. Results will be updated in real-time as votes are cast."}
+                  </Typography>
+                  <Typography variant="body2" className="text-gray-500">
+                    Total Participation: <span className="font-bold text-blue-600">{totalVotes.toLocaleString()}</span>{" "}
+                    votes cast across <span className="font-bold text-purple-600">{candidates.length}</span> candidates
+                  </Typography>
+                </Paper>
+              </Box>
+            </div>
+          </Fade>
+        </Container>
+      </motion.div>
 
-      {/* Confetti and Winner Popup */}
+      {/* Confetti and Winner Popup - Outside the blurred content */}
       <AnimatePresence>
-        {showConfetti && (
+        {showWinnerPopup && (
           <>
-            <Confetti width={width} height={height} zIndex={9999} />
+            {/* Blur Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ 
+                duration: 0.8,
+                ease: [0.4, 0.0, 0.2, 1]
+              }}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                zIndex: 9998,
+              }}
+            />
+            
+            {/* Winner Popup */}
             {winner && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, scale: 0.5, y: 50 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.5, y: 50 }}
+                transition={{ 
+                  duration: 0.8,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 25
+                }}
                 style={{
                   position: "fixed",
                   top: "20%",
-                  left: "50%",
+                  left: "27%",
                   transform: "translate(-50%, -50%)",
-                  zIndex: 9999,
-                  background: "rgba(255,255,255,0.95)",
+                  zIndex: 10000,
+                  background: "rgba(255,255,255,0.98)",
                   backdropFilter: "blur(20px)",
-                  padding: "40px 50px",
-                  borderRadius: "20px",
+                  padding: "50px 60px",
+                  borderRadius: "24px",
                   textAlign: "center",
-                  boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-                  border: "1px solid rgba(255,255,255,0.2)",
+                  boxShadow: "0 25px 80px rgba(0,0,0,0.4)",
+                  border: "2px solid rgba(255,255,255,0.3)",
                   maxWidth: "90vw",
+                  maxHeight: "90vh",
                 }}
               >
-                <Box
-                  sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #ffd700, #ffed4e)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
-                    mb: 3,
-                    boxShadow: "0 8px 32px rgba(255, 215, 0, 0.4)",
-                    animation: "pulse 2s infinite",
-                  }}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
                 >
-                  <EmojiEvents sx={{ color: "#b45309", fontSize: 40 }} />
-                </Box>
-                <Typography
-                  variant="h4"
-                  className="font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-2"
+                  <Box
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg, #ffd700, #ffed4e)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      mx: "auto",
+                      mb: 4,
+                      boxShadow: "0 12px 40px rgba(255, 215, 0, 0.5)",
+                      animation: "pulse 2s infinite",
+                    }}
+                  >
+                    <EmojiEvents sx={{ color: "#b45309", fontSize: 50 }} />
+                  </Box>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
                 >
-                  🎉 Congratulations!
-                </Typography>
-                <Typography variant="h5" className="font-bold text-gray-800 mb-2">
-                  {winner.name}
-                </Typography>
-                <Typography variant="h6" className="text-gray-600 mb-3">
-                  Winner of the National Leadership Election 2025
-                </Typography>
-                <Typography variant="body1" className="text-gray-500">
-                  With {winner.votes.toLocaleString()} votes ({((winner.votes / totalVotes) * 100).toFixed(1)}%)
-                </Typography>
+                  <Typography
+                    variant="h3"
+                    className="font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-3"
+                  >
+                    🎉 Congratulations!
+                  </Typography>
+                  <Typography variant="h4" className="font-bold text-gray-800 mb-3">
+                    {winner.name}
+                  </Typography>
+                  <Typography variant="h5" className="text-gray-600 mb-4">
+                    Winner of the National Leadership Election 2025
+                  </Typography>
+                  {/* <Typography variant="h6" className="text-gray-500 mb-2">
+                    With {winner.votes.toLocaleString()} votes
+                  </Typography> */}
+                 
+                </motion.div>
               </motion.div>
             )}
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Confetti - Separate layer to avoid blur */}
+      <AnimatePresence>
+        {showConfetti && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              zIndex: 9999,
+            }}
+          >
+            <Confetti 
+              width={width} 
+              height={height}
+              numberOfPieces={300}
+              recycle={false}
+              gravity={0.3}
+              colors={['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8']}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 

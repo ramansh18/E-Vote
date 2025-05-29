@@ -5,7 +5,7 @@ const { voterContract } = contracts; // your web3 instance + contract
 const deployedAddresses = require("../../contractAddresses.json");
 require("dotenv").config({ path: "../.env" });
 const User = require("../models/User");
-
+const Activity = require("../models/activity")
 exports.registerVoter = async (req, res) => {
   try {
     const { name, age, gender } = req.body;
@@ -65,18 +65,18 @@ exports.registerVoter = async (req, res) => {
 
     // 7. Send signed transaction
     const tx = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
-    console.log("Voter registration successful:", tx.transactionHash);
-    const io = req.app.get("io")
-    io.emit("newActivity", {
-      id: Date.now(), // unique id
-      action: `Voter "${user.name}" registered`,
-      user: name,
-      time: "Just now",
-      type: "voter",
-      avatar: "/placeholder.svg?height=40&width=40",
-    })
-     console.log("📡 Emitted test newActivity event");
+    const activity = new Activity({
+     action: `Voter ${name} Registered`,
+     user: name,  // Get from user data
+     type: "voter",
+   });
+   
+   await activity.save(); // ✅ Save to DB
+   
+   // Emit to socket
+   const io = req.app.get("io");
+   io.emit("newActivity", activity);
+  
     res.status(201).json({
       message: "Voter registered successfully!",
       txHash: tx.transactionHash,

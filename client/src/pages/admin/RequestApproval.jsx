@@ -343,8 +343,8 @@ const RequestApproval = () => {
               </Box>
 
               {/* Centered Statistics Cards */}
-        <Box className="flex justify-center mb-8">
-  <Box sx={{ maxWidth: 1000, width: "100%" }}>
+        <Box className="flex mb-8 ml-10">
+  <Box sx={{ maxWidth: 1200, width: "100%" }}>
     <Grid container spacing={2} justifyContent="center">
       {[
         {
@@ -391,8 +391,8 @@ const RequestApproval = () => {
     border: "1px solid rgba(255,255,255,0.2)",
     overflow: "hidden",
     position: "relative",
-    width: "100%",
-    minHeight: 120, // Ensures uniform height
+    width: 278,
+    height: 132, // Ensures uniform height
     display: "flex",
     alignItems: "center",
     transition: "all 0.3s ease",
@@ -702,6 +702,7 @@ const RequestApproval = () => {
                                               px: 2,
                                               py: 1,
                                               borderRadius: 2,
+                                              mr:1,
                                               background: "linear-gradient(135deg, #10b981, #059669)",
                                               fontWeight: 600,
                                               textTransform: "none",

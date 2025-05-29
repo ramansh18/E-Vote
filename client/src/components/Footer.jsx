@@ -60,7 +60,7 @@ const Footer = () => {
 
       <div className="relative z-10">
         {/* Main Footer Content */}
-        <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Brand Section */}
             <div className="lg:col-span-1">
@@ -206,6 +206,7 @@ const Footer = () => {
                         borderColor: "rgba(59, 130, 246, 0.5)",
                         transform: "scale(1.1) rotate(5deg)",
                       },
+                      
                     }}
                   >
                     {social.icon}
@@ -216,7 +217,7 @@ const Footer = () => {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-8 pt-6 border-t border-white/10">
+          <div className="mt-8 pt-5 border-t border-white/10">
             <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-gray-400">
               <div className="flex items-center space-x-2">
                 <Security className="text-green-400" />

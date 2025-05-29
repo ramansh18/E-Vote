@@ -372,97 +372,165 @@ const ContactUs = () => {
 
 
 {/* Contact Methods */}
-            <Box className="mb-16">
-              <Box className="text-center mb-12">
-                <Typography variant="h3" className="font-bold text-gray-800 mb-4">
-                  How Can We Help?
-                </Typography>
-                <Box className="flex justify-center">
-                    <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto">
-                  Choose the best way to reach us based on your needs and urgency
-                </Typography>
-                </Box>
-              </Box>
+         <Box className="mb-16">
+  <Box className="text-center mb-12">
+    <Typography variant="h3" className="font-bold text-gray-800 mb-4">
+      How Can We Help?
+    </Typography>
+    <Box className="flex justify-center">
+      <Typography variant="h6" className="text-gray-600 max-w-3xl mx-auto">
+        Choose the best way to reach us based on your needs and urgency
+      </Typography>
+    </Box>
+  </Box>
 
-              <Grid container spacing={4}>
-                {contactMethods.map((method, index) => (
-                  <Grid item xs={12} sm={6} md={3} key={index}>
-                    <Grow in={showContent} timeout={800 + index * 200}>
-                      <Card
-                        sx={{
-                          borderRadius: 4,
-                          background: "rgba(255,255,255,0.95)",
-                          backdropFilter: "blur(20px)",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                          height: "100%",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            transform: "translateY(-8px) scale(1.02)",
-                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                          },
-                        }}
-                      >
-                        <CardContent sx={{ p: 4, textAlign: "center", height: "100%" }}>
-                          <Box
-                            sx={{
-                              width: 64,
-                              height: 64,
-                              borderRadius: 4,
-                              background: method.gradient,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "white",
-                              mx: "auto",
-                              mb: 3,
-                              boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-                            }}
-                          >
-                            {method.icon}
-                          </Box>
-                          <Typography variant="h6" className="font-bold text-gray-800 mb-2">
-                            {method.title}
-                          </Typography>
-                          <Typography variant="body2" className="text-gray-600 mb-3">
-                            {method.description}
-                          </Typography>
-                          <Typography variant="body1" className="font-semibold text-gray-800 mb-2">
-                            {method.contact}
-                          </Typography>
-                          <Chip
-                            label={method.responseTime}
-                            size="small"
-                            sx={{
-                              background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))",
-                              color: "#3b82f6",
-                              fontWeight: 600,
-                              mb: 3,
-                            }}
-                          />
-                          <Button
-                            variant="contained"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              background: method.gradient,
-                              fontWeight: 600,
-                              borderRadius: 3,
-                              py: 1.5,
-                              "&:hover": {
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
-                              },
-                            }}
-                          >
-                            {method.action}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </Grow>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+  {/* Centered container with fixed card layout */}
+  <Box
+    sx={{
+  display: "flex",
+  justifyContent: "flex-start", // Change from "center" to "flex-start"
+  mx: "auto",
+  maxWidth: "1200px",
+  paddingLeft: "60px", // Add left padding to shift it right from the left edge
+}}
+  >
+    <Grid 
+      container 
+      spacing={3} // Reduced spacing between cards
+      sx={{
+        justifyContent: "center", // Center the grid items
+        maxWidth: "100%",
+      }}
+    >
+      {contactMethods.map((method, index) => (
+        <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grow in={showContent} timeout={800 + index * 200}>
+            <Card
+              sx={{
+                borderRadius: 4,
+                background: "rgba(255,255,255,0.95)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                height: "320x", // Slightly reduced height
+                width: "250px", // Reduced width to fit all cards in one row
+                mx: "auto", // Center each card
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-8px) scale(1.02)",
+                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                },
+              }}
+            >
+              <CardContent 
+                sx={{ 
+                  p: 2.5, // Reduced padding
+                  textAlign: "center", 
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between", // Distribute content evenly
+                }}
+              >
+                <Box>
+                  <Box
+                    sx={{
+                      width: 56, // Slightly smaller icon
+                      height: 56,
+                      borderRadius: 4,
+                      background: method.gradient,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      mx: "auto",
+                      mb: 2.5,
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {method.icon}
+                  </Box>
+                  
+                  <Typography 
+                    variant="h6" 
+                    className="font-bold text-gray-800 mb-2"
+                    sx={{ 
+                      minHeight: "32px", // Fixed height for title
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1rem", // Slightly smaller font
+                    }}
+                  >
+                    {method.title}
+                  </Typography>
+                  
+                  <Typography 
+                    variant="body2" 
+                    className="text-gray-600 mb-3"
+                    sx={{ 
+                      minHeight: "60px", // Fixed height for description
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.85rem", // Slightly smaller font
+                    }}
+                  >
+                    {method.description}
+                  </Typography>
+                  
+                  <Typography 
+                    variant="body1" 
+                    className="font-semibold text-gray-800 mb-2"
+                    sx={{ 
+                      minHeight: "28px", // Fixed height for contact info
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "0.9rem", // Slightly smaller font
+                    }}
+                  >
+                    {method.contact}
+                  </Typography>
+                  
+                  <Box sx={{ mb: 2.5 }}>
+                    <Chip
+                      label={method.responseTime}
+                      size="small"
+                      sx={{
+                        background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))",
+                        color: "#3b82f6",
+                        fontWeight: 600,
+                        fontSize: "0.75rem", // Smaller font
+                      }}
+                    />
+                  </Box>
+                </Box>
+                
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    background: method.gradient,
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    py: 1.25, // Slightly smaller padding
+                    fontSize: "0.9rem", // Smaller font
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+                    },
+                  }}
+                >
+                  {method.action}
+                </Button>
+              </CardContent>
+            </Card>
+          </Grow>
+        </Grid>
+      ))}
+    </Grid>
+  </Box>
+</Box>
 
 
            

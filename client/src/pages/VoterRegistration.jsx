@@ -112,8 +112,8 @@ export default function VoterRegistration() {
         }, 2000)
       }
     } catch (err) {
-      const errorMessage = err.response.data.message
-      console.log(err)
+      const errorMessage = err.response.data.message || "Error message"
+      console.log(err.response.data.message)
       setSnackbar({
         open: true,
         message: errorMessage,

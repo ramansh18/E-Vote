@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 
     // Final filename: cleanName + timestamp + extension
     const filename = `${cleanName}_${timestamp}${extension}`;
+    console.log(filename)
     cb(null, filename);
   },
 });

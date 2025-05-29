@@ -6,12 +6,12 @@ const deployedAddresses = require("../../contractAddresses.json");
 require("dotenv").config({ path: "../.env" });
 const Candidate = require("../models/Candidate.js")
 const User = require("../models/User");
-
+const Activity = require('../models/activity.js')
 const axios = require('axios');
-
+const Notification = require('../models/Notifications')
 exports.createElection = async (req, res) => {
     try {
-        const { title, description, candidates, startTime, endTime } = req.body;
+        const { title, description, candidates, startTime, endTime,category } = req.body;
         const latestElection = await Election.findOne().sort({ electionNumber: -1 });
         const newElectionNumber = latestElection ? latestElection.electionNumber + 1 : 1;
 
@@ -21,6 +21,7 @@ exports.createElection = async (req, res) => {
             candidates,
             startTime,
             endTime,
+            category,
             electionNumber: newElectionNumber,
             status: "upcoming"
         });
@@ -36,7 +37,10 @@ exports.createElection = async (req, res) => {
 // ✅ Get All Elections (Off-chain)
 exports.getElections = async (req, res) => {
   try {
-    const elections = await Election.find({ status: { $ne: "completed" } });
+    const elections = await Election.find({
+  status: { $in: ["ongoing", "upcoming"] },
+});
+  console.log(elections.length)
 
     // You may also want to get user's voting history here if needed for hasVoted.
     // Assuming you have req.user.id from auth middleware:
@@ -86,16 +90,6 @@ exports.getUpcomingElections = async (req, res) => {
         res.status(500).json({ message: "Error fetching elections", error });
     }
 };
-exports.getUpcomingElections = async (req, res) => {
-    try {
-        const elections = await Election.find({
-        status: { $in: [ "upcoming"] },
-      });
-        res.status(200).json(elections);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching elections", error });
-    }
-};
 exports.getAvailableElections = async (req, res) => {
     try {
       const elections = await Election.find({
@@ -123,101 +117,123 @@ exports.getElectionById = async (req, res) => {
 
 // ✅ Start Election (On-chain + update DB)
 exports.startElection = async (req, res) => {
-    try {
-        const { duration } = req.body;
-        const election = await Election.findById(req.params.id);
-        if (!election) {
-            return res.status(404).json({ message: "Election not found" });
-        }
+  try {
+    const election = await Election.findById(req.params.id);
+    const electionId = req.params.id;
 
-        // Check if there are any approved candidates for this election
-        const approvedCandidates = await Candidate.find({ electionId: election._id,  status: "approved" });
-        if (approvedCandidates.length === 0) {
-            return res.status(400).json({ message: "No approved candidates for this election." });
-        }
-
-        console.log("Approved candidates for election:", approvedCandidates);
-
-
-        // Set up relayer for gasless transactions
-        const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
-        const relayerWallet = web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
-
-        // Add each approved candidate to the Voting contract
-        for (let candidate of approvedCandidates) {
-            const candidateAddress = candidate.walletAddress; // Assuming the candidate's address is stored in the 'address' field
-
-            // Add candidate to the Voting contract
-            const txDataAddCandidate = votingContract.methods.addCandidate(candidateAddress).encodeABI();
-
-            // Estimate gas for adding candidate
-            const gasAddCandidate = await web3.eth.estimateGas({
-                to: deployedAddresses.voting, // Use the deployed Voting contract address
-                data: txDataAddCandidate,
-                from: relayerWallet.address
-            });
-
-            // Get the gas price
-            const gasPriceAddCandidate = await web3.eth.getGasPrice();
-
-            // Sign the transaction to add the candidate
-            const signedTxAddCandidate = await web3.eth.accounts.signTransaction(
-                {
-                    to: deployedAddresses.voting, // Use the deployed Voting contract address
-                    data: txDataAddCandidate,
-                    gas: gasAddCandidate,
-                    gasPrice: gasPriceAddCandidate,
-                    from: relayerWallet.address
-                },
-                relayerPrivateKey
-            );
-
-            // Send the signed transaction to add the candidate
-            await web3.eth.sendSignedTransaction(signedTxAddCandidate.rawTransaction);
-        }
-
-        // Now, start the election in the Election contract
-        const txDataStartElection = electionContract.methods.startElection(duration).encodeABI();
-
-        // Estimate gas for starting the election
-        const gasStartElection = await web3.eth.estimateGas({
-            to: deployedAddresses.election, // Use the deployed Election contract address
-            data: txDataStartElection,
-            from: relayerWallet.address
-        });
-
-        // Get the gas price for the start election transaction
-        const gasPriceStartElection = await web3.eth.getGasPrice();
-
-        // Sign the transaction to start the election
-        const signedTxStartElection = await web3.eth.accounts.signTransaction(
-            {
-                to: deployedAddresses.election, // Use the deployed Election contract address
-                data: txDataStartElection,
-                gas: gasStartElection,
-                gasPrice: gasPriceStartElection,
-                from: relayerWallet.address
-            },
-            relayerPrivateKey
-        );
-
-        // Send the signed transaction to start the election
-        const tx = await web3.eth.sendSignedTransaction(signedTxStartElection.rawTransaction);
-
-        // Update the election status to 'ongoing'
-        election.status = "ongoing";
-        await election.save();
-
-        res.status(200).json({
-            message: "Election started successfully!",
-            election,
-            txHash: tx.transactionHash // Return the transaction hash
-        });
-    } catch (error) {
-        console.error("Error in startElection:", error);
-        res.status(500).json({ message: "Error starting election", error });
+    if (!election) {
+      return res.status(404).json({ message: "Election not found" });
     }
+
+    const electionNumber = election.electionNumber;
+    const approvedCandidates = await Candidate.find({
+      electionId: election._id,
+      status: "approved"
+    });
+
+    if (approvedCandidates.length < 2) {
+      return res.status(400).json({ message: "Minimum 2 approved candidates required." });
+    }
+
+    const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
+    const relayerWallet = web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
+
+    // ✅ Check if election already started
+    const status = await electionContract.methods.getElectionStatus(electionNumber).call();
+    if (status === "Ongoing" || status === "Ended") {
+  return res.status(400).json({
+    success: false,
+    message: `Election is already ${status.toLowerCase()}, cannot start again.`,
+  });
+}
+    console.log(status)
+    // ✅ Add only new candidates to Voting contract
+    const alreadyAdded = await votingContract.methods.getAllCandidates().call();
+    const newCandidates = approvedCandidates.filter(
+      c => !alreadyAdded.includes(c.walletAddress)
+    );
+
+    for (let candidate of newCandidates) {
+      const txDataAddCandidate = votingContract.methods.addCandidate(candidate.walletAddress).encodeABI();
+      const gas = await web3.eth.estimateGas({
+        to: deployedAddresses.voting,
+        data: txDataAddCandidate,
+        from: relayerWallet.address
+      });
+      const gasPrice = await web3.eth.getGasPrice();
+      const signedTx = await web3.eth.accounts.signTransaction({
+        to: deployedAddresses.voting,
+        data: txDataAddCandidate,
+        gas,
+        gasPrice,
+        from: relayerWallet.address
+      }, relayerPrivateKey);
+      await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    }
+
+    // ✅ Start Election using electionNumber & approvedCount
+    const approvedCount = approvedCandidates.length;
+    const txDataStartElection = electionContract.methods.startElection(electionNumber, approvedCount).encodeABI();
+    const gasStart = await web3.eth.estimateGas({
+      to: deployedAddresses.election,
+      data: txDataStartElection,
+      from: relayerWallet.address
+    });
+    const gasPriceStart = await web3.eth.getGasPrice();
+    const signedTxStart = await web3.eth.accounts.signTransaction({
+      to: deployedAddresses.election,
+      data: txDataStartElection,
+      gas: gasStart,
+      gasPrice: gasPriceStart,
+      from: relayerWallet.address
+    }, relayerPrivateKey);
+    const tx = await web3.eth.sendSignedTransaction(signedTxStart.rawTransaction);
+
+    election.status = "ongoing";
+    await election.save();
+
+    const activity = new Activity({
+      action: `Election ${election.title} Started`,
+      user: "Admin",
+      type: "election",
+    });
+    await activity.save();
+
+    const io = req.app.get("io");
+    io.emit("newActivity", activity);
+
+    const notification = new Notification({
+  type: "ElectionStart", // must match enum exactly
+  title: "Election Started", // add this to satisfy schema
+  message: `Election "${election.title}" has started!`,
+  // election: electionId, // optional unless used elsewhere
+  isGlobal: true,
+  createdAt: new Date(),
+});
+
+    await notification.save();
+
+    io.emit("notification", {
+      type: notification.type,
+      message: notification.message,
+      electionId: electionId,
+      createdAt: notification.createdAt,
+    });
+
+    res.status(200).json({
+      message: "Election started successfully!",
+      election,
+      txHash: tx.transactionHash
+    });
+
+  } catch (error) {
+    console.error("Error in startElection:", error);
+    res.status(500).json({ message: "Error starting election", error });
+  }
 };
+
+
+
 
 
 // ✅ End Election (On-chain + update DB)
@@ -231,7 +247,7 @@ exports.endElection = async (req, res) => {
         const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
         const relayerWallet = web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
 
-        const txData = electionContract.methods.endElection().encodeABI();
+        const txData = electionContract.methods.endElection(election.electionNumber).encodeABI();
 
         // Estimate gas
         const gas = await web3.eth.estimateGas({
@@ -261,7 +277,22 @@ exports.endElection = async (req, res) => {
         // Update the election status to "completed"
         election.status = "completed";
         await election.save();
-
+        const notif = await Notification.create({
+          type: 'ElectionResult', // Correct casing
+          title: 'Election Ended', // Required field
+          message: `The election "${election.title}" has ended. Check out the results now!`,
+          read: false,
+          isGlobal: true, // Correct field name
+          createdAt: new Date(),
+});
+  const io = req.app.get("io");
+  // Emit to all connected clients
+  io.emit('notification', {
+    id: notif._id,
+    type: notif.type,
+    message: notif.message,
+    createdAt: notif.createdAt,
+  });
         res.status(200).json({
             message: "Election ended successfully!",
             election,

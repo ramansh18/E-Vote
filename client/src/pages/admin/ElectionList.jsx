@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { useSelector } from "react-redux"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 import {
   Container,
   Typography,
@@ -26,12 +25,7 @@ import {
   TableRow,
   Snackbar,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Event,
   ArrowBack,
@@ -53,84 +47,82 @@ import {
   HowToVote,
   Timeline,
   HourglassTop,
-  HowToReg,TaskAlt
-} from "@mui/icons-material"
-import { useNavigate } from "react-router-dom"
+  HowToReg,
+  TaskAlt,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 const ElectionListPage = () => {
-  const [elections, setElections] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [viewMode, setViewMode] = useState("table") // 'table' or 'cards'
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success")
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedElectionId, setSelectedElectionId] = useState(null)
-  const [durationInMin, setDurationInMin] = useState("")
+  const [elections, setElections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [viewMode, setViewMode] = useState("table"); // 'table' or 'cards'
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [stats, setStats] = useState({
     total: 0,
     upcoming: 0,
     ongoing: 0,
     completed: 0,
-  })
+  });
 
-  const token = useSelector((state) => state.auth.token)
-  const navigate = useNavigate()
+  const token = useSelector((state) => state.auth.token);
+  const navigate = useNavigate();
 
   const fetchElections = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get("http://localhost:5000/api/election")
-      setElections(response.data)
-
+      setLoading(true);
+      const response = await axios.get("http://localhost:5000/api/election");
+      setElections(response.data);
+      console.log("election",response.data)
       // Calculate statistics
       const statsData = {
         total: response.data.length,
         upcoming: response.data.filter((e) => e.status === "upcoming").length,
-        ongoing: response.data.filter((e) => e.status === "ongoing").length,
+        ongoing: response.data.filter((e) => e.status === "active").length,
         completed: response.data.filter((e) => e.status === "completed").length,
-      }
-      setStats(statsData)
+      };
+      setStats(statsData);
 
-      setLoading(false)
+      setLoading(false);
     } catch (err) {
-      setError("Failed to fetch elections.")
-      console.error(err)
-      setLoading(false)
-      showSnackbar("Error loading elections", "error")
+      setError("Failed to fetch elections.");
+      console.error(err);
+      setLoading(false);
+      showSnackbar("Error loading elections", "error");
     }
-  }
+  };
 
   useEffect(() => {
-    fetchElections()
-  }, [])
+    fetchElections();
+  }, []);
 
   const showSnackbar = (message, severity) => {
-    setSnackbarMessage(message)
-    setSnackbarSeverity(severity)
-    setSnackbarOpen(true)
-  }
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   const handleCloseSnackbar = () => {
-    setSnackbarOpen(false)
-  }
+    setSnackbarOpen(false);
+  };
 
   const handleBackToDashboard = () => {
-    navigate("/admin/dashboard")
-  }
+    navigate("/admin/dashboard");
+  };
 
   const handleRefresh = () => {
-    fetchElections()
-  }
+    fetchElections();
+  };
 
   const handleCreateElection = () => {
-    navigate("/elections/create")
-  }
+    navigate("/admin/create-election");
+  };
 
   const handleViewElection = (id) => {
-    navigate(`/election/${id}`)
-  }
+    navigate(`/election/${id}`);
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -139,44 +131,34 @@ const ElectionListPage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      })
-      fetchElections()
-      showSnackbar("Election deleted successfully!", "success")
+      });
+      fetchElections();
+      showSnackbar("Election deleted successfully!", "success");
     } catch (error) {
-      console.error("Error deleting election:", error)
-      showSnackbar("Failed to delete the election!", "error")
+      console.error("Error deleting election:", error);
+      showSnackbar("Failed to delete the election!", "error");
     }
-  }
+  };
 
-  const handleStartClick = (id) => {
-    setSelectedElectionId(id)
-    setDialogOpen(true)
-  }
-
-  const handleStartConfirm = async () => {
-    const durationInSec = Number.parseInt(durationInMin) * 60
+  const handleStart = async (id) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/election/${selectedElectionId}/start`,
-        { duration: durationInSec },
+        `http://localhost:5000/api/election/${id}/start`,
+        {}, // Empty body since no duration needed
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        },
-      )
-      fetchElections()
-      showSnackbar("Election started successfully!", "success")
+        }
+      );
+      fetchElections();
+      showSnackbar("Election started successfully!", "success");
     } catch (error) {
-      console.error("Error starting election:", error)
-      showSnackbar("Failed to start the election!", "error")
-    } finally {
-      setDialogOpen(false)
-      setDurationInMin("")
-      setSelectedElectionId(null)
+      console.error("Error starting election:", error);
+      showSnackbar("Failed to start the election!", "error");
     }
-  }
+  };
 
   const handleEnd = async (id) => {
     try {
@@ -188,41 +170,41 @@ const ElectionListPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        },
-      )
-      fetchElections()
-      showSnackbar("Election ended successfully!", "success")
+        }
+      );
+      fetchElections();
+      showSnackbar("Election ended successfully!", "success");
     } catch (error) {
-      console.error("Error ending election:", error)
-      showSnackbar("Failed to end the election!", "error")
+      console.error("Error ending election:", error);
+      showSnackbar("Failed to end the election!", "error");
     }
-  }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
       case "upcoming":
-        return "warning"
+        return "warning";
       case "ongoing":
-        return "success"
+        return "success";
       case "completed":
-        return "default"
+        return "default";
       default:
-        return "default"
+        return "default";
     }
-  }
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
       case "upcoming":
-        return <Schedule />
+        return <Schedule />;
       case "ongoing":
-        return <PlayArrow />
+        return <PlayArrow />;
       case "completed":
-        return <CheckCircle />
+        return <CheckCircle />;
       default:
-        return <Event />
+        return <Event />;
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -248,7 +230,7 @@ const ElectionListPage = () => {
           </Container>
         </Box>
       </Box>
-    )
+    );
   }
 
   if (error) {
@@ -313,7 +295,7 @@ const ElectionListPage = () => {
           </Container>
         </Box>
       </Box>
-    )
+    );
   }
 
   return (
@@ -343,7 +325,10 @@ const ElectionListPage = () => {
 
       {/* Centered Main Content */}
       <Box className="relative z-10 min-h-screen flex flex-col">
-        <Container maxWidth="xl" sx={{ flex: 1, display: "flex", flexDirection: "column", py: 4 }}>
+        <Container
+          maxWidth="xl"
+          sx={{ flex: 1, display: "flex", flexDirection: "column", py: 4 }}
+        >
           <Fade in timeout={1000}>
             <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
               {/* Centered Header Section */}
@@ -439,9 +424,13 @@ const ElectionListPage = () => {
                       <Search className="text-purple-600" />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title={viewMode === "table" ? "Card View" : "Table View"}>
+                  <Tooltip
+                    title={viewMode === "table" ? "Card View" : "Table View"}
+                  >
                     <IconButton
-                      onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
+                      onClick={() =>
+                        setViewMode(viewMode === "table" ? "cards" : "table")
+                      }
                       sx={{
                         backgroundColor: "rgba(139, 92, 246, 0.1)",
                         "&:hover": {
@@ -461,152 +450,153 @@ const ElectionListPage = () => {
               </Box>
 
               {/* Centered Statistics Cards */}
-           <Box className="flex justify-center mb-8">
-  <Box sx={{ maxWidth: 1200, width: "100%" }}>
-    <Grid container spacing={2} justifyContent="center">
-      {[
-        {
-          label: "Total Elections",
-          value: stats.total,
-          icon: <Event />,
-          gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-          bgIcon: <HowToVote />,
-          subtitle: "All created elections",
-        },
-        {
-          label: "Upcoming",
-          value: stats.upcoming,
-          icon: <Schedule />,
-          gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
-          bgIcon: <HourglassTop />,
-          subtitle: "Yet to start",
-        },
-        {
-          label: "Ongoing",
-          value: stats.ongoing,
-          icon: <PlayArrow />,
-          gradient: "linear-gradient(135deg, #10b981, #059669)",
-          bgIcon: <HowToReg />,
-          subtitle: "In progress",
-        },
-        {
-          label: "Completed",
-          value: stats.completed,
-          icon: <CheckCircle />,
-          gradient: "linear-gradient(135deg, #3b82f6, #2563eb)",
-          bgIcon: <TaskAlt />,
-          subtitle: "Successfully ended",
-        },
-      ].map((stat, index) => (
-        <Grid item xs={12} sm={6} md={3} key={index}>
-          <Grow in timeout={400 + index * 200}>
-            <Paper
-              elevation={3}
-              sx={{
-                borderRadius: 4,
-                background: "rgba(255,255,255,0.95)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                overflow: "hidden",
-                position: "relative",
-                maxWidth: 280,
-                minWidth: 280,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-8px) scale(1.02)",
-                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                },
-              }}
-            >
-              {/* Background Pattern */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: "100px",
-                  height: "100px",
-                  background: stat.gradient,
-                  borderRadius: "0 0 0 100px",
-                  opacity: 0.1,
-                }}
-              />
+              <Box className="flex justify-center mb-8">
+                <Box sx={{ maxWidth: 1200, width: "100%" }}>
+                  <Grid container spacing={2} justifyContent="center">
+                    {[
+                      {
+                        label: "Total Elections",
+                        value: stats.total,
+                        icon: <Event />,
+                        gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                        bgIcon: <HowToVote />,
+                        subtitle: "All created elections",
+                      },
+                      {
+                        label: "Upcoming",
+                        value: stats.upcoming,
+                        icon: <Schedule />,
+                        gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
+                        bgIcon: <HourglassTop />,
+                        subtitle: "Yet to start",
+                      },
+                      {
+                        label: "Ongoing",
+                        value: stats.ongoing,
+                        icon: <PlayArrow />,
+                        gradient: "linear-gradient(135deg, #10b981, #059669)",
+                        bgIcon: <HowToReg />,
+                        subtitle: "In progress",
+                      },
+                      {
+                        label: "Completed",
+                        value: stats.completed,
+                        icon: <CheckCircle />,
+                        gradient: "linear-gradient(135deg, #3b82f6, #2563eb)",
+                        bgIcon: <TaskAlt />,
+                        subtitle: "Successfully ended",
+                      },
+                    ].map((stat, index) => (
+                      <Grid item xs={12} sm={6} md={3} key={index}>
+                        <Grow in timeout={400 + index * 200}>
+                          <Paper
+                            elevation={3}
+                            sx={{
+                              borderRadius: 4,
+                              background: "rgba(255,255,255,0.95)",
+                              backdropFilter: "blur(20px)",
+                              border: "1px solid rgba(255,255,255,0.2)",
+                              overflow: "hidden",
+                              position: "relative",
+                              maxWidth: 280,
+                              minWidth: 280,
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                transform: "translateY(-8px) scale(1.02)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                              },
+                            }}
+                          >
+                            {/* Background Pattern */}
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                width: "100px",
+                                height: "100px",
+                                background: stat.gradient,
+                                borderRadius: "0 0 0 100px",
+                                opacity: 0.1,
+                              }}
+                            />
 
-              {/* Background Icon */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  opacity: 0.1,
-                  fontSize: "4rem",
-                  background: stat.gradient,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                {stat.bgIcon}
+                            {/* Background Icon */}
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 16,
+                                right: 16,
+                                opacity: 0.1,
+                                fontSize: "4rem",
+                                background: stat.gradient,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                              }}
+                            >
+                              {stat.bgIcon}
+                            </Box>
+
+                            {/* Horizontal Layout */}
+                            <CardContent
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 2,
+                                p: 3,
+                                position: "relative",
+                                zIndex: 1,
+                              }}
+                            >
+                              {/* Icon on Left */}
+                              <Box
+                                sx={{
+                                  width: 48,
+                                  height: 48,
+                                  borderRadius: 2,
+                                  background: stat.gradient,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  color: "white",
+                                  boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {stat.icon}
+                              </Box>
+
+                              {/* Content on Right */}
+                              <Box>
+                                <Typography
+                                  variant="h5"
+                                  className="font-bold text-gray-800 leading-snug"
+                                >
+                                  {typeof stat.value === "number"
+                                    ? stat.value.toLocaleString()
+                                    : stat.value}
+                                </Typography>
+                                <Typography
+                                  variant="subtitle1"
+                                  className="font-medium text-gray-700"
+                                >
+                                  {stat.label}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  className="text-gray-500"
+                                >
+                                  {stat.subtitle}
+                                </Typography>
+                              </Box>
+                            </CardContent>
+                          </Paper>
+                        </Grow>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
               </Box>
-
-              {/* Horizontal Layout */}
-              <CardContent
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 3,
-                  position: "relative",
-                  zIndex: 1,
-                }}
-              >
-                {/* Icon on Left */}
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 2,
-                    background: stat.gradient,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "white",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-                    flexShrink: 0,
-                  }}
-                >
-                  {stat.icon}
-                </Box>
-
-                {/* Content on Right */}
-                <Box>
-                  <Typography
-                    variant="h5"
-                    className="font-bold text-gray-800 leading-snug"
-                  >
-                    {typeof stat.value === "number"
-                      ? stat.value.toLocaleString()
-                      : stat.value}
-                  </Typography>
-                  <Typography
-                    variant="subtitle1"
-                    className="font-medium text-gray-700"
-                  >
-                    {stat.label}
-                  </Typography>
-                  <Typography variant="caption" className="text-gray-500">
-                    {stat.subtitle}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Paper>
-          </Grow>
-        </Grid>
-      ))}
-    </Grid>
-  </Box>
-</Box>
-
-
 
               {/* Centered Content Area */}
               <Box className="flex justify-center flex-1">
@@ -630,11 +620,18 @@ const ElectionListPage = () => {
                           <Box className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                             <Event className="text-gray-400 text-4xl" />
                           </Box>
-                          <Typography variant="h5" className="text-gray-600 mb-3">
+                          <Typography
+                            variant="h5"
+                            className="text-gray-600 mb-3"
+                          >
                             No Elections Found
                           </Typography>
-                          <Typography variant="body1" className="text-gray-500 mb-6">
-                            No elections have been created yet. Create your first election to get started.
+                          <Typography
+                            variant="body1"
+                            className="text-gray-500 mb-6"
+                          >
+                            No elections have been created yet. Create your
+                            first election to get started.
                           </Typography>
                           <Button
                             onClick={handleCreateElection}
@@ -643,12 +640,14 @@ const ElectionListPage = () => {
                               px: 4,
                               py: 1.5,
                               borderRadius: 3,
-                              background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                              background:
+                                "linear-gradient(135deg, #8b5cf6, #7c3aed)",
                               color: "white",
                               fontWeight: 600,
                               textTransform: "none",
                               "&:hover": {
-                                background: "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                                background:
+                                  "linear-gradient(135deg, #7c3aed, #6d28d9)",
                                 transform: "translateY(-2px)",
                                 boxShadow: "0 8px 25px rgba(139, 92, 246, 0.3)",
                               },
@@ -674,7 +673,8 @@ const ElectionListPage = () => {
                         {/* Table Header */}
                         <Box
                           sx={{
-                            background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                            background:
+                              "linear-gradient(135deg, #8b5cf6, #7c3aed)",
                             p: 4,
                             position: "relative",
                             textAlign: "center",
@@ -685,11 +685,19 @@ const ElectionListPage = () => {
                               <Event className="text-white" />
                             </Box>
                             <Box>
-                              <Typography variant="h5" className="font-bold text-white mb-1">
+                              <Typography
+                                variant="h5"
+                                className="font-bold text-white mb-1"
+                              >
                                 All Elections
                               </Typography>
-                              <Typography variant="body2" className="text-purple-100">
-                                {elections.length} election{elections.length !== 1 ? "s" : ""} in the system
+                              <Typography
+                                variant="body2"
+                                className="text-purple-100"
+                              >
+                                {elections.length} election
+                                {elections.length !== 1 ? "s" : ""} in the
+                                system
                               </Typography>
                             </Box>
                           </Box>
@@ -706,7 +714,8 @@ const ElectionListPage = () => {
                               sx={{
                                 "& .MuiTableHead-root": {
                                   "& .MuiTableCell-root": {
-                                    background: "linear-gradient(135deg, #f8fafc, #e2e8f0)",
+                                    background:
+                                      "linear-gradient(135deg, #f8fafc, #e2e8f0)",
                                     fontWeight: 700,
                                     fontSize: "1rem",
                                     color: "#374151",
@@ -718,7 +727,8 @@ const ElectionListPage = () => {
                                   "& .MuiTableRow-root": {
                                     transition: "all 0.3s ease",
                                     "&:hover": {
-                                      backgroundColor: "rgba(139, 92, 246, 0.05)",
+                                      backgroundColor:
+                                        "rgba(139, 92, 246, 0.05)",
                                       transform: "scale(1.01)",
                                     },
                                   },
@@ -762,7 +772,11 @@ const ElectionListPage = () => {
                               </TableHead>
                               <TableBody>
                                 {elections.map((election, index) => (
-                                  <Grow in timeout={600 + index * 200} key={election._id}>
+                                  <Grow
+                                    in
+                                    timeout={600 + index * 200}
+                                    key={election.id}
+                                  >
                                     <TableRow>
                                       <TableCell>
                                         <Box className="flex items-center justify-center space-x-3">
@@ -770,12 +784,16 @@ const ElectionListPage = () => {
                                             sx={{
                                               width: 40,
                                               height: 40,
-                                              background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                                              background:
+                                                "linear-gradient(135deg, #8b5cf6, #7c3aed)",
                                             }}
                                           >
                                             <Event />
                                           </Avatar>
-                                          <Typography variant="body1" className="font-semibold text-gray-800">
+                                          <Typography
+                                            variant="body1"
+                                            className="font-semibold text-gray-800"
+                                          >
                                             {election.title}
                                           </Typography>
                                         </Box>
@@ -783,8 +801,15 @@ const ElectionListPage = () => {
                                       <TableCell>
                                         <Chip
                                           icon={getStatusIcon(election.status)}
-                                          label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
-                                          color={getStatusColor(election.status)}
+                                          label={
+                                            election.status
+                                              .charAt(0)
+                                              .toUpperCase() +
+                                            election.status.slice(1)
+                                          }
+                                          color={getStatusColor(
+                                            election.status
+                                          )}
                                           sx={{
                                             fontWeight: 600,
                                             borderRadius: 2,
@@ -792,24 +817,38 @@ const ElectionListPage = () => {
                                         />
                                       </TableCell>
                                       <TableCell>
-                                        <Typography variant="body2" className="text-gray-700">
-                                          {new Date(election.startTime).toLocaleString()}
+                                        <Typography
+                                          variant="body2"
+                                          className="text-gray-700"
+                                        >
+                                          {new Date(
+                                            election.startDate
+                                          ).toLocaleString()}
                                         </Typography>
                                       </TableCell>
                                       <TableCell>
-                                        <Typography variant="body2" className="text-gray-700">
-                                          {new Date(election.endTime).toLocaleString()}
+                                        <Typography
+                                          variant="body2"
+                                          className="text-gray-700"
+                                        >
+                                          {new Date(
+                                            election.endDate
+                                          ).toLocaleString()}
                                         </Typography>
                                       </TableCell>
                                       <TableCell>
                                         <Box className="flex items-center justify-center space-x-2">
                                           <Tooltip title="View Election">
                                             <IconButton
-                                              onClick={() => handleViewElection(election._id)}
+                                              onClick={() =>
+                                                handleViewElection(election.id)
+                                              }
                                               sx={{
-                                                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                                                backgroundColor:
+                                                  "rgba(59, 130, 246, 0.1)",
                                                 "&:hover": {
-                                                  backgroundColor: "rgba(59, 130, 246, 0.2)",
+                                                  backgroundColor:
+                                                    "rgba(59, 130, 246, 0.2)",
                                                   transform: "scale(1.1)",
                                                 },
                                               }}
@@ -821,11 +860,15 @@ const ElectionListPage = () => {
                                           {election.status === "upcoming" && (
                                             <Tooltip title="Start Election">
                                               <IconButton
-                                                onClick={() => handleStartClick(election._id)}
+                                                onClick={() =>
+                                                  handleStart(election.id)
+                                                }
                                                 sx={{
-                                                  backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                                  backgroundColor:
+                                                    "rgba(16, 185, 129, 0.1)",
                                                   "&:hover": {
-                                                    backgroundColor: "rgba(16, 185, 129, 0.2)",
+                                                    backgroundColor:
+                                                      "rgba(16, 185, 129, 0.2)",
                                                     transform: "scale(1.1)",
                                                   },
                                                 }}
@@ -835,14 +878,18 @@ const ElectionListPage = () => {
                                             </Tooltip>
                                           )}
 
-                                          {election.status === "ongoing" && (
+                                          {election.status === "active" && (
                                             <Tooltip title="End Election">
                                               <IconButton
-                                                onClick={() => handleEnd(election._id)}
+                                                onClick={() =>
+                                                  handleEnd(election.id)
+                                                }
                                                 sx={{
-                                                  backgroundColor: "rgba(245, 158, 11, 0.1)",
+                                                  backgroundColor:
+                                                    "rgba(245, 158, 11, 0.1)",
                                                   "&:hover": {
-                                                    backgroundColor: "rgba(245, 158, 11, 0.2)",
+                                                    backgroundColor:
+                                                      "rgba(245, 158, 11, 0.2)",
                                                     transform: "scale(1.1)",
                                                   },
                                                 }}
@@ -854,11 +901,15 @@ const ElectionListPage = () => {
 
                                           <Tooltip title="Delete Election">
                                             <IconButton
-                                              onClick={() => handleDelete(election._id)}
+                                              onClick={() =>
+                                                handleDelete(election.id)
+                                              }
                                               sx={{
-                                                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                                backgroundColor:
+                                                  "rgba(239, 68, 68, 0.1)",
                                                 "&:hover": {
-                                                  backgroundColor: "rgba(239, 68, 68, 0.2)",
+                                                  backgroundColor:
+                                                    "rgba(239, 68, 68, 0.2)",
                                                   transform: "scale(1.1)",
                                                 },
                                               }}
@@ -881,7 +932,7 @@ const ElectionListPage = () => {
                     <Fade in timeout={800}>
                       <Grid container spacing={4}>
                         {elections.map((election, index) => (
-                          <Grid item xs={12} sm={6} lg={4} key={election._id}>
+                          <Grid item xs={12} sm={6} lg={4} key={election.id}>
                             <Grow in timeout={600 + index * 200}>
                               <Card
                                 elevation={24}
@@ -894,14 +945,16 @@ const ElectionListPage = () => {
                                   transition: "all 0.3s ease",
                                   "&:hover": {
                                     transform: "translateY(-8px) scale(1.02)",
-                                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                                    boxShadow:
+                                      "0 20px 60px rgba(0, 0, 0, 0.15)",
                                   },
                                 }}
                               >
                                 {/* Card Header */}
                                 <Box
                                   sx={{
-                                    background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                                    background:
+                                      "linear-gradient(135deg, #8b5cf6, #7c3aed)",
                                     p: 3,
                                     position: "relative",
                                   }}
@@ -919,19 +972,31 @@ const ElectionListPage = () => {
                                         <Event className="text-white" />
                                       </Avatar>
                                       <Box>
-                                        <Typography variant="h6" className="font-bold text-white">
+                                        <Typography
+                                          variant="h6"
+                                          className="font-bold text-white"
+                                        >
                                           {election.title}
                                         </Typography>
-                                        <Typography variant="body2" className="text-purple-100">
+                                        <Typography
+                                          variant="body2"
+                                          className="text-purple-100"
+                                        >
                                           Election
                                         </Typography>
                                       </Box>
                                     </Box>
                                     <Chip
                                       icon={getStatusIcon(election.status)}
-                                      label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
+                                      label={
+                                        election.status
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                        election.status.slice(1)
+                                      }
                                       sx={{
-                                        backgroundColor: "rgba(255,255,255,0.2)",
+                                        backgroundColor:
+                                          "rgba(255,255,255,0.2)",
                                         color: "white",
                                         fontWeight: 600,
                                       }}
@@ -950,11 +1015,19 @@ const ElectionListPage = () => {
                                         <CalendarToday className="text-green-600" />
                                       </Box>
                                       <Box>
-                                        <Typography variant="body2" className="text-gray-500">
+                                        <Typography
+                                          variant="body2"
+                                          className="text-gray-500"
+                                        >
                                           Start Time
                                         </Typography>
-                                        <Typography variant="body1" className="font-semibold text-gray-800">
-                                          {new Date(election.startTime).toLocaleString()}
+                                        <Typography
+                                          variant="body1"
+                                          className="font-semibold text-gray-800"
+                                        >
+                                          {new Date(
+                                            election.startTime
+                                          ).toLocaleString()}
                                         </Typography>
                                       </Box>
                                     </Box>
@@ -964,11 +1037,19 @@ const ElectionListPage = () => {
                                         <AccessTime className="text-orange-600" />
                                       </Box>
                                       <Box>
-                                        <Typography variant="body2" className="text-gray-500">
+                                        <Typography
+                                          variant="body2"
+                                          className="text-gray-500"
+                                        >
                                           End Time
                                         </Typography>
-                                        <Typography variant="body1" className="font-semibold text-gray-800">
-                                          {new Date(election.endTime).toLocaleString()}
+                                        <Typography
+                                          variant="body1"
+                                          className="font-semibold text-gray-800"
+                                        >
+                                          {new Date(
+                                            election.endTime
+                                          ).toLocaleString()}
                                         </Typography>
                                       </Box>
                                     </Box>
@@ -978,11 +1059,15 @@ const ElectionListPage = () => {
                                   <Box className="mt-6 flex justify-center space-x-2">
                                     <Tooltip title="View Election">
                                       <IconButton
-                                        onClick={() => handleViewElection(election._id)}
+                                        onClick={() =>
+                                          handleViewElection(election.id)
+                                        }
                                         sx={{
-                                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                                          backgroundColor:
+                                            "rgba(59, 130, 246, 0.1)",
                                           "&:hover": {
-                                            backgroundColor: "rgba(59, 130, 246, 0.2)",
+                                            backgroundColor:
+                                              "rgba(59, 130, 246, 0.2)",
                                             transform: "scale(1.1)",
                                           },
                                         }}
@@ -994,11 +1079,15 @@ const ElectionListPage = () => {
                                     {election.status === "upcoming" && (
                                       <Tooltip title="Start Election">
                                         <IconButton
-                                          onClick={() => handleStartClick(election._id)}
+                                          onClick={() =>
+                                            handleStart(election.id)
+                                          }
                                           sx={{
-                                            backgroundColor: "rgba(16, 185, 129, 0.1)",
+                                            backgroundColor:
+                                              "rgba(16, 185, 129, 0.1)",
                                             "&:hover": {
-                                              backgroundColor: "rgba(16, 185, 129, 0.2)",
+                                              backgroundColor:
+                                                "rgba(16, 185, 129, 0.2)",
                                               transform: "scale(1.1)",
                                             },
                                           }}
@@ -1008,14 +1097,18 @@ const ElectionListPage = () => {
                                       </Tooltip>
                                     )}
 
-                                    {election.status === "ongoing" && (
+                                    {election.status === "active" && (
                                       <Tooltip title="End Election">
                                         <IconButton
-                                          onClick={() => handleEnd(election._id)}
+                                          onClick={() =>
+                                            handleEnd(election.id)
+                                          }
                                           sx={{
-                                            backgroundColor: "rgba(245, 158, 11, 0.1)",
+                                            backgroundColor:
+                                              "rgba(245, 158, 11, 0.1)",
                                             "&:hover": {
-                                              backgroundColor: "rgba(245, 158, 11, 0.2)",
+                                              backgroundColor:
+                                                "rgba(245, 158, 11, 0.2)",
                                               transform: "scale(1.1)",
                                             },
                                           }}
@@ -1027,11 +1120,15 @@ const ElectionListPage = () => {
 
                                     <Tooltip title="Delete Election">
                                       <IconButton
-                                        onClick={() => handleDelete(election._id)}
+                                        onClick={() =>
+                                          handleDelete(election.id)
+                                        }
                                         sx={{
-                                          backgroundColor: "rgba(239, 68, 68, 0.1)",
+                                          backgroundColor:
+                                            "rgba(239, 68, 68, 0.1)",
                                           "&:hover": {
-                                            backgroundColor: "rgba(239, 68, 68, 0.2)",
+                                            backgroundColor:
+                                              "rgba(239, 68, 68, 0.2)",
                                             transform: "scale(1.1)",
                                           },
                                         }}
@@ -1055,85 +1152,6 @@ const ElectionListPage = () => {
         </Container>
       </Box>
 
-      {/* Start Election Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: 4,
-            background: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          <Typography variant="h6" className="font-bold">
-            Start Election
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{ p: 4 }}>
-          <TextField
-            label="Duration (in minutes)"
-            type="number"
-            fullWidth
-            value={durationInMin}
-            onChange={(e) => setDurationInMin(e.target.value)}
-            inputProps={{ min: 1 }}
-            sx={{
-              mt: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 3,
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-                },
-              },
-            }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ p: 3, justifyContent: "center", gap: 2 }}>
-          <Button
-            onClick={() => setDialogOpen(false)}
-            sx={{
-              px: 4,
-              py: 1.5,
-              borderRadius: 3,
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleStartConfirm}
-            variant="contained"
-            sx={{
-              px: 4,
-              py: 1.5,
-              borderRadius: 3,
-              background: "linear-gradient(135deg, #10b981, #059669)",
-              fontWeight: 600,
-              textTransform: "none",
-              "&:hover": {
-                background: "linear-gradient(135deg, #059669, #047857)",
-                transform: "translateY(-2px)",
-                boxShadow: "0 8px 25px rgba(16, 185, 129, 0.3)",
-              },
-            }}
-          >
-            Start Election
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
@@ -1154,7 +1172,7 @@ const ElectionListPage = () => {
         </Alert>
       </Snackbar>
     </Box>
-  )
-}
+  );
+};
 
-export default ElectionListPage
+export default ElectionListPage;

@@ -32,6 +32,8 @@ import {
   Info,
   ContactMail,
 } from "@mui/icons-material"
+import NotificationDropdown from "./NotificationDropdown.jsx"
+
 
 const Header = () => {
   const dispatch = useDispatch()
@@ -122,11 +124,7 @@ const Header = () => {
     // Prevent if the event target is not the expected button
     if (event.currentTarget !== menuButtonRef.current) return
 
-    console.log("Menu click handler triggered", {
-      event: event.type,
-      trusted: event.isTrusted,
-      target: event.currentTarget,
-    })
+    
 
     setAnchorEl(event.currentTarget)
   }, [])
@@ -191,15 +189,7 @@ const Header = () => {
     },
   ]
 
-  // Debug logging
-  useEffect(() => {
-    console.log("Header state:", {
-      isLoggedIn,
-      anchorEl: !!anchorEl,
-      hasMounted: hasMounted.current,
-      isInitialLogin: isInitialLogin.current,
-    })
-  }, [isLoggedIn, anchorEl])
+  
 
   return (
     <>
@@ -288,13 +278,13 @@ const Header = () => {
                     </Button>
                   ))}
               </Box>
-
+                  
               {/* User Section */}
               <Box className="hidden md:flex items-center space-x-4">
                 {isLoggedIn ? (
                   <>
                     {/* Notifications */}
-                    <IconButton
+                    {/* <IconButton
                       sx={{
                         width: 44,
                         height: 44,
@@ -311,8 +301,8 @@ const Header = () => {
                       <Badge badgeContent={3} color="error">
                         <Notifications />
                       </Badge>
-                    </IconButton>
-
+                    </IconButton> */}
+                    <NotificationDropdown />
                     {/* User Menu */}
                     <Box className="relative">
                       <IconButton ref={menuButtonRef} onClick={handleMenuClick} sx={{ p: 0 }} disableRipple>

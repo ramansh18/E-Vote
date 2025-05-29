@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Button,
   Container,
@@ -13,7 +12,7 @@ import {
   Fade,
   Slide,
   Zoom,
-} from "@mui/material"
+} from "@mui/material";
 import {
   HowToVote,
   Security,
@@ -30,18 +29,19 @@ import {
   Groups,
   AccountBalance,
   Smartphone,
-} from "@mui/icons-material"
-import { Link } from "react-router-dom"
+} from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import TestimonialsCarousel from "../components/TestimonialCaraousel";
 
 const Home = () => {
-  const [visible, setVisible] = useState(false)
-  const [statsVisible, setStatsVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
 
   useEffect(() => {
-    setVisible(true)
-    const timer = setTimeout(() => setStatsVisible(true), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    setVisible(true);
+    const timer = setTimeout(() => setStatsVisible(true), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const features = [
     {
@@ -72,14 +72,14 @@ const Home = () => {
         "Advanced identity verification ensures only eligible voters can participate, maintaining election integrity.",
       color: "from-amber-500 to-orange-500",
     },
-  ]
+  ];
 
   const stats = [
     { number: "1M+", label: "Votes Cast", icon: <HowToVote /> },
     { number: "50K+", label: "Active Users", icon: <People /> },
     { number: "200+", label: "Elections Held", icon: <Public /> },
     { number: "99.9%", label: "Uptime", icon: <TrendingUp /> },
-  ]
+  ];
 
   const testimonials = [
     {
@@ -87,14 +87,16 @@ const Home = () => {
       role: "Election Commissioner",
       avatar: "SJ",
       rating: 5,
-      comment: "E-Vote has revolutionized how we conduct elections. The transparency and security are unmatched.",
+      comment:
+        "E-Vote has revolutionized how we conduct elections. The transparency and security are unmatched.",
     },
     {
       name: "Michael Chen",
       role: "University Student",
       avatar: "MC",
       rating: 5,
-      comment: "Finally, a voting system that's accessible and easy to use. Voted from my dorm room!",
+      comment:
+        "Finally, a voting system that's accessible and easy to use. Voted from my dorm room!",
     },
     {
       name: "Dr. Emily Rodriguez",
@@ -104,7 +106,7 @@ const Home = () => {
       comment:
         "The blockchain technology ensures complete transparency. This is the future of democratic participation.",
     },
-  ]
+  ];
 
   const steps = [
     {
@@ -116,7 +118,8 @@ const Home = () => {
     {
       step: "02",
       title: "Verify",
-      description: "Complete the verification process to ensure election integrity",
+      description:
+        "Complete the verification process to ensure election integrity",
       icon: <Shield />,
     },
     {
@@ -131,7 +134,7 @@ const Home = () => {
       description: "Monitor results with complete transparency",
       icon: <Timeline />,
     },
-  ]
+  ];
 
   return (
     <Box sx={{ overflow: "hidden" }}>
@@ -139,7 +142,8 @@ const Home = () => {
       <Box
         sx={{
           minHeight: "85vh",
-          background: "linear-gradient(135deg, #1a202c 0%, #1e3a8a 50%, #312e81 100%)",
+          background:
+            "linear-gradient(135deg, #1a202c 0%, #1e3a8a 50%, #312e81 100%)",
           position: "relative",
           display: "flex",
           alignItems: "center",
@@ -225,8 +229,9 @@ const Home = () => {
                       fontSize: "1.1rem",
                     }}
                   >
-                    Experience secure, transparent, and accessible digital voting powered by blockchain technology. Your
-                    voice matters, and we ensure it's heard.
+                    Experience secure, transparent, and accessible digital
+                    voting powered by blockchain technology. Your voice matters,
+                    and we ensure it's heard.
                   </Typography>
                   <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                     <Button
@@ -306,15 +311,20 @@ const Home = () => {
                         width: 140,
                         height: 140,
                         borderRadius: 3,
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        background:
+                          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         position: "relative",
                         animation: "glow 2s ease-in-out infinite alternate",
                         "@keyframes glow": {
-                          from: { boxShadow: "0 0 15px rgba(102, 126, 234, 0.5)" },
-                          to: { boxShadow: "0 0 30px rgba(102, 126, 234, 0.8)" },
+                          from: {
+                            boxShadow: "0 0 15px rgba(102, 126, 234, 0.5)",
+                          },
+                          to: {
+                            boxShadow: "0 0 30px rgba(102, 126, 234, 0.8)",
+                          },
                         },
                       }}
                     >
@@ -329,7 +339,9 @@ const Home = () => {
                         right: "10%",
                         animation: "bounce 2s infinite",
                         "@keyframes bounce": {
-                          "0%, 20%, 50%, 80%, 100%": { transform: "translateY(0)" },
+                          "0%, 20%, 50%, 80%, 100%": {
+                            transform: "translateY(0)",
+                          },
                           "40%": { transform: "translateY(-8px)" },
                           "60%": { transform: "translateY(-4px)" },
                         },
@@ -369,7 +381,6 @@ const Home = () => {
                         <Speed sx={{ color: "#8b5cf6", fontSize: 24 }} />
                       </Paper>
                     </Box>
-
                   </Box>
                 </Box>
               </Slide>
@@ -399,7 +410,8 @@ const Home = () => {
                       p: 3,
                       textAlign: "center",
                       borderRadius: 3,
-                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                       color: "white",
                       transition: "transform 0.3s ease",
                       "&:hover": {
@@ -407,7 +419,9 @@ const Home = () => {
                       },
                     }}
                   >
-                    <Box sx={{ mb: 1.5, color: "rgba(255,255,255,0.8)" }}>{stat.icon}</Box>
+                    <Box sx={{ mb: 1.5, color: "rgba(255,255,255,0.8)" }}>
+                      {stat.icon}
+                    </Box>
                     <Typography variant="h4" fontWeight="bold" sx={{ mb: 0.5 }}>
                       {stat.number}
                     </Typography>
@@ -438,80 +452,101 @@ const Home = () => {
             >
               Why Choose E-Vote?
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
-              Experience the next generation of democratic participation with our cutting-edge features
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ maxWidth: 600, mx: "auto" }}
+            >
+              Experience the next generation of democratic participation with
+              our cutting-edge features
             </Typography>
           </Box>
 
-          <Grid container spacing={3}>
-            {features.map((feature, index) => (
-              <Grid item xs={12} md={6} key={index}>
-                <Fade in={visible} timeout={1000 + index * 200}>
-                  <Card
-                    elevation={8}
-                    sx={{
-                      height: 280,
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      transition: "all 0.3s ease",
-                      display: "flex",
-                      flexDirection: "column",
-                      "&:hover": {
-                        transform: "translateY(-5px)",
-                        boxShadow: "0 15px 40px rgba(0,0,0,0.15)",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        height: 4,
-                        background: `linear-gradient(90deg, ${feature.color})`,
-                      }}
-                    />
-                    <CardContent
-                      sx={{
-                        p: 3,
-                        flex: 1,
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 2.5,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          p: 1.5,
-                          borderRadius: 2,
-                          background: `linear-gradient(135deg, ${feature.color})`,
-                          color: "white",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          minWidth: 60,
-                          height: 60,
-                        }}
-                      >
-                        {feature.icon}
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1.5 }}>
-                          {feature.title}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            lineHeight: 1.6,
-                          }}
-                        >
-                          {feature.description}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Fade>
-              </Grid>
-            ))}
-          </Grid>
+          <Box
+  sx={{
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+  }}
+>
+  <Grid
+    container
+    spacing={3}
+    sx={{
+      width: 770,
+      maxWidth: 900, 
+      // max width for all cards combined
+      margin: '0 auto', // center horizontally
+    }}
+  >
+    {features.map((feature, index) => (
+      <Grid item xs={12} md={6} key={index}>
+        <Fade in={visible} timeout={1000 + index * 200}>
+          <Card
+            elevation={8}
+            sx={{
+              height: 200,
+              borderRadius: 3,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              "&:hover": {
+                transform: "translateY(-5px)",
+                boxShadow: "0 15px 40px rgba(0,0,0,0.15)",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                height: 4,
+                background: `linear-gradient(90deg, ${feature.color})`,
+              }}
+            />
+            <CardContent
+              sx={{
+                p: 3,
+                flex: 1,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 2.5,
+              }}
+            >
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 2,
+                  background: `linear-gradient(135deg, ${feature.color})`,
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: 60,
+                  height: 60,
+                }}
+              >
+                {feature.icon}
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 1.5 }}>
+                  {feature.title}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.6 }}
+                >
+                  {feature.description}
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Fade>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
+
         </Container>
       </Box>
 
@@ -529,7 +564,7 @@ const Home = () => {
 
           <Grid container spacing={3}>
             {steps.map((step, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid item xs={12}md={6} key={index}>
                 <Fade in={visible} timeout={1200 + index * 200}>
                   <Box sx={{ textAlign: "center", position: "relative" }}>
                     <Box
@@ -537,7 +572,8 @@ const Home = () => {
                         width: 60,
                         height: 60,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        background:
+                          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -581,70 +617,7 @@ const Home = () => {
       </Box>
 
       {/* Testimonials Section */}
-      <Box sx={{ py: 8, backgroundColor: "white" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 6 }}>
-            <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
-              What People Say
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Trusted by millions of users worldwide
-            </Typography>
-          </Box>
-
-          <Grid container spacing={3}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Fade in={visible} timeout={1400 + index * 200}>
-                  <Card
-                    elevation={6}
-                    sx={{
-                      height: "100%",
-                      borderRadius: 3,
-                      p: 2.5,
-                      transition: "transform 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-3px)",
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <Avatar
-                        sx={{
-                          width: 50,
-                          height: 50,
-                          mr: 2,
-                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                          fontSize: 18,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {testimonial.avatar}
-                      </Avatar>
-                      <Box>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                          {testimonial.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {testimonial.role}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ display: "flex", mb: 1.5 }}>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} sx={{ color: "#ffd700", fontSize: 16 }} />
-                      ))}
-                    </Box>
-                    <Typography variant="body2" sx={{ fontStyle: "italic", lineHeight: 1.5 }}>
-                      "{testimonial.comment}"
-                    </Typography>
-                  </Card>
-                </Fade>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
+      <TestimonialsCarousel />
 
       {/* CTA Section */}
       <Box
@@ -662,9 +635,17 @@ const Home = () => {
                 Ready to Make Your Voice Heard?
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                Join millions of users who trust E-Vote for secure, transparent democratic participation
+                Join millions of users who trust E-Vote for secure, transparent
+                democratic participation
               </Typography>
-              <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Button
                   component={Link}
                   to="/register"
@@ -714,7 +695,7 @@ const Home = () => {
         </Container>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

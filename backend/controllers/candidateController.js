@@ -125,7 +125,7 @@ exports.registerCandidate = async (req, res) => {
 */
 
 exports.submitCandidateRequest = async (req, res) => {
-  const {  electionId, party } = req.body;
+  const {  electionId, party,symbolUrl} = req.body;
   const userId = req.user.id;
   console.log(userId)
   try {
@@ -140,6 +140,7 @@ exports.submitCandidateRequest = async (req, res) => {
       party,
       walletAddress: null,
       status: "pending",
+      symbolUrl
     });
 
     await newCandidateRequest.save();
@@ -186,8 +187,6 @@ exports.rejectCandidateRequest = async (req, res) => {
 
 exports.approveCandidateRequest = async (req, res) => {
   const { requestId } = req.params;
-  const io = req.app.get('io');
-    console.log("🧪 IO instance:", io);
   try {
     const request = await Candidate.findById(requestId);
     if (!request || request.status !== "pending") {
@@ -253,9 +252,9 @@ exports.approveCandidateRequest = async (req, res) => {
     await request.save(); // Save the updated candidate request
     
     const activity = new Activity({
-  action: "New candidate request approved",
-  user: candidateName,  // Get from user data
-  type: "candidate",
+  action: `Candidate ${candidateName} request approved.`,
+  user: "Admin",  // Get from user data
+  type: "approval",
 });
 
 await activity.save(); // ✅ Save to DB
@@ -306,8 +305,7 @@ exports.getMyCandidateRequest = async (req, res) => {
     }).populate({
       path: "electionId",
       select: "title", // fetch only electionTitle from Election model
-    }).select("_id party electionId status createdAt"); // Select required fields from Candidate
-
+    }).select("_id party electionId status createdAt symbolUrl"); // Select required fields from Candidate
     if (requests.length === 0) {
       return res.status(404).json({ message: "No pending or approved requests found." });
     }
@@ -320,6 +318,7 @@ exports.getMyCandidateRequest = async (req, res) => {
       electionTitle: req.electionId?.title || "N/A",
       status: req.status,
       submittedAt: req.createdAt,
+      symbolUrl: req.symbolUrl
     }));
     res.status(200).json({
       message: "Your candidate request fetched successfully!",

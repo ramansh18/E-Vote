@@ -11,22 +11,18 @@ const LogoutButton = () => {
   const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
-    // Dispatch Redux logout action to clear state
-    dispatch(setLogout());
-    localStorage.clear();
-
-    // Show the Snackbar
     setOpen(true);
-
-    // Redirect after Snackbar delay (so it can show properly)
-    setTimeout(() => {
-      navigate('/login');
-    }, 1500); // Set this duration to match Snackbar autoHideDuration (2 seconds)
   };
 
   const handleClose = (_, reason) => {
     if (reason === 'clickaway') return;
+
     setOpen(false);
+
+    // Perform logout and redirect after Snackbar closes
+    dispatch(setLogout());
+    localStorage.clear();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -41,9 +37,10 @@ const LogoutButton = () => {
 
       <Snackbar
         open={open}
-        autoHideDuration={2000} // Ensure this matches your setTimeout for smooth UX
+        autoHideDuration={2000}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+
       >
         <Alert onClose={handleClose} severity="success" sx={{ width: '100%' }}>
           Logged out successfully!

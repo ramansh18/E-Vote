@@ -114,7 +114,7 @@ const Dashboard = () => {
     });
 
     const data = res.data;
-
+    console.log("election ka data",data)
     if (!data || data.length === 0) {
       setElections([
         {
@@ -186,7 +186,7 @@ const Dashboard = () => {
     });
 
     const data = res.data?.completedElections;
-    console.log("result ka data====",data)
+    //console.log("result ka data====",data)
     if (data && data.length > 0) {
       setCompletedElections(data);
     } else {
@@ -297,7 +297,7 @@ const Dashboard = () => {
       },
     });
     const data =res.data?.votingHistory;
-    console.log(res.data.votingHistory)
+    // console.log(res.data.votingHistory)
     if (!data || data.length === 0) {
       // If no voting history returned, set mock data
       setVotingHistory([
@@ -349,7 +349,7 @@ const Dashboard = () => {
       const data = await res.json()
       setNotifications(data)
     } catch (err) {
-      console.error("Failed to fetch notifications", err)
+      // console.error("Failed to fetch notifications", err)
       setNotifications([
         {
           id: "1",
@@ -743,9 +743,11 @@ const Dashboard = () => {
                       <Typography variant="h4" className="font-bold mb-4">
                         Join the Democratic Process
                       </Typography>
-                      <Typography variant="h6" className="opacity-90 max-w-2xl mx-auto">
+                      <Box className="flex justify-center">
+                        <Typography variant="h6" className="opacity-90 max-w-2xl mx-auto">
                         Take part in shaping your community's future by registering as a voter or candidate
                       </Typography>
+                      </Box>
                     </Box>
 
                     <Grid container spacing={4} justifyContent="center">
@@ -899,520 +901,520 @@ const Dashboard = () => {
 
               {/* Main Content Tabs - Replaced Analytics with Results */}
               <Grow in timeout={1200}>
-                <Paper
-                  elevation={24}
-                  sx={{
-                    borderRadius: 4,
-                    background: "rgba(255,255,255,0.95)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    overflow: "hidden",
-                  }}
-                >
-                  {/* Tab Navigation */}
-                  <Box
-                    sx={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
-                      backdropFilter: "blur(10px)",
-                      borderBottom: "1px solid rgba(255,255,255,0.1)",
-                    }}
-                  >
-                    <Tabs
-                      value={activeTab}
-                      onChange={handleTabChange}
-                      variant="fullWidth"
-                      TabIndicatorProps={{
-                        style: {
-                          height: 4,
-                          borderRadius: 2,
-                          background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
-                        },
-                      }}
-                    >
-                      <Tab
-                        icon={<VoteIcon />}
-                        label="Elections"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          py: 3,
-                          minHeight: 80,
-                          color: "#6b7280",
-                          "&.Mui-selected": {
-                            color: "#3b82f6",
-                          },
-                        }}
-                      />
-                      <Tab
-                        icon={<HistoryIcon />}
-                        label="Voting History"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          py: 3,
-                          minHeight: 80,
-                          color: "#6b7280",
-                          "&.Mui-selected": {
-                            color: "#3b82f6",
-                          },
-                        }}
-                      />
-                      <Tab
-                        icon={<NotificationsIcon />}
-                        label="Notifications"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          py: 3,
-                          minHeight: 80,
-                          color: "#6b7280",
-                          "&.Mui-selected": {
-                            color: "#3b82f6",
-                          },
-                        }}
-                      />
-                      <Tab
-                        icon={<TrophyIcon />}
-                        label="Results"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          py: 3,
-                          minHeight: 80,
-                          color: "#6b7280",
-                          "&.Mui-selected": {
-                            color: "#3b82f6",
-                          },
-                        }}
-                      />
-                    </Tabs>
-                  </Box>
-
-                  {/* Elections Tab */}
-          {activeTab === 0 && (
-  <Box sx={{ p: 4 }}>
-    <Box className="text-center mb-8">
-      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-        Active & Upcoming Elections
-      </Typography>
-      <Typography variant="h6" className="text-gray-600">
-        Elections you can participate in or are scheduled to vote
-      </Typography>
-    </Box>
-
-    <Box className="space-y-6">
-      {elections
-        .filter((e) => e.status !== "completed")
-        .map((election, index) => (
-          <Grow in timeout={600 + index * 200} key={election.id}>
-            <Paper
-              elevation={12}
-              sx={{
-                borderRadius: 4,
-                background: "rgba(255,255,255,0.95)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-4px)",
-                  boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-                },
-              }}
-            >
-              <CardContent sx={{ p: 4 }}>
-                <Grid container spacing={4} sx={{
-                  display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-                }}>
-                  <Grid item xs={12} md={8}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                        <Typography variant="h5" className="font-bold text-gray-800">
-                          {election.title}
-                        </Typography>
-                        <Chip
-                          icon={getElectionStatusIcon(election.status)}
-                          label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
-                          color={getElectionStatusColor(election.status)}
-                          sx={{ fontWeight: 600 }}
-                        />
-                      </Box>
-                      <Typography variant="body1" sx={{ color: '#6b7280', mb: 2, lineHeight: 1.6 }}>
-                        {election.description}
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, color: '#6b7280', mb: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <CalendarIcon sx={{ color: "#3b82f6", fontSize: 20 }} />
-                          <Typography variant="body2" className="font-medium">
-                            Ends: {new Date(election.endDate).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <VoteIcon sx={{ color: "#10b981", fontSize: 20 }} />
-                          <Typography variant="body2" className="font-medium">
-                            {election.candidates} candidates
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <TrendingUp sx={{ color: "#8b5cf6", fontSize: 20 }} />
-                          <Typography variant="body2" className="font-medium">
-                            {election.totalVotes.toLocaleString()} votes cast
-                          </Typography>
-                        </Box>
-                      </Box>
-                      
-                      {/* Fixed height container for progress bar */}
-                      <Box sx={{ minHeight: 40, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        {election.status === "active" && (
-                          <Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                              <Typography variant="body2" sx={{ color: '#6b7280', fontWeight: 500 }}>
-                                Voting Progress
-                              </Typography>
-                              <Typography variant="body2" sx={{ color: '#6b7280', fontWeight: 700 }}>
-                                75%
-                              </Typography>
-                            </Box>
-                            <LinearProgress
-                              variant="determinate"
-                              value={75}
-                              sx={{
-                                height: 8,
-                                borderRadius: 4,
-                                backgroundColor: "#e5e7eb",
-                                "& .MuiLinearProgress-bar": {
-                                  background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
-                                  borderRadius: 4,
-                                },
-                              }}
-                            />
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
-                  </Grid>
-                  {/* button grid */}
-                  <Grid item xs={12} md={4}>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'flex-end', 
-                      alignItems: 'center', 
-                      height: '100%',
-                      pl: 2
-                    }}>
-                      {election.status === "active" ? (
-                        <Button
-                          onClick={() => handleVoteNow(election.id || election._id)}
-                          variant="contained"
-                          size="large"
-                          startIcon={<VoteIcon />}
-                          sx={{
-                            px: 6,
-                            py: 3,
-                            borderRadius: 4,
-                            fontWeight: 700,
-                            fontSize: "1.1rem",
-                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                            boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              background: "linear-gradient(135deg, #2563eb, #7c3aed)",
-                              transform: "translateY(-2px) scale(1.02)",
-                              boxShadow: "0 12px 40px rgba(59, 130, 246, 0.4)",
-                            },
-                          }}
-                        >
-                          Vote Now
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          size="large"
-                          disabled
-                          startIcon={<ScheduleIcon />}
-                          sx={{
-                            px: 6,
-                            py: 3,
-                            borderRadius: 4,
-                            fontWeight: 700,
-                            fontSize: "1.1rem",
-                            borderWidth: 2,
-                          }}
-                        >
-                          Upcoming
-                        </Button>
-                      )}
-                    </Box>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Paper>
-          </Grow>
-        ))}
-    </Box>
-  </Box>
-)}
-
-                  {/* Voting History Tab */}
-                  {activeTab === 1 && (
-                    <Box sx={{ p: 4 }}>
-                      <Box className="text-center mb-8">
-                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                          Your Voting History
-                        </Typography>
-                        <Typography variant="h6" className="text-gray-600">
-                          Complete record of your participation in elections
-                        </Typography>
-                      </Box>
-
-                      <Box className="space-y-4">
-                        {votingHistory.map((vote, index) => (
-                          <Grow in timeout={400 + index * 150} key={vote.id}>
-                            <Paper
-                              elevation={12}
-                              sx={{
-                                borderRadius: 4,
-                                background: "rgba(255,255,255,0.95)",
-                                backdropFilter: "blur(20px)",
-                                border: "1px solid rgba(255,255,255,0.2)",
-                                transition: "all 0.3s ease",
-                                "&:hover": {
-                                  transform: "translateY(-2px)",
-                                  boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
-                                },
-                              }}
-                            >
-                              <ListItem sx={{ p: 3 }}>
-                                <ListItemIcon>
-                                  <Box
-                                    sx={{
-                                      width: 48,
-                                      height: 48,
-                                      borderRadius: 3,
-                                      background: "linear-gradient(135deg, #10b981, #059669)",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      color: "white",
-                                    }}
-                                  >
-                                    <CheckCircleIcon />
-                                  </Box>
-                                </ListItemIcon>
-                                <ListItemText
-                                  primary={
-                                    <Typography variant="h6" className="font-bold text-gray-800 mb-2">
-                                      {vote.electionTitle}
-                                    </Typography>
-                                  }
-                                  secondary={
-                                    <Typography variant="body1" className="text-gray-600">
-                                      Voted on {new Date(vote.votedAt).toLocaleDateString()} at{" "}
-                                      {new Date(vote.votedAt).toLocaleTimeString()}
-                                    </Typography>
-                                  }
-                                />
-                                <Chip
-                                  icon={vote.status === "confirmed" ? <CheckCircleIcon /> : <ScheduleIcon />}
-                                  label={vote.status === "confirmed" ? "Confirmed" : "Pending"}
-                                  color={vote.status === "confirmed" ? "success" : "warning"}
-                                  sx={{ fontWeight: 600 }}
-                                />
-                              </ListItem>
-                            </Paper>
-                          </Grow>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
-
-                  {/* Notifications Tab */}
-                  {activeTab === 2 && (
-                    <Box sx={{ p: 4 }}>
-                      <Box className="text-center mb-8">
-                        <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-                          Recent Notifications
-                        </Typography>
-                        <Typography variant="h6" className="text-gray-600">
-                          Important updates and announcements
-                        </Typography>
-                      </Box>
-
-                      <Box className="space-y-4">
-                        {notifications.map((notification, index) => (
-                          <Grow in timeout={400 + index * 150} key={notification.id}>
-                            <Alert
-                              severity={notification.type}
-                              sx={{
-                                borderRadius: 3,
-                                background: "rgba(255,255,255,0.95)",
-                                backdropFilter: "blur(20px)",
-                                border: !notification.read
-                                  ? "2px solid rgba(59, 130, 246, 0.3)"
-                                  : "1px solid rgba(255,255,255,0.2)",
-                                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-                              }}
-                            >
-                              <Typography variant="h6" className="font-bold mb-2">
-                                {notification.title}
-                              </Typography>
-                              <Typography variant="body1" className="mb-3 leading-relaxed">
-                                {notification.message}
-                              </Typography>
-                              <Typography variant="caption" className="text-gray-500 font-medium">
-                                {new Date(notification.timestamp).toLocaleString()}
-                              </Typography>
-                            </Alert>
-                          </Grow>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
-
-                  {/* Results Tab - New tab for completed elections */}
-                  {activeTab === 3 && (
-  <Box sx={{ p: 4 }}>
-    <Box className="text-center mb-8">
-      <Typography variant="h4" className="font-bold text-gray-800 mb-3">
-        Election Results
-      </Typography>
-      <Typography variant="h6" className="text-gray-600">
-        View results from completed elections
-      </Typography>
-    </Box>
-
-    <Box className="space-y-6">
-      {completedElections.map((election, index) => (
-        <Grow in timeout={600 + index * 200} key={election.id}>
-          <Paper
-            elevation={12}
-            sx={{
-              borderRadius: 4,
-              background: "rgba(255,255,255,0.95)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+      <Paper
+        elevation={24}
+        sx={{
+          borderRadius: 4,
+          background: "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Tab Navigation */}
+        <Box
+          sx={{
+            background: "linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
+            backdropFilter: "blur(10px)",
+            borderBottom: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="fullWidth"
+            TabIndicatorProps={{
+              style: {
+                height: 4,
+                borderRadius: 2,
+                background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
               },
             }}
           >
-            <CardContent sx={{ p: 4 }}>
-              <Grid container spacing={4} sx={{ display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',}}>
-                <Grid item xs={12} md={8}>
-                  <Box className="flex flex-wrap items-center gap-3 mb-4">
-                    <Typography variant="h5" className="font-bold text-gray-800">
-                      {election.title}
-                    </Typography>
-                    <Chip
-                      icon={<TrophyIcon />}
-                      label="Completed"
-                      color="success"
-                      sx={{ fontWeight: 600 }}
-                    />
-                    {election.hasVoted && (
-                      <Chip
-                        icon={<CheckCircleIcon />}
-                        label="You Voted"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ fontWeight: 600 }}
-                      />
-                    )}
-                  </Box>
-                  <Typography variant="body1" className="text-gray-600 mb-4 leading-relaxed">
-                    {election.description}
-                  </Typography>
+            <Tab
+              icon={<VoteIcon />}
+              label="Elections"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1rem",
+                py: 3,
+                minHeight: 80,
+                color: "#6b7280",
+                "&.Mui-selected": {
+                  color: "#3b82f6",
+                },
+              }}
+            />
+            <Tab
+              icon={<HistoryIcon />}
+              label="Voting History"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1rem",
+                py: 3,
+                minHeight: 80,
+                color: "#6b7280",
+                "&.Mui-selected": {
+                  color: "#3b82f6",
+                },
+              }}
+            />
+            <Tab
+              icon={<NotificationsIcon />}
+              label="Notifications"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1rem",
+                py: 3,
+                minHeight: 80,
+                color: "#6b7280",
+                "&.Mui-selected": {
+                  color: "#3b82f6",
+                },
+              }}
+            />
+            <Tab
+              icon={<TrophyIcon />}
+              label="Results"
+              sx={{
+                fontWeight: 700,
+                fontSize: "1rem",
+                py: 3,
+                minHeight: 80,
+                color: "#6b7280",
+                "&.Mui-selected": {
+                  color: "#3b82f6",
+                },
+              }}
+            />
+          </Tabs>
+        </Box>
 
-                  {/* Winner Information */}
-                  <Box
+        {/* Elections Tab - Compact Design */}
+        {activeTab === 0 && (
+          <Box sx={{ p: 4 }}>
+            <Box className="text-center mb-6">
+              <Typography variant="h4" className="font-bold text-gray-800 mb-2">
+                Active & Upcoming Elections
+              </Typography>
+              <Typography variant="body1" className="text-gray-600">
+                Elections you can participate in or are scheduled to vote
+              </Typography>
+            </Box>
+
+            <Box className="space-y-4">
+              {elections
+                .filter((e) => e.status !== "completed")
+                .map((election, index) => (
+                  <Grow in timeout={400 + index * 150} key={election.id}>
+                    <Paper
+                      elevation={12}
+                      sx={{
+                        borderRadius: 4,
+                        background: "rgba(255,255,255,0.95)",
+                        backdropFilter: "blur(20px)",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
+                        },
+                      }}
+                    >
+                      <ListItem sx={{ p: 3 }}>
+                        <ListItemIcon>
+                          <Box
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 3,
+                              background: election.status === "active"
+                                ? "linear-gradient(135deg, #10b981, #059669)"
+                                : "linear-gradient(135deg, #f59e0b, #d97706)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                            }}
+                          >
+                            {election.status === "active" ? <VoteIcon /> : <ScheduleIcon />}
+                          </Box>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                              <Typography variant="h6" className="font-bold text-gray-800">
+                                {election.title}
+                              </Typography>
+                              <Chip
+                                icon={getElectionStatusIcon(election.status)}
+                                label={election.status.charAt(0).toUpperCase() + election.status.slice(1)}
+                                color={getElectionStatusColor(election.status)}
+                                size="small"
+                                sx={{ fontWeight: 600 }}
+                              />
+                            </Box>
+                          }
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" className="text-gray-600 mb-2">
+                                {election.description}
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                                <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <CalendarIcon sx={{ fontSize: 16, color: "#3b82f6" }} />
+                                  Ends: {new Date(election.endDate).toLocaleDateString()}
+                                </Typography>
+                                <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <VoteIcon sx={{ fontSize: 16, color: "#10b981" }} />
+                                  {election.candidates} candidates
+                                </Typography>
+                                <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <TrendingUp sx={{ fontSize: 16, color: "#8b5cf6" }} />
+                                  {election.totalVotes.toLocaleString()} votes
+                                </Typography>
+                              </Box>
+                              {election.status === "active" && (
+                                <Box sx={{ width: '100%', maxWidth: 300 }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                    <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 500 }}>
+                                      Voting Progress
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 600 }}>
+                                      75%
+                                    </Typography>
+                                  </Box>
+                                  <LinearProgress
+                                    variant="determinate"
+                                    value={75}
+                                    sx={{
+                                      height: 6,
+                                      borderRadius: 3,
+                                      backgroundColor: "#e5e7eb",
+                                      "& .MuiLinearProgress-bar": {
+                                        background: "linear-gradient(45deg, #3b82f6, #8b5cf6)",
+                                        borderRadius: 3,
+                                      },
+                                    }}
+                                  />
+                                </Box>
+                              )}
+                            </Box>
+                          }
+                        />
+                        <Box sx={{ ml: 2 }}>
+                          {election.status === "active" ? (
+                            <Button
+                              onClick={() => handleVoteNow(election.id || election._id)}
+                              variant="contained"
+                              size="medium"
+                              startIcon={<VoteIcon />}
+                              sx={{
+                                px: 3,
+                                py: 1.5,
+                                borderRadius: 3,
+                                fontWeight: 600,
+                                background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                                boxShadow: "0 4px 16px rgba(59, 130, 246, 0.3)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                  background: "linear-gradient(135deg, #2563eb, #7c3aed)",
+                                  transform: "translateY(-1px)",
+                                  boxShadow: "0 6px 20px rgba(59, 130, 246, 0.4)",
+                                },
+                              }}
+                            >
+                              Vote
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outlined"
+                              size="medium"
+                              disabled
+                              startIcon={<ScheduleIcon />}
+                              sx={{
+                                px: 3,
+                                py: 1.5,
+                                borderRadius: 3,
+                                fontWeight: 600,
+                                borderWidth: 2,
+                              }}
+                            >
+                              Upcoming
+                            </Button>
+                          )}
+                        </Box>
+                      </ListItem>
+                    </Paper>
+                  </Grow>
+                ))}
+            </Box>
+          </Box>
+        )}
+
+        {/* Voting History Tab */}
+        {activeTab === 1 && (
+          <Box sx={{ p: 4 }}>
+            <Box className="text-center mb-6">
+              <Typography variant="h4" className="font-bold text-gray-800 mb-2">
+                Your Voting History
+              </Typography>
+              <Typography variant="body1" className="text-gray-600">
+                Complete record of your participation in elections
+              </Typography>
+            </Box>
+
+            <Box className="space-y-4">
+              {votingHistory.map((vote, index) => (
+                <Grow in timeout={400 + index * 150} key={vote.id}>
+                  <Paper
+                    elevation={12}
                     sx={{
-                      p: 3,
-                      mb: 4,
-                      mt:1,
-                      width:600,
-                      borderRadius: 3,
-                      background:
-                        "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))",
-                      border: "1px solid rgba(16, 185, 129, 0.2)",
-                    }}
-                  >
-                    <Box className="flex items-center gap-3 mb-2">
-                      <TrophyIcon sx={{ color: "#10b981", fontSize: 24 }} />
-                      <Typography variant="h6" className="font-bold text-gray-800">
-                        Winner: {election.winner.name}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" className="text-gray-600">
-                      {election.winner.votes.toLocaleString()} votes (
-                      {Math.round((election.winner.votes / election.totalVotes) * 100)}% of total
-                      votes)
-                    </Typography>
-                  </Box>
-
-                  <Box className="flex flex-wrap items-center gap-4 text-gray-500">
-                    <Box className="flex items-center gap-2">
-                      <CalendarIcon sx={{ color: "#3b82f6", fontSize: 20 }} />
-                      <Typography variant="body2" className="font-medium">
-                        Ended: {new Date(election.endDate || election.endTime).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <VoteIcon sx={{ color: "#10b981", fontSize: 20 }} />
-                      <Typography variant="body2" className="font-medium">
-                        {election.candidates.length} candidates
-                      </Typography>
-                    </Box>
-                    <Box className="flex items-center gap-2">
-                      <TrendingUp sx={{ color: "#8b5cf6", fontSize: 20 }} />
-                      <Typography variant="body2" className="font-medium">
-                        {election.totalVotes.toLocaleString()} total votes
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Grid>
-
-                {/* button grid */}
-                <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <Button
-                    onClick={() => handleCheckResults(election.id)}
-                    variant="outlined"
-                    size="large"
-                    startIcon={<TrophyIcon />}
-                    sx={{
-                      px: 6,
-                      py: 3,
                       borderRadius: 4,
-                      fontWeight: 700,
-                      fontSize: "1.1rem",
-                      borderWidth: 2,
-                      borderColor: "#10b981",
-                      color: "#10b981",
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      transition: "all 0.3s ease",
                       "&:hover": {
-                        borderWidth: 2,
-                        borderColor: "#059669",
-                        backgroundColor: "rgba(16, 185, 129, 0.1)",
                         transform: "translateY(-2px)",
+                        boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
                       },
                     }}
                   >
-                    View Details
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Paper>
-        </Grow>
-      ))}
-    </Box>
-  </Box>
-)}
-                </Paper>
-              </Grow>
+                    <ListItem sx={{ p: 3 }}>
+                      <ListItemIcon>
+                        <Box
+                          sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 3,
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                          }}
+                        >
+                          <CheckCircleIcon />
+                        </Box>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="h6" className="font-bold text-gray-800 mb-2">
+                            {vote.electionTitle}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography variant="body1" className="text-gray-600">
+                            Voted on {new Date(vote.votedAt).toLocaleDateString()} at{" "}
+                            {new Date(vote.votedAt).toLocaleTimeString()}
+                          </Typography>
+                        }
+                      />
+                      <Chip
+                        icon={vote.status === "confirmed" ? <CheckCircleIcon /> : <ScheduleIcon />}
+                        label={vote.status === "confirmed" ? "Confirmed" : "Pending"}
+                        color={vote.status === "confirmed" ? "success" : "warning"}
+                        sx={{ fontWeight: 600 }}
+                      />
+                    </ListItem>
+                  </Paper>
+                </Grow>
+              ))}
+            </Box>
+          </Box>
+        )}
+
+        {/* Notifications Tab */}
+        {activeTab === 2 && (
+          <Box sx={{ p: 4 }}>
+            <Box className="text-center mb-6">
+              <Typography variant="h4" className="font-bold text-gray-800 mb-2">
+                Recent Notifications
+              </Typography>
+              <Typography variant="body1" className="text-gray-600">
+                Important updates and announcements
+              </Typography>
+            </Box>
+
+            <Box className="space-y-4">
+              {notifications.map((notification, index) => (
+                <Grow in timeout={400 + index * 150} key={notification.id}>
+                  <Alert
+                    severity={notification.type}
+                    sx={{
+                      borderRadius: 3,
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: !notification.read
+                        ? "2px solid rgba(59, 130, 246, 0.3)"
+                        : "1px solid rgba(255,255,255,0.2)",
+                      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    <Typography variant="h6" className="font-bold mb-2">
+                      {notification.title}
+                    </Typography>
+                    <Typography variant="body1" className="mb-3 leading-relaxed">
+                      {notification.message}
+                    </Typography>
+                    <Typography variant="caption" className="text-gray-500 font-medium">
+                      {new Date(notification.timestamp).toLocaleString()}
+                    </Typography>
+                  </Alert>
+                </Grow>
+              ))}
+            </Box>
+          </Box>
+        )}
+
+        {/* Results Tab - Compact Design */}
+        {activeTab === 3 && (
+          <Box sx={{ p: 4 }}>
+            <Box className="text-center mb-6">
+              <Typography variant="h4" className="font-bold text-gray-800 mb-2">
+                Election Results
+              </Typography>
+              <Typography variant="body1" className="text-gray-600">
+                View results from completed elections
+              </Typography>
+            </Box>
+
+            <Box className="space-y-4">
+              {completedElections.map((election, index) => (
+                <Grow in timeout={400 + index * 150} key={election.id}>
+                  <Paper
+                    elevation={12}
+                    sx={{
+                      borderRadius: 4,
+                      background: "rgba(255,255,255,0.95)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 12px 40px rgba(0, 0, 0, 0.1)",
+                      },
+                    }}
+                  >
+                    <ListItem sx={{ p: 3 }}>
+                      <ListItemIcon>
+                        <Box
+                          sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 3,
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                          }}
+                        >
+                          <TrophyIcon />
+                        </Box>
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                            <Typography variant="h6" className="font-bold text-gray-800">
+                              {election.title}
+                            </Typography>
+                            <Chip
+                              icon={<TrophyIcon />}
+                              label="Completed"
+                              color="success"
+                              size="small"
+                              sx={{ fontWeight: 600 }}
+                            />
+                            {election.hasVoted && (
+                              <Chip
+                                icon={<CheckCircleIcon />}
+                                label="You Voted"
+                                color="primary"
+                                variant="outlined"
+                                size="small"
+                                sx={{ fontWeight: 600 }}
+                              />
+                            )}
+                          </Box>
+                        }
+                        secondary={
+                          <Box>
+                            <Typography variant="body2" className="text-gray-600 mb-2">
+                              {election.description}
+                            </Typography>
+
+                            {/* Winner Information - Compact */}
+                            <Box
+                              sx={{
+                                p: 2,
+                                mb: 2,
+                                borderRadius: 2,
+                                background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))",
+                                border: "1px solid rgba(16, 185, 129, 0.2)",
+                              }}
+                            >
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: "#10b981", mb: 0.5 }}>
+                                🏆 Winner: {election.winner.name}
+                              </Typography>
+                              <Typography variant="caption" className="text-gray-600">
+                                {election.winner.votes.toLocaleString()} votes (
+                                {Math.round((election.winner.votes / election.totalVotes) * 100)}% of total)
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <CalendarIcon sx={{ fontSize: 16, color: "#3b82f6" }} />
+                                Ended: {new Date(election.endDate || election.endTime).toLocaleDateString()}
+                              </Typography>
+                              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <VoteIcon sx={{ fontSize: 16, color: "#10b981" }} />
+                                {election.candidates.length} candidates
+                              </Typography>
+                              <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <TrendingUp sx={{ fontSize: 16, color: "#8b5cf6" }} />
+                                {election.totalVotes.toLocaleString()} total votes
+                              </Typography>
+                            </Box>
+                          </Box>
+                        }
+                      />
+                      <Box sx={{ ml: 2 }}>
+                        <Button
+                          onClick={() => handleCheckResults(election.id)}
+                          variant="outlined"
+                          size="medium"
+                          startIcon={<TrophyIcon />}
+                          sx={{
+                            px: 3,
+                            py: 1.5,
+                            borderRadius: 3,
+                            fontWeight: 600,
+                            borderWidth: 2,
+                            borderColor: "#10b981",
+                            color: "#10b981",
+                            "&:hover": {
+                              borderWidth: 2,
+                              borderColor: "#059669",
+                              backgroundColor: "rgba(16, 185, 129, 0.1)",
+                              transform: "translateY(-1px)",
+                            },
+                          }}
+                        >
+                          View Details
+                        </Button>
+                      </Box>
+                    </ListItem>
+                  </Paper>
+                </Grow>
+              ))}
+            </Box>
+          </Box>
+        )}
+      </Paper>
+    </Grow>
             </div>
           </Fade>
         </Container>

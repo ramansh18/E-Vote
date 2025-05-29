@@ -29,6 +29,11 @@ const electionSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    category: {
+    type: String,
+    enum: ["general", "local", "student", "corporate", "community"],
+    required: true,
+  },
     status: {
         type: String,
         enum: ["upcoming", "ongoing", "completed"],

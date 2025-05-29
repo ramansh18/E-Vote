@@ -196,6 +196,7 @@ const CreateElection = () => {
 
     setLoading(true)
     try {
+      console.log(formData)
       const response = await axios.post(
         "http://localhost:5000/api/election",
         {
@@ -239,7 +240,7 @@ const CreateElection = () => {
   }
 
   const handleBackToElections = () => {
-    navigate("/elections")
+    navigate("/admin/dashboard")
   }
 
   const formatDateTime = (dateTimeString) => {

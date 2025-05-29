@@ -11,7 +11,7 @@ const activitySchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['candidate', 'voter', 'election', 'admin'], // Add more as needed
+    enum: ['candidate', 'voter', 'election', 'approval'], // Add more as needed
     required: true,
   },
   timestamp: {
