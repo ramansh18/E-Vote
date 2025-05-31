@@ -257,7 +257,7 @@ const Home = () => {
                     >
                       Start Voting Now
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="outlined"
                       size="medium"
                       startIcon={<PlayArrow />}
@@ -278,7 +278,7 @@ const Home = () => {
                       }}
                     >
                       Watch Demo
-                    </Button>
+                    </Button> */}
                   </Box>
                 </Box>
               </Fade>
