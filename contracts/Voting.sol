@@ -14,11 +14,17 @@ contract Voting {
     IVoterRegistration public voterContract;
     ICandidateRegistration public candidateContract;
 
-    mapping(address => bool) public hasVoted;
-    mapping(address => uint256) public votesReceived;
-    address[] public candidates;
+    // Track if a voter has voted in a specific election
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
 
-    event VoteCast(address indexed voter, address indexed candidate);
+    // Track votes received by candidate in specific election
+    mapping(uint256 => mapping(address => uint256)) public votesReceived;
+
+    // Candidates list per election
+    mapping(uint256 => address[]) public candidates;
+
+    event VoteCast(uint256 indexed electionId, address indexed voter, address indexed candidate);
+    event CandidateAdded(uint256 indexed electionId, address indexed candidate);
 
     constructor(address _voterContract, address _candidateContract) {
         admin = msg.sender;
@@ -31,31 +37,49 @@ contract Voting {
         _;
     }
 
-    function addCandidate(address _candidate) external onlyAdmin {
+    // Add a candidate to a specific election
+    function addCandidate(uint256 electionId, address _candidate) external onlyAdmin {
         require(candidateContract.isCandidate(_candidate), "Not a registered candidate");
-        for (uint i = 0; i < candidates.length; i++) {
-            require(candidates[i] != _candidate, "Candidate already added");
+        // Check candidate not already added to this election
+        address[] storage electionCandidates = candidates[electionId];
+        for (uint i = 0; i < electionCandidates.length; i++) {
+            require(electionCandidates[i] != _candidate, "Candidate already added");
         }
-        candidates.push(_candidate);
+        electionCandidates.push(_candidate);
+
+        emit CandidateAdded(electionId, _candidate);
     }
 
-    // ✅ Gasless vote function (only one, used by relayer)
-    function voteFor(address _voter, address _candidate) external {
+    // Vote for a candidate in a specific election
+    function voteFor(uint256 electionId, address _voter, address _candidate) external {
         require(voterContract.isRegistered(_voter), "Not a registered voter");
         require(candidateContract.isCandidate(_candidate), "Invalid candidate");
-        require(!hasVoted[_voter], "Voter has already voted");
+        require(!hasVoted[electionId][_voter], "Voter has already voted in this election");
 
-        hasVoted[_voter] = true;
-        votesReceived[_candidate] += 1;
+        // Check candidate is part of this election
+        address[] storage electionCandidates = candidates[electionId];
+        bool candidateExists = false;
+        for (uint i = 0; i < electionCandidates.length; i++) {
+            if (electionCandidates[i] == _candidate) {
+                candidateExists = true;
+                break;
+            }
+        }
+        require(candidateExists, "Candidate not part of this election");
 
-        emit VoteCast(_voter, _candidate);
+        hasVoted[electionId][_voter] = true;
+        votesReceived[electionId][_candidate] += 1;
+
+        emit VoteCast(electionId, _voter, _candidate);
     }
 
-    function getVotes(address _candidate) external view returns (uint256) {
-        return votesReceived[_candidate];
+    // Get votes for candidate in election
+    function getVotes(uint256 electionId, address _candidate) external view returns (uint256) {
+        return votesReceived[electionId][_candidate];
     }
 
-    function getAllCandidates() external view returns (address[] memory) {
-        return candidates;
+    // Get all candidates in election
+    function getAllCandidates(uint256 electionId) external view returns (address[] memory) {
+        return candidates[electionId];
     }
 }

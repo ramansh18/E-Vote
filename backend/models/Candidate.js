@@ -5,6 +5,7 @@ const candidateSchema = new mongoose.Schema({
     electionId: { type: mongoose.Schema.Types.ObjectId, ref: "Election", required: true },
     walletAddress: { type: String, default: null }, 
     party: { type: String, required: true },
+    motto:{type:String, required:true},
     txHash: { type: String }, // Store Blockchain Transaction Hash
     status: { type: String, enum: ["pending", "approved"], default: "pending" },
     symbolUrl: {

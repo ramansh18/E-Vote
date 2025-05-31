@@ -125,7 +125,8 @@ exports.registerCandidate = async (req, res) => {
 */
 
 exports.submitCandidateRequest = async (req, res) => {
-  const {  electionId, party,symbolUrl} = req.body;
+  const {  electionId, party,motto,symbolUrl} = req.body;
+  console.log(electionId, party,motto,symbolUrl)
   const userId = req.user.id;
   console.log(userId)
   try {
@@ -140,6 +141,7 @@ exports.submitCandidateRequest = async (req, res) => {
       party,
       walletAddress: null,
       status: "pending",
+      motto,
       symbolUrl
     });
 
@@ -362,7 +364,7 @@ exports.getApprovedCandidates = async (req, res) => {
   try {
     // Find all approved candidates
     const candidates = await Candidate.find({ status: "approved" }).populate("userId electionId");
-
+    console.log("candal ka ---",candidates)
     res.status(200).json({
       message: "Approved candidates fetched successfully!",
       candidates,

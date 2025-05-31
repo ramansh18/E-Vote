@@ -7,6 +7,8 @@ const sendOTP = require("../utils/sendOTP");
 const crypto = require('crypto');
 const {generateWallet} = require("../utils/wallet")
 const mailSender = require('../utils/mailSender')
+const { generateOTPEmailTemplate } = require('../templates/VerifyOtp');
+const { generatePasswordResetTemplate } = require('../templates/passwordResetTemplate'); 
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -29,17 +31,31 @@ const register = async (req, res) => {
     const otp = crypto.randomInt(100000, 999999).toString();  // 6-digit OTP
     const otpPayload = { email: normalizedEmail, otp };
     await OTP.create(otpPayload);
-    sendOTP(normalizedEmail, otp);
     
-
-    const emailTitle = "Your OTP for E-Voting Registration";
-    const emailBody = `<h3>Your OTP is: ${otp}</h3><p>Please use this OTP to complete your registration.</p>`;
+    // Generate professional OTP email template
+    const emailTitle = "Verify Your E-Voting Account - OTP Code";
+    const emailBody = generateOTPEmailTemplate({
+        otpCode: otp,
+        platformName: 'E-Voting Platform', // Update with your platform name
+        faviconUrl: 'https://res.cloudinary.com/duwnm6bjs/image/upload/v1748609859/e-voting-uploads/x6pyk2j2hijwfkjwkven.png', // Update with your favicon URL
+        supportEmail: 'evote2025@gmail.com', // Update with your support email
+        companyAddress: 'Lucknow,2025', // Update with your address
+        expiryMinutes: 1, // OTP expiry time
+        userEmail: normalizedEmail
+    });
     
+    // Send the professional email template
     await mailSender(normalizedEmail, emailTitle, emailBody);
-    console.log(otp)
+    
+    // Optional: Keep the simple OTP function if needed for other purposes
+    // sendOTP(normalizedEmail, otp);
+    
+    console.log('OTP sent to:', normalizedEmail, 'OTP:', otp);
+    
     res.status(200).json({
-        message: "OTP sent successfully",
-        otp,
+        message: "OTP sent successfully. Please check your email to verify your account.",
+        // Remove otp from response in production for security
+        // otp, // Only include this during development/testing
     });
 };
 
@@ -155,29 +171,47 @@ const getMe = async (req, res) => {
 
 const sendResetPasswordToken = async (req, res) => {
     const { email } = req.body;
-  
+    
     try {
-      const user = await User.findOne({ email });
-      if (!user) return res.status(404).json({ message: 'User not found.' });
-  
-      const rawToken = crypto.randomBytes(32).toString('hex');
-      const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
-  
-      user.resetPasswordToken = hashedToken;
-      user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
-      await user.save();
-  
-      const resetUrl = `http://localhost:5173/reset-password?token=${rawToken}`;
-      const message = `Click this link to reset your password:\n\n${resetUrl}`;
-  
-      await mailSender(user.email, 'Password Reset Request', message);
-  
-      res.status(200).json({ message: 'Reset link sent to email.' });
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+        
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+        
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
+        await user.save();
+        
+        // Construct the reset URL - update with your frontend URL
+        const resetUrl = `http://localhost:5173/reset-password?token=${rawToken}`;
+        
+        // Generate professional password reset email template
+        const emailTitle = "Reset Your Password - E-Voting Platform";
+        const emailBody = generatePasswordResetTemplate({
+            resetUrl: resetUrl,
+            platformName: 'E-Voting Platform', // Update with your platform name
+            faviconUrl: 'https://res.cloudinary.com/duwnm6bjs/image/upload/v1748609859/e-voting-uploads/x6pyk2j2hijwfkjwkven.png', // Update with your favicon URL
+            supportEmail: 'evote2025@gmail.com', // Update with your support email
+            companyAddress: 'Lucknow,Uttar Pradesh', // Update with your address
+            expiryMinutes: 15, // Token expiry time in minutes
+            userEmail: email
+        });
+        
+        // Send the professional email template
+        await mailSender(user.email, emailTitle, emailBody);
+        
+        console.log('Password reset email sent to:', user.email);
+        
+        res.status(200).json({ 
+            message: 'Password reset link sent to your email. Please check your inbox and follow the instructions.' 
+        });
+        
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Failed to send reset token.' });
+        console.error('Password reset error:', error);
+        res.status(500).json({ message: 'Failed to send reset token. Please try again later.' });
     }
-  };
+};
   
   // Reset password using token
 

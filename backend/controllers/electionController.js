@@ -130,7 +130,7 @@ exports.startElection = async (req, res) => {
       electionId: election._id,
       status: "approved"
     });
-
+    console.log("length",approvedCandidates.length)
     if (approvedCandidates.length < 2) {
       return res.status(400).json({ message: "Minimum 2 approved candidates required." });
     }
@@ -148,13 +148,13 @@ exports.startElection = async (req, res) => {
 }
     console.log(status)
     // ✅ Add only new candidates to Voting contract
-    const alreadyAdded = await votingContract.methods.getAllCandidates().call();
+    const alreadyAdded = await votingContract.methods.getAllCandidates(electionNumber).call();
     const newCandidates = approvedCandidates.filter(
       c => !alreadyAdded.includes(c.walletAddress)
     );
 
     for (let candidate of newCandidates) {
-      const txDataAddCandidate = votingContract.methods.addCandidate(candidate.walletAddress).encodeABI();
+      const txDataAddCandidate = votingContract.methods.addCandidate(electionNumber,candidate.walletAddress).encodeABI();
       const gas = await web3.eth.estimateGas({
         to: deployedAddresses.voting,
         data: txDataAddCandidate,
@@ -342,9 +342,9 @@ exports.getApprovedCandidatesForElection = async (req, res) => {
       if (approvedCandidates.length === 0) {
         return res.status(404).json({ message: "No approved candidates found for this election." });
       }
-  
+      const election = await Election.findById(electionId);
       // Get all candidates from the blockchain
-      const blockchainCandidates = await votingContract.methods.getAllCandidates().call();
+      const blockchainCandidates = await votingContract.methods.getAllCandidates(election.electionNumber).call();
       const blockchainAddresses = blockchainCandidates.map(addr => addr.toLowerCase());
   
       // Filter candidates whose walletAddress matches any on the blockchain (case-insensitive)
@@ -361,9 +361,11 @@ exports.getApprovedCandidatesForElection = async (req, res) => {
         _id: candidate._id,
         walletAddress: candidate.walletAddress,
         party: candidate.party,
-        user: candidate.userId, // Populated user details
+        motto: candidate.motto,
+        user: candidate.userId,
+        symbolUrl : candidate.symbolUrl // Populated user details
       }));
-  
+     //console.log("final data",finalCandidateData)
       res.status(200).json({ candidates: finalCandidateData });
     } catch (error) {
       console.error("Error fetching candidates:", error);
@@ -407,40 +409,47 @@ exports.getApprovedCandidatesForElection = async (req, res) => {
   };
   
 
-  exports.getElectionResults = async (req, res) => {
-    try {
-      const { electionId } = req.params;
-  
-      const election = await Election.findById(electionId);
-  
-      if (!election) {
-        return res.status(404).json({ message: 'Election not found' });
-      }
-  
-      // Structure the result for frontend use
-      const candidates = election.candidates.map((candidate) => ({
-        candidateId: candidate._id,
-        walletAddress: candidate.walletAddress,
-        name: candidate.name,
-        party: candidate.party,
-        votes: candidate.votes,
-      }));
-  
-      res.status(200).json({
-        message: 'Election results fetched successfully',
-        election: {
-          _id: election._id,
-          title: election.title,
-          status: election.status,
-          totalVotes: candidates.reduce((sum, c) => sum + (c.votes || 0), 0),
-        },
-        candidates,
-      });
-    } catch (error) {
-      console.error('Error fetching election results:', error);
-      res.status(500).json({ message: 'Failed to fetch election results' });
+ 
+exports.getElectionResults = async (req, res) => {
+  try {
+    const { electionId } = req.params;
+
+    const election = await Election.findById(electionId);
+
+    if (!election) {
+      return res.status(404).json({ message: 'Election not found' });
     }
-  };
+
+    // Fetch symbolUrls for each candidate using candidateId
+    const enrichedCandidates = await Promise.all(
+      election.candidates.map(async (c) => {
+        const candidateData = await Candidate.findById(c.candidateId).select('symbolUrl');
+        return {
+          candidateId: c.candidateId,
+          walletAddress: c.walletAddress,
+          name: c.name,
+          party: c.party,
+          votes: c.votes,
+          symbolUrl: candidateData?.symbolUrl || null, // fallback to null
+        };
+      })
+    );
+
+    res.status(200).json({
+      message: 'Election results fetched successfully',
+      election: {
+        _id: election._id,
+        title: election.title,
+        status: election.status,
+        totalVotes: enrichedCandidates.reduce((sum, c) => sum + (c.votes || 0), 0),
+      },
+      candidates: enrichedCandidates,
+    });
+  } catch (error) {
+    console.error('Error fetching election results:', error);
+    res.status(500).json({ message: 'Failed to fetch election results' });
+  }
+};
 
 
 

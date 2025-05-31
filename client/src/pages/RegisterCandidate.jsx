@@ -12,6 +12,7 @@ const RegisterCandidate = () => {
   const [userId, setUserId] = useState("");
   const [electionId, setElectionId] = useState("");
   const [party, setParty] = useState("");
+  const [motto, setMotto] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -22,7 +23,7 @@ const RegisterCandidate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!userId || !electionId || !party) {
+    if (!userId || !electionId || !party ||!motto) {
       setErrorMessage("All fields are required!");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -34,6 +35,7 @@ const RegisterCandidate = () => {
       const response = await axios.post("http://localhost:5000/api/candidate/register", {
         userId,
         electionId,
+        motto,
         party,
       });
 

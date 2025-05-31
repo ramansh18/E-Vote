@@ -52,7 +52,7 @@ exports.castVote = async (req, res) => {
     const relayerWallet =
       web3.eth.accounts.privateKeyToAccount(relayerPrivateKey);
     // Prepare transaction: Voting contract
-    const tx = votingContract.methods.voteFor(
+    const tx = votingContract.methods.voteFor(election.electionNumber,
       user.walletAddress,
       candidateAddress
     );
@@ -176,13 +176,7 @@ exports.addCandidate = async (req, res) => {
   try {
     const { candidateAddress } = req.body;
 
-    // const { address: voterWalletAddress } = generateWallet();
-
-    // Optional: Check if already a candidate
-    // const isCandidate = await votingContract.methods.isCandidate(candidateAddress).call();
-    // if (isCandidate) {
-    //   return res.status(400).json({ message: 'Candidate is already registered in Voting contract' });
-    // }
+    
     const relayerPrivateKey = process.env.RELAYER_PRIVATE_KEY;
 
     // Step 2: Create the relayer wallet using the private key (No need to generate a wallet for the candidate)

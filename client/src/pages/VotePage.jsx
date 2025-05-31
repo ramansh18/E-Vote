@@ -41,6 +41,7 @@ const VotePage = () => {
   const [confirmDialog, setConfirmDialog] = useState(false)
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" })
   const [electionTime, setElectionTime] = useState(null)
+  const [imgError, setImgError] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState({
     days: 0,
     hours: 0,
@@ -105,7 +106,7 @@ const VotePage = () => {
     const hash = candidate?.user?.name?.split("").reduce((a, b) => a + b.charCodeAt(0), 0) || 0
     return {
       ...candidate,
-      motto: mottos[hash % mottos.length],
+      
       description: descriptions[hash % descriptions.length],
     }
   }
@@ -117,6 +118,7 @@ const VotePage = () => {
         const res = await axios.get(`http://localhost:5000/api/election/${electionId}/candidates/approved`, {
           headers: { Authorization: `Bearer ${token}` },
         })
+        console.log("candidate ka data",res.data)
         const enhancedCandidates = (res.data.candidates || []).map(enhanceCandidateData)
         setCandidates(enhancedCandidates)
       } catch (err) {
@@ -609,21 +611,35 @@ const VotePage = () => {
                               <Box className="flex items-start gap-6">
                                 {/* Party Symbol */}
                                 <Box className="flex-shrink-0">
-                                  <Avatar
-                                    sx={{
-                                      width: 80,
-                                      height: 80,
-                                      background: partyGradient,
-                                      fontSize: 24,
-                                      fontWeight: "bold",
-                                      color: "white",
-                                      boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-                                      border: "3px solid rgba(255,255,255,0.8)",
-                                    }}
-                                  >
-                                    {generatePartySymbol(candidate.party)}
-                                  </Avatar>
-                                </Box>
+      <Avatar
+        sx={{
+          width: 80,
+          height: 80,
+          background : "white",
+          fontSize: 24,
+          fontWeight: "bold",
+          color: "white",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+          border: "3px solid rgba(255,255,255,0.8)",
+          overflow: "hidden",
+        }}
+      >
+        {!imgError && candidate.symbolUrl ? (
+          <img
+            src={candidate.symbolUrl}
+            alt={`${candidate.party} Symbol`}
+            onError={() => setImgError(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          generatePartySymbol(candidate.party)
+        )}
+      </Avatar>
+    </Box>
 
                                 {/* Candidate Information */}
                                 <Box className="flex-1 min-w-0">
@@ -663,13 +679,7 @@ const VotePage = () => {
                                     "{candidate.motto}"
                                   </Typography>
 
-                                  <Typography
-                                    variant="body1"
-                                    className="text-gray-700 leading-relaxed"
-                                    sx={{ lineHeight: 1.6 }}
-                                  >
-                                    {candidate.description}
-                                  </Typography>
+                                  
 
                                   {/* Additional candidate info */}
                                   <Box className="flex items-center gap-4 mt-4">

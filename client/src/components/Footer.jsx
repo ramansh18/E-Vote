@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Link } from "react-router-dom"
-import { IconButton, Tooltip, Divider } from "@mui/material"
+import { Link } from "react-router-dom";
+import { IconButton, Tooltip, Divider } from "@mui/material";
 import {
   Facebook,
   Twitter,
@@ -14,17 +14,17 @@ import {
   Security,
   Speed,
   Verified,
-} from "@mui/icons-material"
+} from "@mui/icons-material";
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   const socialLinks = [
     { icon: <Facebook />, label: "Facebook", href: "#" },
     { icon: <Twitter />, label: "Twitter", href: "#" },
     { icon: <LinkedIn />, label: "LinkedIn", href: "#" },
     { icon: <Instagram />, label: "Instagram", href: "#" },
-  ]
+  ];
 
   const quickLinks = [
     { label: "Home", href: "/" },
@@ -32,21 +32,21 @@ const Footer = () => {
     { label: "Elections", href: "/elections" },
     { label: "How to Vote", href: "/guide" },
     { label: "Contact", href: "/contact" },
-  ]
+  ];
 
   const legalLinks = [
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
     { label: "Cookie Policy", href: "/cookies" },
     { label: "Accessibility", href: "/accessibility" },
-  ]
+  ];
 
   const features = [
     { icon: <Security />, text: "256-bit Encryption" },
     { icon: <Verified />, text: "Verified Secure" },
     { icon: <HowToVote />, text: "Easy Voting" },
     { icon: <Speed />, text: "Instant Results" },
-  ]
+  ];
 
   return (
     <footer className="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
@@ -73,34 +73,47 @@ const Footer = () => {
                   <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     E-Vote
                   </h3>
-                  <p className="text-sm text-gray-300">Secure Digital Democracy</p>
+                  <p className="text-sm text-gray-300">
+                    Secure Digital Democracy
+                  </p>
                 </div>
               </div>
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Empowering democracy through secure, transparent, and accessible digital voting solutions. Your voice
-                matters, and we make sure it's heard.
+                Empowering democracy through secure, transparent, and accessible
+                digital voting solutions. Your voice matters, and we make sure
+                it's heard.
               </p>
 
               {/* Contact Info */}
               <div className="space-y-3">
-                <div className="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors duration-300">
+                <a
+                  href="mailto:evote2025@gmail.com"
+                  className="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors duration-300"
+                >
                   <Email className="text-lg" />
-                  <span className="text-sm">support@evote.com</span>
-                </div>
-                <div className="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors duration-300">
-                  <Phone className="text-lg" />
-                  <span className="text-sm">+1 (555) 123-4567</span>
-                </div>
+                  <span className="text-sm">evote2025@gmail.com</span>
+                </a>
+
+                <a
+  href="tel:+91818XXX75241"
+  className="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors duration-300"
+>
+  <Phone className="text-lg" />
+  <span className="text-sm">+91 818XXX75241</span>
+</a>
+
                 <div className="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition-colors duration-300">
                   <LocationOn className="text-lg" />
-                  <span className="text-sm">123 Democracy St, Digital City</span>
+                  <span className="text-sm">Lucknow,Uttar Pradesh</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-semibold mb-6 text-blue-400">Quick Links</h4>
+              <h4 className="text-lg font-semibold mb-6 text-blue-400">
+                Quick Links
+              </h4>
               <ul className="space-y-3">
                 {quickLinks.map((link, index) => (
                   <li key={index}>
@@ -118,7 +131,9 @@ const Footer = () => {
 
             {/* Legal Links */}
             <div>
-              <h4 className="text-lg font-semibold mb-6 text-blue-400">Legal</h4>
+              <h4 className="text-lg font-semibold mb-6 text-blue-400">
+                Legal
+              </h4>
               <ul className="space-y-3">
                 {legalLinks.map((link, index) => (
                   <li key={index}>
@@ -136,7 +151,9 @@ const Footer = () => {
 
             {/* Security Features */}
             <div>
-              <h4 className="text-lg font-semibold mb-6 text-blue-400">Security Features</h4>
+              <h4 className="text-lg font-semibold mb-6 text-blue-400">
+                Security Features
+              </h4>
               <div className="space-y-4">
                 {features.map((feature, index) => (
                   <div
@@ -181,9 +198,12 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
             <div className="text-center md:text-left">
-              <p className="text-gray-300 text-sm">&copy; {currentYear} E-Voting System. All rights reserved.</p>
+              <p className="text-gray-300 text-sm">
+                &copy; {currentYear} E-Voting System. All rights reserved.
+              </p>
               <p className="text-gray-400 text-xs mt-1">
-                Powered by blockchain technology for secure and transparent elections.
+                Powered by blockchain technology for secure and transparent
+                elections.
               </p>
             </div>
 
@@ -206,7 +226,6 @@ const Footer = () => {
                         borderColor: "rgba(59, 130, 246, 0.5)",
                         transform: "scale(1.1) rotate(5deg)",
                       },
-                      
                     }}
                   >
                     {social.icon}
@@ -236,7 +255,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

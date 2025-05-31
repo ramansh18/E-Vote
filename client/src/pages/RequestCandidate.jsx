@@ -50,6 +50,7 @@ const RequestCandidate = () => {
   const [electionSymbol, setElectionSymbol] = useState(null);
   const [symbolPreview, setSymbolPreview] = useState(null);
   const [symbolUrl, setSymbolUrl] = useState("");
+  const [motto, setMotto] = useState("");
   const [elections, setElections] = useState([]);
   const [candidateRequests, setCandidateRequests] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -93,6 +94,7 @@ const RequestCandidate = () => {
         }
       );
       setElections(response.data);
+      console.log(elections)
     } catch (error) {
       console.error("Error fetching elections:", error);
     }
@@ -202,7 +204,7 @@ const RequestCandidate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!party.trim() || !electionId || !symbolUrl) {
+    if (!party.trim() || !electionId || !symbolUrl || !motto) {
       showSnackbar(
         "Please fill in all required fields and upload an election symbol",
         "error"
@@ -223,6 +225,7 @@ const RequestCandidate = () => {
       const requestData = {
         party: party.trim(),
         electionId: electionId,
+        motto : motto,
         symbolUrl: symbolUrl, // Cloudinary URL from your backend
       };
 
@@ -244,6 +247,7 @@ const RequestCandidate = () => {
       // Reset form
       setParty("");
       setElectionId("");
+      setMotto("");
       setElectionSymbol(null);
       setSymbolPreview(null);
       setSymbolUrl("");
@@ -538,6 +542,43 @@ const RequestCandidate = () => {
                           />
                         </Box>
 
+                        {/* motto */}
+                          <Box className="mb-4">
+                          <TextField
+                            label="Motto"
+                            value={motto}
+                            onChange={(e) => setMotto(e.target.value)}
+                            required
+                            fullWidth
+                            placeholder="Enter your motto"
+                            variant="outlined"
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <GroupsIcon className="text-gray-400" />
+                                </InputAdornment>
+                              ),
+                            }}
+                            sx={{
+                              "& .MuiOutlinedInput-root": {
+                                borderRadius: 3,
+                                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                                  transform: "translateY(-2px)",
+                                  boxShadow: "0 8px 25px rgba(0, 0, 0, 0.1)",
+                                },
+                                "&.Mui-focused": {
+                                  backgroundColor: "rgba(255, 255, 255, 1)",
+                                  transform: "translateY(-2px)",
+                                  boxShadow:
+                                    "0 8px 25px rgba(59, 130, 246, 0.15)",
+                                },
+                              },
+                            }}
+                          />
+                        </Box>   
                         {/* Election Symbol Upload */}
                         <Box className="mb-4">
                           <Typography
