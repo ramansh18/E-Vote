@@ -55,7 +55,7 @@ const register = async (req, res) => {
     res.status(200).json({
         message: "OTP sent successfully. Please check your email to verify your account.",
         // Remove otp from response in production for security
-        // otp, // Only include this during development/testing
+         otp, 
     });
 };
 
