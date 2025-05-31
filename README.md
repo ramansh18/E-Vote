@@ -75,6 +75,9 @@ MAIL_USER=your_email@example.com
 MAIL_PASS=your_email_password
 MAIL_HOST=smtp.example.com
 RELAYER_PRIVATE_KEY=your_ganache_private_key
+CLOUDINARY_CLOUD_NAME = cloud_name
+CLOUDINARY_API_KEY = api_key_here
+CLOUDINARY_API_SECRET = api_secret
 ```
 
 > Replace `RELAYER_PRIVATE_KEY` with a private key from one of the Ganache accounts (funded from the mnemonic above).
